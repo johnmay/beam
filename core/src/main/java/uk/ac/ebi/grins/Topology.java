@@ -29,6 +29,12 @@
 
 package uk.ac.ebi.grins;
 
+import java.util.Arrays;
+
+import static uk.ac.ebi.grins.Configuration.CLOCKWISE;
+import static uk.ac.ebi.grins.Configuration.Type.Implicit;
+import static uk.ac.ebi.grins.Configuration.Type.Tetrahedral;
+
 /**
  * Defines the relative topology around a vertex (atom).
  *
@@ -68,12 +74,85 @@ abstract class Topology {
     abstract Topology transform(int[] mapping);
 
     /**
+     * Compute the permutation parity of the vertices {@literal vs} for the
+     * given {@literal rank}. The parity defines the oddness or evenness of a
+     * permutation and is the number of inversions (swaps) one would need to
+     * make to place the 'vs' in the order specified by rank.
+     *
+     * @param vs   array of vertices
+     * @param rank rank of vertices, |R| = max(vs) + 1
+     * @return sign of the permutation, -1=odd or 1=even
+     * @see <a href="http://en.wikipedia.org/wiki/Parity_of_a_permutation>Parity
+     *      of a Permutation</a>
+     */
+    static int parity(int[] vs, int[] rank) {
+        // count elements which are out of order and by how much
+        int count = 0;
+        for (int i = 0; i < vs.length; i++) {
+            for (int j = i + 1; j < vs.length; j++) {
+                if (rank[vs[i]] > rank[vs[j]])
+                    count++;
+            }
+        }
+        // odd parity = -1, even parity = 1
+        return (count & 0x1) == 1 ? -1 : 1;
+    }
+
+    /**
+     * Sorts the array {@literal vs} into the order given by the {@literal
+     * rank}.
+     *
+     * @param vs   vertices to sort
+     * @param rank rank of vertices
+     * @return sorted array (cpy of vs)
+     */
+    static int[] sort(int[] vs, int[] rank) {
+        int[] ws = Arrays.copyOf(vs, vs.length);
+
+        // insertion sort using rank for the ordering
+        for (int i = 0, j = i; i < vs.length - 1; j = ++i) {
+            int v = ws[i + 1];
+            while (rank[v] < rank[ws[j]]) {
+                ws[j + 1] = ws[j];
+                if (--j < 0)
+                    break;
+            }
+            ws[j + 1] = v;
+        }
+        return ws;
+    }
+
+    /**
      * Specify unknown configuration on atom - there is no vertex data stored.
      *
      * @return unknown topology
      */
     static Topology unknown() {
         return UNKNOWN;
+    }
+
+    /**
+     * Define tetrahedral topology of the given configuration.
+     *
+     * @param u             central atom
+     * @param vs            vertices surrounding u, the first is the vertex we
+     *                      are looking from
+     * @param configuration the tetrahedral configuration, @TH1, @TH2, @ or @@
+     * @return topology instance for that configuration
+     * @see Configuration
+     */
+    static Topology tetrahedral(int u, int[] vs, Configuration configuration) {
+
+        if (configuration.type() != Implicit
+                && configuration.type() != Tetrahedral)
+            throw new IllegalArgumentException(configuration.type()
+                                                       + "invalid tetrahedral configuration");
+
+        int p = configuration.shorthand() == CLOCKWISE ? 1 : -1;
+
+        return new Tetrahedral(u,
+                               Arrays.copyOf(vs, vs.length),
+                               p);
     }
 
     private static Topology UNKNOWN = new Topology() {
@@ -93,4 +172,54 @@ abstract class Topology {
             return this;
         }
     };
+
+    private static final class Tetrahedral extends Topology {
+
+        private final int   u;
+        private final int[] vs;
+        private final int   p;
+
+        private Tetrahedral(int u, int[] vs, int p) {
+            this.u = u;
+            this.vs = vs;
+            this.p = p;
+        }
+
+        /** @inheritDoc */
+        @Override int atom() {
+            return u;
+        }
+
+        /** @inheritDoc */
+        @Override Configuration configuration() {
+            return p < 0 ? Configuration.TH1 : Configuration.TH2;
+        }
+
+        /** @inheritDoc */
+        @Override Topology orderBy(int[] rank) {
+            int q = p * parity(vs, rank);
+
+            // consider implicit hydrogen position
+            if (vs.length == 3) {
+                int count = 0;
+                for (int v : vs)
+                    if (rank[v] > rank[u])
+                        count++;
+                // (-1)^n
+                q *= (count & 0x1) == 1 ? -1 : 1;
+            }
+
+            return new Tetrahedral(u,
+                                   sort(vs, rank),
+                                   q);
+        }
+
+        /** @inheritDoc */
+        @Override Topology transform(final int[] mapping) {
+            int[] ws = new int[vs.length];
+            for (int i = 0; i < vs.length; i++)
+                ws[i] = mapping[vs[i]];
+            return new Tetrahedral(mapping[u], ws, p);
+        }
+    }
 }
