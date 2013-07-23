@@ -80,8 +80,12 @@ final class ChemicalGraph {
      */
     int addAtom(Atom a) {
         int index = order;
-        if (order == atoms.length)
+        if (order == atoms.length) {
             atoms = Arrays.copyOf(atoms, order * 2);
+            edges = Arrays.copyOf(edges, order * 2);
+            for(int i = order; i < edges.length; i++)
+                edges[i] = new ArrayList<Edge>(4);
+        }
         atoms[order++] = a;
         return index;
     }

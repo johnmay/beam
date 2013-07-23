@@ -120,6 +120,20 @@ public class ChemicalGraphTest {
                                         new Edge(1, 0, Bond.IMPLICIT)));
     }
 
+    @Test public void testEdgesResize() {
+        ChemicalGraph g = new ChemicalGraph(2);
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        assertThat(g.edges(0).size(), is(1));
+        assertThat(g.edges(0), hasItem(new Edge(0, 1, Bond.IMPLICIT)));
+        assertThat(g.edges(1).size(), is(2));
+        assertThat(g.edges(1), hasItems(new Edge(0, 1, Bond.IMPLICIT),
+                                        new Edge(1, 0, Bond.IMPLICIT)));
+    }
+
     @Test public void testDegree() {
         ChemicalGraph g = new ChemicalGraph(5);
         g.addAtom(mock(Atom.class));
