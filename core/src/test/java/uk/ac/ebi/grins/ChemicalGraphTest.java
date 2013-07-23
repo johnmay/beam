@@ -34,6 +34,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -192,5 +193,24 @@ public class ChemicalGraphTest {
     @Test public void defaultTopology() {
         ChemicalGraph g = new ChemicalGraph(5);
         assertThat(g.topologyOf(5), is(Topology.unknown()));
+    }
+
+    @Test public void clear() {
+        ChemicalGraph g = new ChemicalGraph(2);
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        assertThat(g.order(), is(3));
+        assertThat(g.size(), is(2));
+        assertThat(g.edges(0).size(), is(1));
+        assertThat(g.edges(0), hasItem(new Edge(0, 1, Bond.IMPLICIT)));
+        assertThat(g.edges(1).size(), is(2));
+        assertThat(g.edges(1), hasItems(new Edge(0, 1, Bond.IMPLICIT),
+                                        new Edge(1, 0, Bond.IMPLICIT)));
+        g.clear();
+        assertThat(g.order(), is(0));
+        assertThat(g.size(), is(0));
     }
 }

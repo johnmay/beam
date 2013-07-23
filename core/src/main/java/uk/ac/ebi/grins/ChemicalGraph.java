@@ -191,4 +191,14 @@ final class ChemicalGraph {
     int size() {
         return size;
     }
+
+    void clear() {
+        topologies.clear();
+        for (int i = 0; i < order; i++) {
+            atoms[i] = null;
+            edges[i].clear();
+        }
+        order = 0;
+        size = 0;
+    }
 }
