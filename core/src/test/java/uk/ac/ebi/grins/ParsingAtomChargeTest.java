@@ -126,6 +126,12 @@ public class ParsingAtomChargeTest {
         verify("++2", 3);
     }
 
+    // An implementation is required to accept charges in the range -15 to +15
+    @Test public void rangeCheck() {
+        for (int i = -15; i <= 15; i++)
+            verify((i > 0 ? "+" : "") + Integer.toString(i), i);
+    }
+
     private void verify(String str, int charge) {
         assertThat(Parser.readCharge(CharBuffer.fromString(str)), is(charge));
     }
