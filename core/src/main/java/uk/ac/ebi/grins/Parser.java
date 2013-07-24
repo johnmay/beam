@@ -275,14 +275,26 @@ final class Parser {
             return buffer.nextIsDigit() ? acc - buffer.getNumber()
                                         : readCharge(acc - 1, buffer);
         return acc;
-
     }
 
-    private int readClass(CharBuffer buffer) {
+    /**
+     * Read the atom class of a bracket atom and progress the buffer (if read).
+     * The atom class is the last attribute of the bracket atom and is
+     * identified by a ':' followed by one or more digits. The atom class may be
+     * padded such that ':005' and ':5' are equivalent.
+     *
+     * @param buffer a character buffer
+     * @return the atom class, or 0
+     * @see <a href="http://www.opensmiles.org/opensmiles.html#atomclass">Atom
+     *      Class - OpenSMILES Specification</a>
+     */
+    static int readClass(CharBuffer buffer) throws InvalidSmilesException {
         if (buffer.getIf(':')) {
-            return buffer.getNumber();
+            if (buffer.nextIsDigit())
+                return buffer.getNumber();
+            throw new InvalidSmilesException("invalid atom class, <digit>+ must follow ':'", buffer);
         }
-        return -1;
+        return 0;
     }
 
     private Configuration readChiral(CharBuffer buffer) {
