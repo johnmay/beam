@@ -281,8 +281,7 @@ enum Element {
         if (!buffer.hasRemaining())
             return null;
         char c = buffer.get();
-        if (buffer.hasRemaining() && buffer.next() >= 'a' && buffer
-                .next() <= 'z') {
+        if (buffer.hasRemaining() && buffer.next() >= 'a' && buffer.next() <= 'z') {
             return elementMap.get(new String(new char[]{c, buffer.get()}));
         }
         return elementMap.get(Character.toString(c));
