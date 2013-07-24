@@ -38,12 +38,120 @@ import static org.junit.Assert.assertThat;
 public class ConfigurationTest {
 
     @Test public void tetrahedralShorthand() throws Exception {
-        assertThat(Configuration.TH1.shorthand(), is(Configuration.ANTI_CLOCKWISE));
+        assertThat(Configuration.TH1
+                                .shorthand(), is(Configuration.ANTI_CLOCKWISE));
         assertThat(Configuration.TH2.shorthand(), is(Configuration.CLOCKWISE));
     }
 
     @Test public void tetrahedralType() throws Exception {
-        assertThat(Configuration.TH1.type(), is(Configuration.Type.Tetrahedral));
-        assertThat(Configuration.TH2.type(), is(Configuration.Type.Tetrahedral));
+        assertThat(Configuration.TH1
+                                .type(), is(Configuration.Type.Tetrahedral));
+        assertThat(Configuration.TH2
+                                .type(), is(Configuration.Type.Tetrahedral));
     }
+
+    @Test public void read() throws Exception {
+        for (Configuration config : Configuration.values()) {
+            assertThat(Configuration.read(CharBuffer
+                                                  .fromString(config.symbol())),
+                       is(config));
+        }
+    }
+
+    @Test public void readNone() throws Exception {
+        assertThat(Configuration.read(CharBuffer
+                                              .fromString("]")),
+                   is(Configuration.UNKNOWN));
+    }
+
+    @Test public void readNone1() throws Exception {
+        assertThat(Configuration.read(CharBuffer
+                                              .fromString("")),
+                   is(Configuration.UNKNOWN));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void noTHNumber() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@TH"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void invalidTHNumber() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@TH5"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void noSPNumber() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@SP"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void invalidSPNumber() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@SP4"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void noALNumber() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@AL"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void invalidALNumber() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@AL3"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void noTBNumber() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@TB"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void invalidLoTBNumber() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@TB0"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void invalidHiTBNumber() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@TB21"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void noOHNumber() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@OH"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void invalidLoOHNumber() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@OH0"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void invalidHiOHNumber() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@OH31"));
+    }
+
+    @Test public void antiClockwise() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@H"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void incompleteTHorTB() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@T"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void incompleteSP() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@S"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void incompleteOH() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@O"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void incompleteAL() throws InvalidSmilesException {
+        Configuration.read(CharBuffer.fromString("@A"));
+    }
+
 }

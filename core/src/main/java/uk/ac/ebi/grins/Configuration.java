@@ -127,6 +127,28 @@ enum Configuration {
     /** Shorthand - often converted to this in output */
     private final Configuration shorthand;
 
+    /** Lookup tables for trigonal bipyramidal and octahedral */
+    private static final Configuration[] tbs = new Configuration[21];
+    private static final Configuration[] ohs = new Configuration[31];
+
+    // initialise trigonal lookup
+    static {
+        int i = 1;
+        for (Configuration config : values()) {
+            if (config.type().equals(TrigonalBipyramidal))
+                tbs[i++] = config;
+        }
+    }
+
+    // initialise octahedral lookup
+    static {
+        int i = 1;
+        for (Configuration config : values()) {
+            if (config.type().equals(Octahedral))
+                ohs[i++] = config;
+        }
+    }
+
     private Configuration(Type type, String symbol, Configuration shorthand) {
         this.type = type;
         this.symbol = symbol;
@@ -150,6 +172,15 @@ enum Configuration {
     }
 
     /**
+     * Symbol of the chiral configuration.
+     *
+     * @return the symbol
+     */
+    public String symbol() {
+        return symbol;
+    }
+
+    /**
      * The general type of relative configuration this represents.
      *
      * @return type of the configuration
@@ -157,6 +188,84 @@ enum Configuration {
      */
     public Type type() {
         return type;
+    }
+
+    /**
+     * Read a chiral configuration from a character buffer and progress the
+     * buffer. If there is no configuration then {@link Configuration#UNKNOWN}
+     * is returned. Encountering an invalid permutation designator (e.g.
+     * &#64;TB21) or incomplete class (e.g. &#64;T) will throw an invalid smiles
+     * exception.
+     *
+     * @param buffer a character buffer
+     * @return the configuration
+     * @throws InvalidSmilesException
+     */
+    static Configuration read(final CharBuffer buffer) throws
+                                                       InvalidSmilesException {
+        if (buffer.getIf('@')) {
+            if (buffer.getIf('@')) {
+                return Configuration.CLOCKWISE;
+            } else if (buffer.getIf('T')) {
+                // TH (tetrahedral) or TB (trigonal bipyramidal)
+                if (buffer.getIf('H')) {
+                    if (buffer.getIf('1'))
+                        return Configuration.TH1;
+                    else if (buffer.getIf('2'))
+                        return Configuration.TH2;
+                    else
+                        throw new InvalidSmilesException("invalid permutation designator for @TH, valid values are @TH1 or @TH2:",
+                                                         buffer);
+                } else if (buffer.getIf('B')) {
+                    int num = buffer.getNumber();
+                    if (num < 1 || num > 20)
+                        throw new InvalidSmilesException("invalid permutation designator for @TB, valid values are '@TB1, @TB2, ... @TB20:'",
+                                                         buffer);
+                    return tbs[num];
+                }
+                throw new InvalidSmilesException("'@T' is not a valid chiral specification:", buffer);
+            } else if (buffer.getIf('A')) {
+                // allene (extended tetrahedral)
+                if (buffer.getIf('L')) {
+                    if (buffer.getIf('1'))
+                        return Configuration.AL1;
+                    else if (buffer.getIf('2'))
+                        return Configuration.AL2;
+                    else
+                        throw new InvalidSmilesException("invalid permutation designator for @AL, valid values are '@AL1 or @AL2':", buffer);
+                } else {
+                    throw new InvalidSmilesException("'@A' is not a valid chiral specification:", buffer);
+                }
+            } else if (buffer.getIf('S')) {
+                // square planar
+                if (buffer.getIf('P')) {
+                    if (buffer.getIf('1'))
+                        return Configuration.SP1;
+                    else if (buffer.getIf('2'))
+                        return Configuration.SP2;
+                    else if (buffer.getIf('3'))
+                        return Configuration.SP3;
+                    else
+                        throw new InvalidSmilesException("invalid permutation designator for @SP, valid values are '@SP1, @SP2 or @SP3':",
+                                                         buffer);
+                } else {
+                    throw new InvalidSmilesException("'@S' is not a valid chiral specification:", buffer);
+                }
+            } else if (buffer.getIf('O')) {
+                if (buffer.getIf('H')) {
+                    // octahedral
+                    int num = buffer.getNumber();
+                    if (num < 1 || num > 30)
+                        throw new InvalidSmilesException("invalid permutation designator for @OH, valud values are '@OH1, @OH2, ... @OH30':", buffer);
+                    return ohs[num];
+                } else {
+                    throw new InvalidSmilesException("'@O' is not a valid chiral specification:", buffer);
+                }
+            } else {
+                return Configuration.ANTI_CLOCKWISE;
+            }
+        }
+        return Configuration.UNKNOWN;
     }
 
     /** Types of configuration. */

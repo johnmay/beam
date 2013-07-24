@@ -213,7 +213,7 @@ final class Parser {
                 buffer.get();
         }
 
-        Configuration configuration = readChiral(buffer);
+        Configuration configuration = Configuration.read(buffer);
         int hcount = readHydrogens(buffer);
         int charge = readCharge(buffer);
         int atomClass = readClass(buffer);
@@ -295,34 +295,6 @@ final class Parser {
             throw new InvalidSmilesException("invalid atom class, <digit>+ must follow ':'", buffer);
         }
         return 0;
-    }
-
-    private Configuration readChiral(CharBuffer buffer) {
-        if (buffer.getIf('@')) {
-            if (buffer.getIf('@')) {
-                return Configuration.CLOCKWISE;
-            } else if (buffer.getIf('T')) {
-                // TH (tetrahedral) or TB (trigonal bipyramidal)
-                if (buffer.getIf('H')) {
-                    if (buffer.getIf('1'))
-                        return Configuration.TH1;
-                    else if (buffer.getIf('2'))
-                        return Configuration.TH1;
-                } else if (buffer.getIf('B')) {
-                    return Configuration.UNKNOWN;
-                }
-                return Configuration.UNKNOWN;
-            } else if (buffer.getIf('A')) {
-                // allene (extended tetrahedral)
-                return Configuration.UNKNOWN;
-            } else if (buffer.getIf('O')) {
-                // octahedral
-                return Configuration.UNKNOWN;
-            } else {
-                return Configuration.CLOCKWISE;
-            }
-        }
-        return Configuration.UNKNOWN;
     }
 
     private void ring(int rnum) {
