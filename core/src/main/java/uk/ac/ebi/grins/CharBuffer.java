@@ -137,6 +137,21 @@ final class CharBuffer {
     }
 
     /**
+     * Progress the buffer if the next character is the same as the provided
+     * character.
+     *
+     * @param c a character
+     * @return whether the buffer progressed and the character matched
+     */
+    boolean getIf(final char c) {
+        if (hasRemaining() && nextIs(c)) {
+            position++;
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Get a sequence of digits from the buffer as a positive integer.  The
      * buffer is progressed until the end of the number. If the characters do
      * not represent a number then -1 is returned and the buffer is not
@@ -194,5 +209,10 @@ final class CharBuffer {
      */
     static CharBuffer fromString(String str) {
         return new CharBuffer(str.toCharArray());
+    }
+
+    /** @inheritDoc */
+    @Override public String toString() {
+        return new String(cs);
     }
 }
