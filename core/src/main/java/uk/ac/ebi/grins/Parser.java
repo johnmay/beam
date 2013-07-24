@@ -225,6 +225,15 @@ final class Parser {
         return null;
     }
 
+    /**
+     * Read the hydrogen count and progress the provided buffer. The hydrogen
+     * count is specified by a 'H' an 0 or more digits. A 'H' without digits is
+     * intercepted as 'H1'. When there is no 'H' or 'H0' is specified then the
+     * the hydrogen count is 0.
+     *
+     * @param buffer a character buffer
+     * @return the hydrogen count, 0 if none
+     */
     static int readHydrogens(final CharBuffer buffer) {
         if (buffer.getIf('H')) {
             // when no number is specified 'H' then there is 1 hydrogen
@@ -243,7 +252,8 @@ final class Parser {
      *
      * @param buffer a character buffer
      * @return the formal charge value, 0 if none present
-     * @see <a href="http://www.opensmiles.org/opensmiles.html#charge">Charge - OpenSMILES Specification</a>
+     * @see <a href="http://www.opensmiles.org/opensmiles.html#charge">Charge -
+     *      OpenSMILES Specification</a>
      */
     static int readCharge(final CharBuffer buffer) {
         return readCharge(0, buffer);
