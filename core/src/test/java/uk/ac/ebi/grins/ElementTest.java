@@ -32,6 +32,7 @@ package uk.ac.ebi.grins;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import static junit.framework.Assert.assertNull;
 import static org.hamcrest.CoreMatchers.is;
@@ -190,5 +191,25 @@ public class ElementTest {
             assertThat(e.implicitHydrogens(1), is(0));
             assertThat(e.implicitHydrogens(2), is(0));
         }
+    }
+
+    @Test
+    public void read() {
+        for (Element e : Element.values()) {
+            if (e.aromatic())
+                assertThat(Element.read(CharBuffer.fromString(e.symbol()
+                                                               .toLowerCase(Locale.ENGLISH))), is(e));
+            assertThat(Element.read(CharBuffer.fromString(e.symbol())), is(e));
+        }
+    }
+
+    @Test
+    public void readNone() {
+        assertNull(Element.read(CharBuffer.fromString("")));
+    }
+
+    @Test
+    public void readInvalidElement() {
+        assertNull(Element.read(CharBuffer.fromString("J")));
     }
 }

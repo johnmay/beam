@@ -269,4 +269,22 @@ enum Element {
     static Element ofSymbol(final String symbol) {
         return elementMap.get(symbol);
     }
+
+    /**
+     * Read an element and progress the character buffer. If the element was not
+     * read then a 'null' element is returned.
+     *
+     * @param buffer a character buffer
+     * @return the element, or null
+     */
+    static Element read(final CharBuffer buffer) {
+        if (!buffer.hasRemaining())
+            return null;
+        char c = buffer.get();
+        if (buffer.hasRemaining() && buffer.next() >= 'a' && buffer
+                .next() <= 'z') {
+            return elementMap.get(new String(new char[]{c, buffer.get()}));
+        }
+        return elementMap.get(Character.toString(c));
+    }
 }

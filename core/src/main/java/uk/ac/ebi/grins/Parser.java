@@ -205,13 +205,7 @@ final class Parser {
         // try to read isotope number, -1 if not read
         int isotope = buffer.getNumber();
 
-        // read symbol
-        if (buffer.next() >= 'A' && buffer.next() <= 'Z'
-                || buffer.next() >= 'a' && buffer.next() <= 'z') {
-            buffer.get();
-            if (buffer.next() >= 'a' && buffer.next() <= 'z')
-                buffer.get();
-        }
+        Element element = Element.read(buffer);
 
         Configuration configuration = Configuration.read(buffer);
         int hcount = readHydrogens(buffer);
