@@ -155,5 +155,74 @@ interface Atom {
         }
     }
 
+    static class BracketAtom implements Atom {
+        private final Element element;
+        private final int     hCount, charge, atomClass, isotope;
+        private final boolean aromatic;
 
+        public BracketAtom(int isotope, Element element, int hCount, int charge, int atomClass, boolean aromatic) {
+            this.element = element;
+            this.hCount = hCount;
+            this.charge = charge;
+            this.atomClass = atomClass;
+            this.isotope = isotope;
+            this.aromatic = aromatic;
+        }
+
+        public BracketAtom(Element element, int hCount, int charge) {
+            this(0, element, hCount, charge, 0, false);
+        }
+
+        @Override public Element element() {
+            return element;
+        }
+
+        @Override public boolean aromatic() {
+            return aromatic;
+        }
+
+        @Override public int charge() {
+            return charge;
+        }
+
+        @Override public int hydrogens() {
+            return hCount;
+        }
+
+        @Override public int atomClass() {
+            return atomClass;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            BracketAtom that = (BracketAtom) o;
+
+            if (aromatic != that.aromatic) return false;
+            if (atomClass != that.atomClass) return false;
+            if (charge != that.charge) return false;
+            if (hCount != that.hCount) return false;
+            if (isotope != that.isotope) return false;
+            if (element != that.element) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = element != null ? element.hashCode() : 0;
+            result = 31 * result + hCount;
+            result = 31 * result + charge;
+            result = 31 * result + atomClass;
+            result = 31 * result + isotope;
+            result = 31 * result + (aromatic ? 1 : 0);
+            return result;
+        }
+
+        @Override public String toString() {
+            return "[" + isotope + element.symbol() + "H" + hCount + (charge != 0 ? charge : "") + ":" + atomClass + "]";
+        }
+    }
 }

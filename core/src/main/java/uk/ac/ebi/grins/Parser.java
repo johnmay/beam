@@ -199,24 +199,33 @@ final class Parser {
         }
     }
 
-    private Atom readBracketAtom(CharBuffer buffer) throws
+    static Atom readBracketAtom(CharBuffer buffer) throws
                                                     InvalidSmilesException {
 
         // try to read isotope number, -1 if not read
         int isotope = buffer.getNumber();
 
+        // lowercase indicates aromatic
+        boolean aromatic = buffer.next() >= 'a' && buffer.next() <= 'z';
+
         Element element = Element.read(buffer);
 
         Configuration configuration = Configuration.read(buffer);
-        int hcount = readHydrogens(buffer);
+
+        int hCount = readHydrogens(buffer);
         int charge = readCharge(buffer);
         int atomClass = readClass(buffer);
 
         if (!buffer.getIf(']'))
             throw InvalidSmilesException.invalidBracketAtom(buffer);
 
-        // new bracket atom
-        return null;
+        // create the atom
+        return new Atom.BracketAtom(isotope < 0 ? 0 : isotope,
+                                    element,
+                                    hCount,
+                                    charge,
+                                    atomClass,
+                                    aromatic);
     }
 
     /**
