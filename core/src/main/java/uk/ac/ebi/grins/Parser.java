@@ -259,6 +259,14 @@ final class Parser {
         return readCharge(0, buffer);
     }
 
+    /**
+     * Internal method for parsing charge, to allow concatenated signs (--, ++)
+     * the method recursively invokes increment or decrementing an accumulator.
+     *
+     * @param acc    accumulator
+     * @param buffer a character buffer
+     * @return the charge value
+     */
     private static int readCharge(int acc, final CharBuffer buffer) {
         if (buffer.getIf('+'))
             return buffer.nextIsDigit() ? acc + buffer.getNumber()
