@@ -62,6 +62,14 @@ final class Parser {
         this(CharBuffer.fromString(str));
     }
 
+    static ChemicalGraph parse(String str) throws InvalidSmilesException {
+        return new Parser(str).molecule();
+    }
+
+    ChemicalGraph molecule() {
+        return g;
+    }
+
     private void addAtom(Atom a) {
         int v = g.addAtom(a);
         if (!stack.empty()) {
