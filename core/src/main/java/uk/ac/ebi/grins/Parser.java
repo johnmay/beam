@@ -46,12 +46,21 @@ import static uk.ac.ebi.grins.Atom.OrganicSubset;
 /** @author John May */
 final class Parser {
 
+    /** Keep track of branching. */
     private final IntStack stack = new IntStack(10);
+
+    /** Molecule being loaded. */
     private final ChemicalGraph g;
+
+    /** Keep track of ring information. */
     private RingBond[] rings = new RingBond[10];
 
+    /** Local arrangement for ring openings. */
     private Map<Integer, LocalArrangement> arrangement
             = new HashMap<Integer, LocalArrangement>(5);
+
+    /** Current bond. */
+    private Bond bond = Bond.IMPLICIT;
 
     Parser(CharBuffer buffer) throws InvalidSmilesException {
         g = new ChemicalGraph(1 + (2 * (buffer.length() / 3)));
@@ -66,10 +75,21 @@ final class Parser {
         return new Parser(str).molecule();
     }
 
+    /**
+     * Access the molecule created by the parser.
+     *
+     * @return the chemical graph for the parsed smiles string
+     */
     ChemicalGraph molecule() {
         return g;
     }
 
+    /**
+     * Add an atom and bond with the atom on the stack (if available and non-dot
+     * bond).
+     *
+     * @param a an atom to add
+     */
     private void addAtom(Atom a) {
         int v = g.addAtom(a);
         if (!stack.empty()) {
@@ -206,13 +226,20 @@ final class Parser {
                     return;
 
                 default:
-                    throw new InvalidSmilesException("unexpected character", buffer);
+                    throw new InvalidSmilesException("unexpected character:", buffer);
             }
         }
     }
 
+    /**
+     * Read a bracket atom from the buffer.
+     *
+     * @param buffer
+     * @return
+     * @throws InvalidSmilesException
+     */
     static Atom readBracketAtom(CharBuffer buffer) throws
-                                                    InvalidSmilesException {
+                                                   InvalidSmilesException {
 
         // try to read isotope number, -1 if not read
         int isotope = buffer.getNumber();
@@ -404,7 +431,7 @@ final class Parser {
         }
     }
 
-    private static class RingBond {
+    private static final class RingBond {
         int  u;
         Bond bond;
 
