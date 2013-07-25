@@ -312,7 +312,7 @@ final class Parser {
         return 0;
     }
 
-    private void ring(int rnum) {
+    private void ring(int rnum) throws InvalidSmilesException {
         if (rings.length <= rnum || rings[rnum] == null) {
             openRing(rnum);
         } else {
@@ -345,7 +345,7 @@ final class Parser {
         return la;
     }
 
-    private void closeRing(int rnum) {
+    private void closeRing(int rnum) throws InvalidSmilesException {
         RingBond rbond = rings[rnum];
         rings[rnum] = null;
         g.addEdge(new Edge(rbond.u, stack.peek(),
@@ -355,14 +355,32 @@ final class Parser {
         arrangement.get(rbond.u).replace(-rnum, stack.peek());
     }
 
-    Bond decideBond(final Bond a, final Bond b) {
-        if (a == Bond.IMPLICIT)
+    /**
+     * Decide the bond to use for a ring bond. The bond symbol can be present on
+     * either or both bonded atoms. This method takes those bonds, chooses the
+     * correct one or reports an error if there is a conflict.
+     *
+     * Equivalent SMILES:
+     * <blockquote><pre>
+     *     C=1CCCCC=1
+     *     C=1CCCCC1    (preferred)
+     *     C1CCCCC=1
+     * </pre></blockquote>
+     *
+     * @param a a bond
+     * @param b other bond
+     * @return the bond to use for this edge
+     * @throws InvalidSmilesException ring bonds did not match
+     */
+    static Bond decideBond(final Bond a, final Bond b) throws
+                                                       InvalidSmilesException {
+        if (a == b)
+            return a;
+        else if (a == Bond.IMPLICIT)
             return b;
         else if (b == Bond.IMPLICIT)
             return a;
-        else if (a == b)
-            return a;
-        throw new Error("ring bonds did not match: " + a + " and " + b);
+        throw new InvalidSmilesException("ring bond mismatch, " + a + " and " + b);
     }
 
     public static void main(String[] args) throws IOException {
