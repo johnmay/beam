@@ -34,7 +34,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static uk.ac.ebi.grins.Atom.AromaticSubset;
@@ -48,7 +50,8 @@ final class Parser {
     private final ChemicalGraph g;
     private RingBond[] rings = new RingBond[10];
 
-    Bond bond = Bond.IMPLICIT;
+    private Map<Integer, LocalArrangement> arrangement
+            = new HashMap<Integer, LocalArrangement>(5);
 
     Parser(CharBuffer buffer) throws InvalidSmilesException {
         g = new ChemicalGraph(1 + (2 * (buffer.length() / 3)));
@@ -311,8 +314,26 @@ final class Parser {
     private void openRing(int rnum) {
         if (rnum >= rings.length)
             rings = Arrays.copyOf(rings, rnum + 1);
-        rings[rnum] = new RingBond(stack.peek(), bond);
+        int u = stack.peek();
+
+        // create a ring bond
+        rings[rnum] = new RingBond(u, bond);
+
+        // keep track of arrangement (important for stereo configurations)
+        createArrangement(u).add(-rnum);
+
         bond = Bond.IMPLICIT;
+    }
+
+    private LocalArrangement createArrangement(int u) {
+        LocalArrangement la = arrangement.get(u);
+        if (la == null) {
+            la = new LocalArrangement();
+            for (Edge e : g.edges(stack.peek()))
+                la.add(e.other(u));
+            arrangement.put(u, la);
+        }
+        return la;
     }
 
     private void closeRing(int rnum) {
@@ -321,6 +342,8 @@ final class Parser {
         g.addEdge(new Edge(rbond.u, stack.peek(),
                            decideBond(rbond.bond, bond.inverse())));
         bond = Bond.IMPLICIT;
+        // adjust the arrangement replacing where this ring number was openned
+        arrangement.get(rbond.u).replace(-rnum, stack.peek());
     }
 
     Bond decideBond(final Bond a, final Bond b) {
@@ -364,4 +387,28 @@ final class Parser {
         }
     }
 
+    private static final class LocalArrangement {
+
+        int[] vs;
+        int   n;
+
+        private LocalArrangement() {
+            this.vs = new int[4];
+        }
+
+        void add(final int v) {
+            if (n == vs.length)
+                vs = Arrays.copyOf(vs, n * 2);
+            vs[n++] = v;
+        }
+
+        void replace(final int u, final int v) {
+            for (int i = 0; i < n; i++) {
+                if (vs[i] == u) {
+                    vs[i] = v;
+                    return;
+                }
+            }
+        }
+    }
 }
