@@ -66,7 +66,8 @@ final class Parser {
         int v = g.addAtom(a);
         if (!stack.empty()) {
             int u = stack.pop();
-            g.addEdge(new Edge(u, v, bond));
+            if (bond != Bond.DOT)
+                g.addEdge(new Edge(u, v, bond));
             bond = Bond.IMPLICIT;
         }
         stack.push(v);
