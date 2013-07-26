@@ -29,6 +29,7 @@
 
 package uk.ac.ebi.grins;
 
+import static uk.ac.ebi.grins.Configuration.Type.DoubleBond;
 import static uk.ac.ebi.grins.Configuration.Type.ExtendedTetrahedral;
 import static uk.ac.ebi.grins.Configuration.Type.Implicit;
 import static uk.ac.ebi.grins.Configuration.Type.None;
@@ -51,72 +52,76 @@ enum Configuration {
     ANTI_CLOCKWISE(Implicit, "@"),
     CLOCKWISE(Implicit, "@@"),
 
-    // tetrahedral
+    // tetrahedral (Sp3)
     TH1(Tetrahedral, "@TH1", ANTI_CLOCKWISE),
     TH2(Tetrahedral, "@TH2", CLOCKWISE),
 
-    // extended tetrahedral, allene-like
+    // double bond (Sp2)
+    DB1(DoubleBond, "@DB1", ANTI_CLOCKWISE),
+    DB2(DoubleBond, "@DB2", CLOCKWISE),
+
+    // extended tetrahedral, allene-like (Sp)
     AL1(ExtendedTetrahedral, "@AL1", ANTI_CLOCKWISE),
     AL2(ExtendedTetrahedral, "@AL2", CLOCKWISE),
 
     // square planar
-    SP1(SquarePlanar, "@SP1", UNKNOWN),
-    SP2(SquarePlanar, "@SP2", UNKNOWN),
-    SP3(SquarePlanar, "@SP3", UNKNOWN),
+    SP1(SquarePlanar, "@SP1"),
+    SP2(SquarePlanar, "@SP2"),
+    SP3(SquarePlanar, "@SP3"),
 
     // trigonal bipyramidal
-    TB1(TrigonalBipyramidal, "@TB1", UNKNOWN),
-    TB2(TrigonalBipyramidal, "@TB2", UNKNOWN),
-    TB3(TrigonalBipyramidal, "@TB3", UNKNOWN),
-    TB4(TrigonalBipyramidal, "@TB4", UNKNOWN),
-    TB5(TrigonalBipyramidal, "@TB5", UNKNOWN),
-    TB6(TrigonalBipyramidal, "@TB6", UNKNOWN),
-    TB7(TrigonalBipyramidal, "@TB7", UNKNOWN),
-    TB8(TrigonalBipyramidal, "@TB8", UNKNOWN),
-    TB9(TrigonalBipyramidal, "@TB9", UNKNOWN),
-    TB10(TrigonalBipyramidal, "@TB10", UNKNOWN),
-    TB11(TrigonalBipyramidal, "@TB11", UNKNOWN),
-    TB12(TrigonalBipyramidal, "@TB12", UNKNOWN),
-    TB13(TrigonalBipyramidal, "@TB13", UNKNOWN),
-    TB14(TrigonalBipyramidal, "@TB14", UNKNOWN),
-    TB15(TrigonalBipyramidal, "@TB15", UNKNOWN),
-    TB16(TrigonalBipyramidal, "@TB16", UNKNOWN),
-    TB17(TrigonalBipyramidal, "@TB17", UNKNOWN),
-    TB18(TrigonalBipyramidal, "@TB18", UNKNOWN),
-    TB19(TrigonalBipyramidal, "@TB19", UNKNOWN),
-    TB20(TrigonalBipyramidal, "@TB20", UNKNOWN),
+    TB1(TrigonalBipyramidal, "@TB1", ANTI_CLOCKWISE),
+    TB2(TrigonalBipyramidal, "@TB2", CLOCKWISE),
+    TB3(TrigonalBipyramidal, "@TB3"),
+    TB4(TrigonalBipyramidal, "@TB4"),
+    TB5(TrigonalBipyramidal, "@TB5"),
+    TB6(TrigonalBipyramidal, "@TB6"),
+    TB7(TrigonalBipyramidal, "@TB7"),
+    TB8(TrigonalBipyramidal, "@TB8"),
+    TB9(TrigonalBipyramidal, "@TB9"),
+    TB10(TrigonalBipyramidal, "@TB10"),
+    TB11(TrigonalBipyramidal, "@TB11"),
+    TB12(TrigonalBipyramidal, "@TB12"),
+    TB13(TrigonalBipyramidal, "@TB13"),
+    TB14(TrigonalBipyramidal, "@TB14"),
+    TB15(TrigonalBipyramidal, "@TB15"),
+    TB16(TrigonalBipyramidal, "@TB16"),
+    TB17(TrigonalBipyramidal, "@TB17"),
+    TB18(TrigonalBipyramidal, "@TB18"),
+    TB19(TrigonalBipyramidal, "@TB19"),
+    TB20(TrigonalBipyramidal, "@TB20"),
 
     // octahedral
-    OH1(Octahedral, "@OH1", UNKNOWN),
-    OH2(Octahedral, "@OH2", UNKNOWN),
-    OH3(Octahedral, "@OH3", UNKNOWN),
-    OH4(Octahedral, "@OH4", UNKNOWN),
-    OH5(Octahedral, "@OH5", UNKNOWN),
-    OH6(Octahedral, "@OH6", UNKNOWN),
-    OH7(Octahedral, "@OH7", UNKNOWN),
-    OH8(Octahedral, "@OH8", UNKNOWN),
-    OH9(Octahedral, "@OH9", UNKNOWN),
-    OH10(Octahedral, "@OH10", UNKNOWN),
-    OH11(Octahedral, "@OH11", UNKNOWN),
-    OH12(Octahedral, "@OH12", UNKNOWN),
-    OH13(Octahedral, "@OH13", UNKNOWN),
-    OH14(Octahedral, "@OH14", UNKNOWN),
-    OH15(Octahedral, "@OH15", UNKNOWN),
-    OH16(Octahedral, "@OH16", UNKNOWN),
-    OH17(Octahedral, "@OH17", UNKNOWN),
-    OH18(Octahedral, "@OH18", UNKNOWN),
-    OH19(Octahedral, "@OH19", UNKNOWN),
-    OH20(Octahedral, "@OH20", UNKNOWN),
-    OH21(Octahedral, "@OH21", UNKNOWN),
-    OH22(Octahedral, "@OH22", UNKNOWN),
-    OH23(Octahedral, "@OH23", UNKNOWN),
-    OH24(Octahedral, "@OH24", UNKNOWN),
-    OH25(Octahedral, "@OH25", UNKNOWN),
-    OH26(Octahedral, "@OH26", UNKNOWN),
-    OH27(Octahedral, "@OH27", UNKNOWN),
-    OH28(Octahedral, "@OH28", UNKNOWN),
-    OH29(Octahedral, "@OH29", UNKNOWN),
-    OH30(Octahedral, "@OH30", UNKNOWN);
+    OH1(Octahedral, "@OH1", ANTI_CLOCKWISE),
+    OH2(Octahedral, "@OH2", CLOCKWISE),
+    OH3(Octahedral, "@OH3"),
+    OH4(Octahedral, "@OH4"),
+    OH5(Octahedral, "@OH5"),
+    OH6(Octahedral, "@OH6"),
+    OH7(Octahedral, "@OH7"),
+    OH8(Octahedral, "@OH8"),
+    OH9(Octahedral, "@OH9"),
+    OH10(Octahedral, "@OH10"),
+    OH11(Octahedral, "@OH11"),
+    OH12(Octahedral, "@OH12"),
+    OH13(Octahedral, "@OH13"),
+    OH14(Octahedral, "@OH14"),
+    OH15(Octahedral, "@OH15"),
+    OH16(Octahedral, "@OH16"),
+    OH17(Octahedral, "@OH17"),
+    OH18(Octahedral, "@OH18"),
+    OH19(Octahedral, "@OH19"),
+    OH20(Octahedral, "@OH20"),
+    OH21(Octahedral, "@OH21"),
+    OH22(Octahedral, "@OH22"),
+    OH23(Octahedral, "@OH23"),
+    OH24(Octahedral, "@OH24"),
+    OH25(Octahedral, "@OH25"),
+    OH26(Octahedral, "@OH26"),
+    OH27(Octahedral, "@OH27"),
+    OH28(Octahedral, "@OH28"),
+    OH29(Octahedral, "@OH29"),
+    OH30(Octahedral, "@OH30");
 
     /** Type of configuration. */
     private final Type type;
@@ -273,6 +278,7 @@ enum Configuration {
         None,
         Implicit,
         Tetrahedral,
+        DoubleBond,
         ExtendedTetrahedral,
         SquarePlanar,
         TrigonalBipyramidal,
