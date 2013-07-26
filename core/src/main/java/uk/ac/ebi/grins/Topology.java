@@ -31,7 +31,16 @@ package uk.ac.ebi.grins;
 
 import java.util.Arrays;
 
+import static uk.ac.ebi.grins.Configuration.AL1;
+import static uk.ac.ebi.grins.Configuration.AL2;
+import static uk.ac.ebi.grins.Configuration.ANTI_CLOCKWISE;
 import static uk.ac.ebi.grins.Configuration.CLOCKWISE;
+import static uk.ac.ebi.grins.Configuration.OH1;
+import static uk.ac.ebi.grins.Configuration.OH2;
+import static uk.ac.ebi.grins.Configuration.TB1;
+import static uk.ac.ebi.grins.Configuration.TB2;
+import static uk.ac.ebi.grins.Configuration.TH1;
+import static uk.ac.ebi.grins.Configuration.TH2;
 import static uk.ac.ebi.grins.Configuration.Type.Implicit;
 import static uk.ac.ebi.grins.Configuration.Type.Tetrahedral;
 
@@ -153,6 +162,70 @@ abstract class Topology {
         return new Tetrahedral(u,
                                Arrays.copyOf(vs, vs.length),
                                p);
+    }
+
+    /**
+     * Convert an implicit configuration ('@' or '@@') c, to an explicit one
+     * (e.g. @TH1).
+     *
+     * @param c
+     * @param g
+     * @param u
+     * @return
+     */
+    static Configuration toExplicit(ChemicalGraph g, int u, Configuration c) {
+
+        // already explicit
+        if (c.type() != Implicit)
+            return c;
+
+        int deg = g.degree(u);
+        int valence = deg + g.atom(u).hydrogens();
+
+        // tetrahedral topology, square planar must always be explicit
+        if (valence == 4) {
+            return c == ANTI_CLOCKWISE ? TH1 : TH2;
+        }
+
+        // tetrahedral topology with implicit lone pair or double bond (Sp2)
+        // atoms (todo)
+        else if (valence == 3) {
+
+            // XXX: sulfoxide special case... would be better to compute
+            // hybridization don't really like doing this here but it works
+            if (g.atom(u).element() == Element.Sulfur) {
+                for (Edge e : g.edges(u)) {
+                    if (e.bond() == Bond.DOUBLE
+                            && g.atom(e.other(u)).element() == Element.Oxygen) {
+                        return c == ANTI_CLOCKWISE ? TH1 : TH2;
+                    }
+                }
+            }
+
+            // TODO: double bond stereo as atom specification
+
+        }
+
+        // odd number of cumulated double bond systems (e.g. allene)
+        else if (deg == 2) {
+            // check both bonds are double
+            for (Edge e : g.edges(u))
+                if (e.bond() != Bond.DOUBLE)
+                    return Configuration.UNKNOWN;
+            return c == ANTI_CLOCKWISE ? AL1 : AL2;
+        }
+
+        // trigonal bipyramidal
+        else if (valence == 5) {
+            return c == ANTI_CLOCKWISE ? TB1 : TB2;
+        }
+
+        // octahedral
+        else if (valence == 6) {
+            return c == ANTI_CLOCKWISE ? OH1 : OH2;
+        }
+
+        return Configuration.UNKNOWN;
     }
 
     private static Topology UNKNOWN = new Topology() {
