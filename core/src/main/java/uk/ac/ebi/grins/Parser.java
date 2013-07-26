@@ -59,12 +59,23 @@ final class Parser {
     private Map<Integer, LocalArrangement> arrangement
             = new HashMap<Integer, LocalArrangement>(5);
 
+    private Map<Integer, Configuration> configurations
+            = new HashMap<Integer, Configuration>(5);
+
     /** Current bond. */
     private Bond bond = Bond.IMPLICIT;
+
+    /** Current configuration. */
+    private Configuration configuration = Configuration.UNKNOWN;
 
     Parser(CharBuffer buffer) throws InvalidSmilesException {
         g = new ChemicalGraph(1 + (2 * (buffer.length() / 3)));
         readSmiles(buffer);
+
+        // create topologies
+        for (Map.Entry<Integer, Configuration> e : configurations.entrySet()) {
+            int u = e.getKey();
+        }
     }
 
     Parser(String str) throws InvalidSmilesException {
@@ -99,10 +110,23 @@ final class Parser {
             bond = Bond.IMPLICIT;
         }
         stack.push(v);
+
+        // configurations used to create topologies after parsing
+        if (configuration != Configuration.UNKNOWN) {
+            configurations.put(v, configuration);
+            configuration = Configuration.UNKNOWN;
+        }
     }
 
-    // primary dispatch table
-    private void readSmiles(CharBuffer buffer) throws InvalidSmilesException {
+    /**
+     * Read a molecule from the character buffer.
+     *
+     * @param buffer a character buffer
+     * @throws InvalidSmilesException invalid grammar
+     */
+    private void readSmiles(final CharBuffer buffer) throws
+                                                     InvalidSmilesException {
+        // primary dispatch
         while (buffer.hasRemaining()) {
             char c = buffer.get();
             switch (c) {
@@ -232,24 +256,27 @@ final class Parser {
     }
 
     /**
-     * Read a bracket atom from the buffer.
+     * Read a bracket atom from the buffer. A bracket atom optionally defines
+     * isotope, chirality, hydrogen count, formal charge and the atom class.
      *
-     * @param buffer
-     * @return
-     * @throws InvalidSmilesException
+     * <blockquote><pre>
+     * bracket_atom ::= '[' isotope? symbol chiral? hcount? charge? class? ']'
+     * </pre></blockquote>
+     *
+     * @param buffer a character buffer
+     * @return a bracket atom
+     * @throws InvalidSmilesException thrown if the bracket atom did not match
+     *                                the grammar, invalid symbol, missing
+     *                                closing bracket or invalid chiral
+     *                                specification.
      */
-    static Atom readBracketAtom(CharBuffer buffer) throws
-                                                   InvalidSmilesException {
+    Atom readBracketAtom(final CharBuffer buffer) throws
+                                                  InvalidSmilesException {
+        final int isotope = buffer.getNumber();
+        final boolean aromatic = buffer.next() >= 'a' && buffer.next() <= 'z';
+        final Element element = Element.read(buffer);
 
-        // try to read isotope number, -1 if not read
-        int isotope = buffer.getNumber();
-
-        // lowercase indicates aromatic
-        boolean aromatic = buffer.next() >= 'a' && buffer.next() <= 'z';
-
-        Element element = Element.read(buffer);
-
-        Configuration configuration = Configuration.read(buffer);
+        configuration = Configuration.read(buffer);
 
         int hCount = readHydrogens(buffer);
         int charge = readCharge(buffer);
@@ -258,7 +285,9 @@ final class Parser {
         if (!buffer.getIf(']'))
             throw InvalidSmilesException.invalidBracketAtom(buffer);
 
-        // create the atom
+        // currently we treat unspecified isotope the same as '0', this does not
+        // follow the specification but is a point of contention and most parser
+        // do this.
         return new Atom.BracketAtom(isotope < 0 ? 0 : isotope,
                                     element,
                                     hCount,

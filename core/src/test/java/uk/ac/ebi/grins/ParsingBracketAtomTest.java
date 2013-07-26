@@ -134,8 +134,7 @@ public class ParsingBracketAtomTest {
 
     private Atom parse(String str) throws InvalidSmilesException {
         CharBuffer buffer = CharBuffer.fromString(str);
-        buffer.get(); // read off '['
-        return Parser.readBracketAtom(buffer);
+        return new Parser(buffer).molecule().atom(0);
     }
 
     private Atom atom(Element e) {

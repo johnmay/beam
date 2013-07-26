@@ -49,4 +49,5 @@ public class ParserTest {
         assertThat(Parser.decideBond(Bond.IMPLICIT, Bond.DOUBLE), is(Bond.DOUBLE));
     }
 
+
 }
