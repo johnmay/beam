@@ -6,6 +6,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static uk.ac.ebi.grins.Configuration.AL1;
+import static uk.ac.ebi.grins.Configuration.AL2;
+import static uk.ac.ebi.grins.Configuration.ANTI_CLOCKWISE;
+import static uk.ac.ebi.grins.Configuration.CLOCKWISE;
 import static uk.ac.ebi.grins.Configuration.TH1;
 import static uk.ac.ebi.grins.Configuration.TH2;
 
@@ -101,4 +105,173 @@ public class TopologyTest {
                      .configuration(), is(TH2));
     }
 
+    @Test public void implicitToExplicit_tetrahedral() {
+
+        // N[C@]([H])(C)C(=O)O
+        ChemicalGraph g = new ChemicalGraph(7);
+        g.addAtom(Atom.OrganicSubset.Nitrogen);
+        g.addAtom(new Atom.BracketAtom(Element.Carbon, 0, 0));
+        g.addAtom(Atom.EXPLICIT_HYDROGEN);
+        g.addAtom(Atom.OrganicSubset.Carbon);
+        g.addAtom(Atom.OrganicSubset.Carbon);
+        g.addAtom(Atom.OrganicSubset.Oxygen);
+        g.addAtom(Atom.OrganicSubset.Oxygen);
+
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 3, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 4, Bond.IMPLICIT));
+        g.addEdge(new Edge(4, 5, Bond.DOUBLE));
+        g.addEdge(new Edge(4, 6, Bond.IMPLICIT));
+
+        assertThat(Topology.toExplicit(g, 1, ANTI_CLOCKWISE), is(TH1));
+        assertThat(Topology.toExplicit(g, 1, CLOCKWISE), is(TH2));
+    }
+
+    @Test public void implicitToExplicit_tetrahedralImplicitH() {
+
+        // N[C@]([H])(C)C(=O)O
+        ChemicalGraph g = new ChemicalGraph(7);
+        g.addAtom(Atom.OrganicSubset.Nitrogen);
+        g.addAtom(new Atom.BracketAtom(Element.Carbon, 1, 0));
+        g.addAtom(Atom.OrganicSubset.Carbon);
+        g.addAtom(Atom.OrganicSubset.Carbon);
+        g.addAtom(Atom.OrganicSubset.Oxygen);
+        g.addAtom(Atom.OrganicSubset.Oxygen);
+
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 3, Bond.IMPLICIT));
+        g.addEdge(new Edge(3, 4, Bond.DOUBLE));
+        g.addEdge(new Edge(3, 5, Bond.IMPLICIT));
+
+        assertThat(Topology.toExplicit(g, 1, ANTI_CLOCKWISE), is(TH1));
+        assertThat(Topology.toExplicit(g, 1, CLOCKWISE), is(TH2));
+    }
+
+    @Test public void implicitToExplicit_sulfoxide() {
+        // C[S@](CC)=O
+        ChemicalGraph g = new ChemicalGraph(5);
+        g.addAtom(Atom.OrganicSubset.Carbon);
+        g.addAtom(new Atom.BracketAtom(Element.Sulfur, 0, 0));
+        g.addAtom(Atom.OrganicSubset.Carbon);
+        g.addAtom(Atom.OrganicSubset.Carbon);
+        g.addAtom(Atom.OrganicSubset.Oxygen);
+
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 4, Bond.DOUBLE));
+        g.addEdge(new Edge(2, 3, Bond.IMPLICIT));
+
+        assertThat(Topology.toExplicit(g, 1, ANTI_CLOCKWISE), is(TH1));
+        assertThat(Topology.toExplicit(g, 1, CLOCKWISE), is(TH2));
+    }
+
+    @Test public void implicitToExplicit_allene() {
+
+        // OC(Cl)=[C@]=C(C)F
+        ChemicalGraph g = new ChemicalGraph(7);
+        g.addAtom(Atom.OrganicSubset.Oxygen);
+        g.addAtom(Atom.OrganicSubset.Carbon);
+        g.addAtom(Atom.OrganicSubset.Chlorine);
+        g.addAtom(new Atom.BracketAtom(Element.Carbon, 0, 0));
+        g.addAtom(Atom.OrganicSubset.Carbon);
+        g.addAtom(Atom.OrganicSubset.Carbon);
+        g.addAtom(Atom.OrganicSubset.Fluorine);
+
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 3, Bond.DOUBLE));
+        g.addEdge(new Edge(3, 4, Bond.DOUBLE));
+        g.addEdge(new Edge(4, 5, Bond.IMPLICIT));
+        g.addEdge(new Edge(5, 6, Bond.IMPLICIT));
+
+        assertThat(Topology.toExplicit(g, 3, ANTI_CLOCKWISE), is(AL1));
+        assertThat(Topology.toExplicit(g, 3, CLOCKWISE), is(AL2));
+    }
+
+    @Test public void implicitToExplicit_trigonalBipyramidal() {
+        // O=C[As@](F)(Cl)(Br)S
+        ChemicalGraph g = new ChemicalGraph(7);
+        g.addAtom(Atom.OrganicSubset.Oxygen);
+        g.addAtom(Atom.OrganicSubset.Carbon);
+        g.addAtom(new Atom.BracketAtom(Element.Arsenic, 0, 0));
+        g.addAtom(Atom.OrganicSubset.Fluorine);
+        g.addAtom(Atom.OrganicSubset.Chlorine);
+        g.addAtom(Atom.OrganicSubset.Bromine);
+        g.addAtom(Atom.OrganicSubset.Sulfur);
+
+        g.addEdge(new Edge(0, 1, Bond.DOUBLE));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        g.addEdge(new Edge(2, 3, Bond.IMPLICIT));
+        g.addEdge(new Edge(2, 4, Bond.IMPLICIT));
+        g.addEdge(new Edge(2, 5, Bond.IMPLICIT));
+        g.addEdge(new Edge(2, 6, Bond.IMPLICIT));
+
+        assertThat(Topology.toExplicit(g, 2, ANTI_CLOCKWISE),
+                   is(Configuration.TB1));
+        assertThat(Topology.toExplicit(g, 2, CLOCKWISE),
+                   is(Configuration.TB2));
+    }
+
+    @Test public void implicitToExplicit_octahedral() {
+        // S[Co@@](F)(Cl)(Br)(I)C=O
+        ChemicalGraph g = new ChemicalGraph(8);
+        g.addAtom(Atom.OrganicSubset.Sulfur);
+        g.addAtom(new Atom.BracketAtom(Element.Cobalt, 0, 0));
+        g.addAtom(Atom.OrganicSubset.Fluorine);
+        g.addAtom(Atom.OrganicSubset.Chlorine);
+        g.addAtom(Atom.OrganicSubset.Bromine);
+        g.addAtom(Atom.OrganicSubset.Iodine);
+        g.addAtom(Atom.OrganicSubset.Carbon);
+        g.addAtom(Atom.OrganicSubset.Oxygen);
+
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 3, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 4, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 5, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 6, Bond.IMPLICIT));
+        g.addEdge(new Edge(6, 7, Bond.DOUBLE));
+
+        assertThat(Topology.toExplicit(g, 1, ANTI_CLOCKWISE),
+                   is(Configuration.OH1));
+        assertThat(Topology.toExplicit(g, 1, CLOCKWISE),
+                   is(Configuration.OH2));
+    }
+
+    @Test public void implicitToExplicit_unknown() {
+        assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, Configuration.UNKNOWN),
+                   is(Configuration.UNKNOWN));
+    }
+
+    @Test public void implicitToExplicit_th1_th2() {
+        assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, Configuration.TH1),
+                   is(Configuration.TH1));
+        assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, Configuration.TH2),
+                   is(Configuration.TH2));
+    }
+
+    @Test public void implicitToExplicit_al1_al2() {
+        assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, Configuration.AL1),
+                   is(Configuration.AL1));
+        assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, Configuration.AL2),
+                   is(Configuration.AL2));
+    }
+
+    @Test public void implicitToExplicit_tbs() {
+        for(Configuration c : Configuration.values()){
+            if(c.type() == Configuration.Type.TrigonalBipyramidal)
+                assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, c),
+                           is(c));
+        }
+    }
+
+    @Test public void implicitToExplicit_ohs() {
+        for(Configuration c : Configuration.values()){
+            if(c.type() == Configuration.Type.Octahedral)
+                assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, c),
+                           is(c));
+        }
+    }
 }

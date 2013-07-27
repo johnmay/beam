@@ -168,10 +168,29 @@ abstract class Topology {
      * Convert an implicit configuration ('@' or '@@') c, to an explicit one
      * (e.g. @TH1).
      *
-     * @param c
-     * @param g
-     * @param u
-     * @return
+     * <blockquote><pre>
+     * Implicit Valence Explicit Example
+     * @        4       @TH1     O[C@H](N)C or O[C@]([H])(N)C
+     * @@       4       @TH2     O[C@@H](N)C or O[C@@]([H])(N)C
+     *
+     * @        3       @TH1     C[S@](N)=O
+     * @@       3       @TH2     C[S@@](N)=O
+     *
+     * @        2       @AL1     OC=[C@]=CO
+     * @        2       @AL2     OC=[C@@]=CO
+     *
+     * @        5       @TB1     S[As@](F)(Cl)(Br)C=O
+     * @@       5       @TB2     S[As@@](F)(Cl)(Br)C=O
+     *
+     * @        5       @OH1     S[Co@@](F)(Cl)(Br)(I)C=O
+     * @@       5       @OH2     O=C[Co@](F)(Cl)(Br)(I)S
+     * </pre></blockquote>
+     *
+     * @param g chemical graph
+     * @param u the atom to which the configuration is associated
+     * @param c implicit configuration ({@link Configuration#ANTI_CLOCKWISE or
+     *          Configuration#CLOCKWISE})
+     * @return an explicit configuration or {@link Configuration#UNKNOWN}
      */
     static Configuration toExplicit(ChemicalGraph g, int u, Configuration c) {
 
@@ -179,7 +198,7 @@ abstract class Topology {
         if (c.type() != Implicit)
             return c;
 
-        int deg = g.degree(u);
+        int deg     = g.degree(u);
         int valence = deg + g.atom(u).hydrogens();
 
         // tetrahedral topology, square planar must always be explicit
@@ -192,7 +211,8 @@ abstract class Topology {
         else if (valence == 3) {
 
             // XXX: sulfoxide special case... would be better to compute
-            // hybridization don't really like doing this here but it works
+            // hybridization don't really like doing this here but is sufficient
+            // for now
             if (g.atom(u).element() == Element.Sulfur) {
                 for (Edge e : g.edges(u)) {
                     if (e.bond() == Bond.DOUBLE
