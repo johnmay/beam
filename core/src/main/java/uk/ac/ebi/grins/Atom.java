@@ -225,4 +225,7 @@ interface Atom {
             return "[" + isotope + element.symbol() + "H" + hCount + (charge != 0 ? charge : "") + ":" + atomClass + "]";
         }
     }
+
+    public static Atom EXPLICIT_HYDROGEN = new BracketAtom(Element.Hydrogen, 0, 0);
+
 }
