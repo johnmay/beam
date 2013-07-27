@@ -229,6 +229,18 @@ enum Configuration {
                     return tbs[num];
                 }
                 throw new InvalidSmilesException("'@T' is not a valid chiral specification:", buffer);
+            } else if (buffer.getIf('D')) {
+                // DB (double bond)
+                if (buffer.getIf('B')) {
+                    if (buffer.getIf('1'))
+                        return Configuration.DB1;
+                    else if (buffer.getIf('2'))
+                        return Configuration.DB2;
+                    else
+                        throw new InvalidSmilesException("invalid permutation designator for @DB, valid values are @DB1 or @DB2:",
+                                                         buffer);
+                }
+                throw new InvalidSmilesException("'@D' is not a valid chiral specification:", buffer);
             } else if (buffer.getIf('A')) {
                 // allene (extended tetrahedral)
                 if (buffer.getIf('L')) {
