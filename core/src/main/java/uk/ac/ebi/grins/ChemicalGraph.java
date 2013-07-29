@@ -83,7 +83,7 @@ final class ChemicalGraph {
         if (order == atoms.length) {
             atoms = Arrays.copyOf(atoms, order * 2);
             edges = Arrays.copyOf(edges, order * 2);
-            for(int i = order; i < edges.length; i++)
+            for (int i = order; i < edges.length; i++)
                 edges[i] = new ArrayList<Edge>(4);
         }
         atoms[order++] = a;
@@ -98,9 +98,7 @@ final class ChemicalGraph {
      * @throws IllegalArgumentException no atom exists
      */
     Atom atom(int i) {
-        if (i < 0 || i >= order)
-            throw new IllegalArgumentException("no atom at index " + i);
-        return atoms[i];
+        return atoms[checkRange(i)];
     }
 
     /**
@@ -111,13 +109,7 @@ final class ChemicalGraph {
      *                                  which do not exist
      */
     void addEdge(Edge e) {
-        int u = e.either(), v = e.other(u);
-        if (u < 0 || u >= order)
-            throw new IllegalArgumentException("cannot add edge, vertex "
-                                                       + u + " does not exist");
-        if (v < 0 || v >= order)
-            throw new IllegalArgumentException("cannot add edge, vertex "
-                                                       + v + " does not exist");
+        int u = checkRange(e.either()), v = checkRange(e.other(u));
         edges[u].add(e);
         edges[v].add(e);
         size++;
@@ -132,9 +124,7 @@ final class ChemicalGraph {
      *                                  atom which does not exist
      */
     int degree(int u) {
-        if (u < 0 || u >= order)
-            throw new IllegalArgumentException("no atom at index " + u);
-        return edges[u].size();
+        return edges[checkRange(u)].size();
     }
 
     /**
@@ -146,9 +136,7 @@ final class ChemicalGraph {
      *                                  atom which does not exist
      */
     List<Edge> edges(int u) {
-        if (u < 0 || u >= order)
-            throw new IllegalArgumentException("no atom at index " + u);
-        return Collections.unmodifiableList(edges[u]);
+        return Collections.unmodifiableList(edges[checkRange(u)]);
     }
 
     /**
@@ -201,4 +189,11 @@ final class ChemicalGraph {
         order = 0;
         size = 0;
     }
+
+    private int checkRange(int u) {
+        if (u < 0 || u >= order)
+            throw new IllegalArgumentException("invalid atom index: " + u);
+        return u;
+    }
+
 }
