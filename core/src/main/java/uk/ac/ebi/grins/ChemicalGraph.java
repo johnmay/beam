@@ -147,6 +147,8 @@ final class ChemicalGraph {
      * @return whether the topology replaced an existing configuration
      */
     boolean addTopology(Topology t) {
+        if (t == Topology.unknown())
+            return false;
         return topologies.put(t.atom(), t) != null;
     }
 
