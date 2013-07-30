@@ -30,6 +30,7 @@
 package uk.ac.ebi.grins;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static uk.ac.ebi.grins.Configuration.AL1;
 import static uk.ac.ebi.grins.Configuration.AL2;
@@ -246,6 +247,18 @@ abstract class Topology {
         }
 
         return Configuration.UNKNOWN;
+    }
+
+    static Topology create(int u, int[] vs, List<Edge> es, Configuration c) {
+        if (c.type() == Implicit)
+            throw new IllegalArgumentException("configuration must be explicit, @TH1/@TH2 instead of @/@@");
+
+        // only tetrahedral is handled for now
+        if (c.type() == Tetrahedral) {
+            return tetrahedral(u, vs, c);
+        }
+
+        return unknown();
     }
 
     private static Topology UNKNOWN = new Topology() {

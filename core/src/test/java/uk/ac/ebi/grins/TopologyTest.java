@@ -2,6 +2,10 @@ package uk.ac.ebi.grins;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -260,18 +264,72 @@ public class TopologyTest {
     }
 
     @Test public void implicitToExplicit_tbs() {
-        for(Configuration c : Configuration.values()){
-            if(c.type() == Configuration.Type.TrigonalBipyramidal)
+        for (Configuration c : Configuration.values()) {
+            if (c.type() == Configuration.Type.TrigonalBipyramidal)
                 assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, c),
                            is(c));
         }
     }
 
     @Test public void implicitToExplicit_ohs() {
-        for(Configuration c : Configuration.values()){
-            if(c.type() == Configuration.Type.Octahedral)
+        for (Configuration c : Configuration.values()) {
+            if (c.type() == Configuration.Type.Octahedral)
                 assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, c),
                            is(c));
         }
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void create_AntiClockwise() {
+        Topology.create(0, new int[0], Collections
+                .<Edge>emptyList(), Configuration.ANTI_CLOCKWISE);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void create_Clockwise() {
+        Topology.create(0, new int[0], Collections
+                .<Edge>emptyList(), Configuration.CLOCKWISE);
+    }
+
+    @Test
+    public void create_tb() {
+        assertThat(Topology.create(0, new int[0], Collections
+                .<Edge>emptyList(), Configuration.TB1), is(Topology.unknown()));
+    }
+
+    @Test
+    public void create_sp() {
+        assertThat(Topology.create(0, new int[0], Collections
+                .<Edge>emptyList(), Configuration.SP1), is(Topology.unknown()));
+    }
+
+    @Test
+    public void create_oh() {
+        assertThat(Topology.create(0, new int[0], Collections
+                .<Edge>emptyList(), Configuration.OH1), is(Topology.unknown()));
+    }
+
+    @Test
+    public void create_db() {
+        assertThat(Topology.create(0, new int[0], Collections
+                .<Edge>emptyList(), Configuration.DB1), is(Topology.unknown()));
+    }
+
+    @Test
+    public void create_al() {
+        assertThat(Topology.create(0, new int[0], Collections
+                .<Edge>emptyList(), Configuration.AL1), is(Topology.unknown()));
+    }
+
+    @Test public void create_th() {
+        int[] vs = new int[]{1, 2, 3, 4};
+        List<Edge> es = Arrays.asList(new Edge(0, 1, Bond.IMPLICIT),
+                                      new Edge(0, 2, Bond.IMPLICIT),
+                                      new Edge(0, 3, Bond.IMPLICIT),
+                                      new Edge(0, 4, Bond.IMPLICIT));
+        Topology t = Topology.create(0, vs, es, TH1);
+        assertThat(t.configuration(), is(TH1));
+        assertThat(t.atom(), is(0));
+    }
+
 }
