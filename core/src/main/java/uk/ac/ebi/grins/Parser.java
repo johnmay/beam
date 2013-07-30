@@ -475,27 +475,6 @@ final class Parser {
         throw new InvalidSmilesException("ring bond mismatch, " + a + " and " + b);
     }
 
-    public static void main(String[] args) throws IOException {
-
-        String path = "/databases/zinc/zinc.smi";
-        BufferedReader r = new BufferedReader(new FileReader(path));
-        String line = null;
-        List<String> smis = new ArrayList<String>();
-        while ((line = r.readLine()) != null)
-            smis.add(line);
-        r.close();
-
-        for (int i = 0; i < 10; i++) {
-            int c = 0;
-            long t0 = System.nanoTime();
-            for (String smi : smis) {
-                new Parser(smi);
-            }
-            long t1 = System.nanoTime();
-            System.out.println(TimeUnit.NANOSECONDS.toMillis(t1 - t0) + " ms");
-        }
-    }
-
     private static final class RingBond {
         int  u;
         Bond bond;
