@@ -75,10 +75,6 @@ final class Parser {
         this(CharBuffer.fromString(str));
     }
 
-    static ChemicalGraph parse(String str) throws InvalidSmilesException {
-        return new Parser(str).molecule();
-    }
-
     /**
      * Access the molecule created by the parser.
      *
@@ -469,6 +465,10 @@ final class Parser {
         else if (b == Bond.IMPLICIT)
             return a;
         throw new InvalidSmilesException("ring bond mismatch, " + a + " and " + b);
+    }
+
+    static ChemicalGraph parse(String str) throws InvalidSmilesException {
+        return new Parser(str).molecule();
     }
 
     private static final class RingBond {
