@@ -141,6 +141,37 @@ final class ChemicalGraph {
     }
 
     /**
+     * Determine if the vertices 'u' and 'v' are adjacent and there is an edge
+     * which connects them.
+     *
+     * @param u a vertex
+     * @param v another vertex
+     * @return whether they are adjacent
+     */
+    boolean adjacent(int u, int v) {
+        checkRange(v);
+        for (Edge e : edges(u))
+            if (e.other(u) == v)
+                return true;
+        return false;
+    }
+
+    /**
+     * Access the edge connecting two adjacent vertices.
+     *
+     * @param u a vertex
+     * @param v another vertex (adjacent to u)
+     * @return the edge connected u and v
+     * @throws IllegalArgumentException u and v are not adjacent
+     */
+    Edge edge(int u, int v) {
+        for (Edge e : edges(u))
+            if (e.other(u) == v)
+                return e;
+        throw new IllegalArgumentException(u + ", " + v + " are not adjacent");
+    }
+
+    /**
      * Add a topology description to the graph. The topology describes the
      * configuration around a given atom.
      *
@@ -203,7 +234,7 @@ final class ChemicalGraph {
 
         ChemicalGraph g = new ChemicalGraph(order);
         g.order = order;
-        g.size  = size;
+        g.size = size;
 
         for (int u = 0; u < order; u++) {
             g.atoms[p[u]] = atoms[u];

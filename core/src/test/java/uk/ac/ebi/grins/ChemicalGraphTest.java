@@ -40,6 +40,7 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -148,6 +149,63 @@ public class ChemicalGraphTest {
         g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
         assertThat(g.degree(0), is(1));
         assertThat(g.degree(1), is(2));
+    }
+
+    @Test public void adjacent() {
+        ChemicalGraph g = new ChemicalGraph(5);
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        assertTrue(g.adjacent(0, 1));
+        assertTrue(g.adjacent(1, 2));
+        assertFalse(g.adjacent(0, 2));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void adjacentInvalid() {
+        ChemicalGraph g = new ChemicalGraph(5);
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        g.adjacent(0, 4);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void adjacentInvalid2() {
+        ChemicalGraph g = new ChemicalGraph(5);
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        g.adjacent(4, 0);
+    }
+
+    @Test
+    public void edge() {
+        ChemicalGraph g = new ChemicalGraph(5);
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        assertThat(g.edge(0, 1), is(new Edge(0, 1, Bond.IMPLICIT)));
+        assertThat(g.edge(1, 2), is(new Edge(1, 2, Bond.IMPLICIT)));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void edgeNone() {
+        ChemicalGraph g = new ChemicalGraph(5);
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        g.edge(0, 2);
     }
 
     @Test(expected = IllegalArgumentException.class)
