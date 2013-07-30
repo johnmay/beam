@@ -40,7 +40,17 @@ import static uk.ac.ebi.grins.Atom.AromaticSubset;
 import static uk.ac.ebi.grins.Atom.OrganicSubset;
 
 
-/** @author John May */
+/**
+ * Parse a SMILES string and create a {@link ChemicalGraph}. A new parser should
+ * be created for each invocation, for convenience {@link #parse(String)} is
+ * provided.
+ *
+ * <blockquote><pre>
+ * ChemicalGraph g = Parser.parse("CCO");
+ * </pre></blockquote>
+ *
+ * @author John May
+ */
 final class Parser {
 
     /** Keep track of branching. */
@@ -65,12 +75,24 @@ final class Parser {
     /** Current configuration. */
     private Configuration configuration = Configuration.UNKNOWN;
 
+    /**
+     * Create a new parser for the specified buffer.
+     *
+     * @param buffer character buffer holding a SMILES string
+     * @throws InvalidSmilesException thrown if the SMILES could not be parsed
+     */
     Parser(CharBuffer buffer) throws InvalidSmilesException {
         g = new ChemicalGraph(1 + (2 * (buffer.length() / 3)));
         readSmiles(buffer);
         createTopologies();
     }
 
+    /**
+     * Create a new parser for the specified string.
+     *
+     * @param str SMILES string
+     * @throws InvalidSmilesException thrown if the SMILES could not be parsed
+     */
     Parser(String str) throws InvalidSmilesException {
         this(CharBuffer.fromString(str));
     }
@@ -396,6 +418,12 @@ final class Parser {
         return 0;
     }
 
+    /**
+     * Handle the ring open/closure of the specified ring number 'rnum'.
+     *
+     * @param rnum ring number
+     * @throws InvalidSmilesException bond types did not match on ring closure
+     */
     private void ring(int rnum) throws InvalidSmilesException {
         if (rings.length <= rnum || rings[rnum] == null) {
             openRing(rnum);
@@ -404,6 +432,11 @@ final class Parser {
         }
     }
 
+    /**
+     * Open the ring bond with the specified 'rnum'.
+     *
+     * @param rnum ring number
+     */
     private void openRing(int rnum) {
         if (rnum >= rings.length)
             rings = Arrays.copyOf(rings, rnum + 1);
@@ -418,6 +451,13 @@ final class Parser {
         bond = Bond.IMPLICIT;
     }
 
+    /**
+     * Create the current local arrangement for vertex 'u' - if the arrangment
+     * already exists then that arrangement is used.
+     *
+     * @param u vertex to get the arrangement around
+     * @return current local arrangement
+     */
     private LocalArrangement createArrangement(int u) {
         LocalArrangement la = arrangement.get(u);
         if (la == null) {
@@ -429,6 +469,12 @@ final class Parser {
         return la;
     }
 
+    /**
+     * Close the ring bond with the specified 'rnum'.
+     *
+     * @param rnum ring number
+     * @throws InvalidSmilesException bond types did not match
+     */
     private void closeRing(int rnum) throws InvalidSmilesException {
         RingBond rbond = rings[rnum];
         rings[rnum] = null;
@@ -467,10 +513,22 @@ final class Parser {
         throw new InvalidSmilesException("ring bond mismatch, " + a + " and " + b);
     }
 
+    /**
+     * Convenience method for parsing a SMILES string.
+     *
+     * @param str SMILES string
+     * @return the chemical graph for the provided SMILES notation
+     * @throws InvalidSmilesException thrown if the SMILES could not be
+     *                                interpreted
+     */
     static ChemicalGraph parse(String str) throws InvalidSmilesException {
         return new Parser(str).molecule();
     }
 
+    /**
+     * Hold information about ring open/closures. The ring bond can optionally
+     * specify the bond type.
+     */
     private static final class RingBond {
         int  u;
         Bond bond;
@@ -481,21 +539,55 @@ final class Parser {
         }
     }
 
+    /**
+     * Hold information on the local arrangement around an atom. The arrangement
+     * is normally identical to the order loaded unless the atom is involved in
+     * a ring closure. This is particularly important for stereo specification
+     * where the ring bonds should be in the order listed. This class stores the
+     * local arrangement by setting a negated 'rnum' as a placeholder and then
+     * replacing it once the connected atom has been read. Although this could
+     * be stored directly on the graph (negated edge) it allows us to keep all
+     * edges in sorted order.
+     */
     private static final class LocalArrangement {
 
         int[] vs;
         int   n;
 
+        /** New local arrangement. */
         private LocalArrangement() {
             this.vs = new int[4];
         }
 
+        /**
+         * Append a vertex to the arrangement.
+         *
+         * @param v vertex to append
+         */
         void add(final int v) {
             if (n == vs.length)
                 vs = Arrays.copyOf(vs, n * 2);
             vs[n++] = v;
         }
 
+        /**
+         * Replace the vertex 'u' with 'v'. Allows us to use negated values as
+         * placeholders.
+         *
+         * <blockquote><pre>
+         * LocalArrangement la = new LocalArrangement();
+         * la.add(1);
+         * la.add(-2);
+         * la.add(-1);
+         * la.add(5);
+         * la.replace(-1, 4);
+         * la.replace(-2, 6);
+         * la.toArray() = {1, 6, 4, 5}
+         * </pre></blockquote>
+         *
+         * @param u negated vertex
+         * @param v new vertex
+         */
         void replace(final int u, final int v) {
             for (int i = 0; i < n; i++) {
                 if (vs[i] == u) {
@@ -505,6 +597,11 @@ final class Parser {
             }
         }
 
+        /**
+         * Access the local arrange of vertices.
+         *
+         * @return array of vertices and there order around an atom.
+         */
         int[] toArray() {
             return Arrays.copyOf(vs, n);
         }
