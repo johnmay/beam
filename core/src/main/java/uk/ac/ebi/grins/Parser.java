@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.Map.Entry;
 import static uk.ac.ebi.grins.Atom.AromaticSubset;
 import static uk.ac.ebi.grins.Atom.OrganicSubset;
 
@@ -71,11 +72,7 @@ final class Parser {
     Parser(CharBuffer buffer) throws InvalidSmilesException {
         g = new ChemicalGraph(1 + (2 * (buffer.length() / 3)));
         readSmiles(buffer);
-
-        // create topologies
-        for (Map.Entry<Integer, Configuration> e : configurations.entrySet()) {
-            int u = e.getKey();
-        }
+        createTopologies();
     }
 
     Parser(String str) throws InvalidSmilesException {
@@ -93,6 +90,45 @@ final class Parser {
      */
     ChemicalGraph molecule() {
         return g;
+    }
+
+    /**
+     * Create the topologies (stereo configurations) for the chemical graph. The
+     * topologies define spacial arrangement around atoms.
+     */
+    private void createTopologies() {
+        // create topologies (stereo configurations)
+        for (Entry<Integer, Configuration> e : configurations.entrySet())
+            addTopology(e.getKey(),
+                        Topology.toExplicit(g, e.getKey(), e.getValue()));
+    }
+
+    /**
+     * Add a topology for vertex 'u' with configuration 'c'. If the atom 'u' was
+     * involved in a ring closure the local arrangement is used instead of the
+     * order in the graph. The configuration should be explicit '@TH1' or '@TH2'
+     * instead of '@' or '@@'.
+     *
+     * @param u a vertex
+     * @param c explicit configuration of that vertex
+     * @see Topology#toExplicit(ChemicalGraph, int, Configuration)
+     */
+    private void addTopology(int u, Configuration c) {
+
+        // stereo on ring closure - use local arrangement
+        if (arrangement.containsKey(u)) {
+            int[] vs = arrangement.get(u).toArray();
+            List<Edge> es = new ArrayList<Edge>(vs.length);
+            for (int v : vs)
+                es.add(g.edge(u, v));
+            g.addTopology(Topology.create(u, vs, es, c));
+        } else {
+            int[] vs = new int[g.degree(u)];
+            List<Edge> es = g.edges(u);
+            for (int i = 0; i < vs.length; i++)
+                vs[i] = es.get(i).other(u);
+            g.addTopology(Topology.create(u, vs, es, c));
+        }
     }
 
     /**
@@ -492,6 +528,10 @@ final class Parser {
                     return;
                 }
             }
+        }
+
+        int[] toArray() {
+            return Arrays.copyOf(vs, n);
         }
     }
 }
