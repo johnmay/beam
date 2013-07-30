@@ -32,6 +32,7 @@ package uk.ac.ebi.grins;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -182,6 +183,69 @@ final class ChemicalGraph {
         return size;
     }
 
+    /**
+     * Permute the vertices of a graph using a given permutation.
+     *
+     * <blockquote><pre>
+     * g = CNCO
+     * h = g.permuate(new int[]{1, 0, 3, 2});
+     * h = NCOC
+     * </pre></blockquote>
+     *
+     * @param p a permutation mapping indicate the new index of each atom
+     * @return a new chemical graph with the vertices permuted by the given
+     *         ordering
+     */
+    ChemicalGraph permute(int[] p) {
+
+        if (p.length != order)
+            throw new IllegalArgumentException("permuation size should equal |V| (order)");
+
+        ChemicalGraph g = new ChemicalGraph(order);
+        g.order = order;
+        g.size  = size;
+
+        for (int u = 0; u < order; u++) {
+            g.atoms[p[u]] = atoms[u];
+            g.addTopology(topologyOf(u).transform(p));
+        }
+
+        for (int u = 0; u < order; u++) {
+            for (Edge e : edges[u]) {
+                if (u < e.other(u)) {
+                    int v = p[u], w = p[e.other(u)];
+                    Edge f = new Edge(v, w, e.bond(u));
+                    g.edges[v].add(f);
+                    g.edges[w].add(f);
+                }
+            }
+        }
+
+        // ensure edges are in sorted order
+        return g.sort();
+    }
+
+    /**
+     * Sort the edges of each vertex in the chemical graph. Ensures that when
+     * invoking {@link #edges(int)} the connected vertices will be in natural
+     * order. The actual order of atoms does not change. The atom order can be
+     * rearranged using {@link #permute(int[])}.
+     *
+     * <blockquote><pre>
+     * g.edges(5) = {5-1, 5-0, 6-5, 5-2}  // unsorted
+     * g.edges(5) = {5-0, 5-1, 5-2, 6-5}  // sorted
+     * </pre></blockquote>
+     *
+     * @return self-reference for fluent invocation
+     * @see #permute(int[])
+     */
+    ChemicalGraph sort() {
+        for (int u = 0; u < order; u++) {
+            Collections.sort(edges[u], EdgeComparator.forVertex(u));
+        }
+        return this;
+    }
+
     void clear() {
         topologies.clear();
         for (int i = 0; i < order; i++) {
@@ -198,4 +262,24 @@ final class ChemicalGraph {
         return u;
     }
 
+    private static final class EdgeComparator implements Comparator<Edge> {
+        private int u;
+
+        private EdgeComparator(int u) {
+            this.u = u;
+        }
+
+        static EdgeComparator forVertex(int u) {
+            return new EdgeComparator(u);
+        }
+
+        @Override public int compare(Edge e, Edge f) {
+            int v = e.other(u), w = f.other(u);
+            if (v > w)
+                return +1;
+            else if (v < w)
+                return -1;
+            return 0;
+        }
+    }
 }

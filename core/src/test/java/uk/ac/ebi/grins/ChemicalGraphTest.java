@@ -29,7 +29,11 @@
 
 package uk.ac.ebi.grins;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -219,4 +223,81 @@ public class ChemicalGraphTest {
         assertThat(g.order(), is(0));
         assertThat(g.size(), is(0));
     }
+
+    @Test public void permute() {
+        ChemicalGraph g = new ChemicalGraph(2);
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        g.addEdge(new Edge(2, 3, Bond.IMPLICIT));
+
+        assertThat(g.degree(0), is(1));
+        assertThat(g.degree(1), is(2));
+        assertThat(g.degree(2), is(2));
+        assertThat(g.degree(3), is(1));
+
+        ChemicalGraph h = g.permute(new int[]{1, 0, 3, 2});
+        assertThat(h.degree(0), is(2));
+        assertThat(h.degree(1), is(1));
+        assertThat(h.degree(2), is(1));
+        assertThat(h.degree(3), is(2));
+        assertThat(g.atom(0), is(h.atom(1)));
+        assertThat(g.atom(1), is(h.atom(0)));
+        assertThat(g.atom(2), is(h.atom(3)));
+        assertThat(g.atom(3), is(h.atom(2)));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void invalidPermutation() {
+        ChemicalGraph g = new ChemicalGraph(2);
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        g.addEdge(new Edge(2, 3, Bond.IMPLICIT));
+        g.permute(new int[2]);
+    }
+
+    @Test public void sort() {
+        ChemicalGraph g = new ChemicalGraph(2);
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addEdge(new Edge(3, 2, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        g.addEdge(new Edge(0, 3, Bond.IMPLICIT));
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        assertThat(g.edges(0), CoreMatchers
+                .<List<Edge>>is(Arrays.asList(new Edge(0, 3, Bond.IMPLICIT),
+                                              new Edge(0, 1, Bond.IMPLICIT))));
+        assertThat(g.edges(1), CoreMatchers
+                .<List<Edge>>is(Arrays.asList(new Edge(1, 2, Bond.IMPLICIT),
+                                              new Edge(1, 0, Bond.IMPLICIT))));
+        assertThat(g.edges(2), CoreMatchers
+                .<List<Edge>>is(Arrays.asList(new Edge(2, 3, Bond.IMPLICIT),
+                                              new Edge(2, 1, Bond.IMPLICIT))));
+        assertThat(g.edges(3), CoreMatchers
+                .<List<Edge>>is(Arrays.asList(new Edge(3, 2, Bond.IMPLICIT),
+                                              new Edge(3, 0, Bond.IMPLICIT))));
+        g.sort();
+        assertThat(g.edges(0), CoreMatchers
+                .<List<Edge>>is(Arrays.asList(new Edge(0, 1, Bond.IMPLICIT),
+                                              new Edge(0, 3, Bond.IMPLICIT))));
+        assertThat(g.edges(1), CoreMatchers
+                .<List<Edge>>is(Arrays.asList(new Edge(1, 0, Bond.IMPLICIT),
+                                              new Edge(1, 2, Bond.IMPLICIT))));
+        assertThat(g.edges(2), CoreMatchers
+                .<List<Edge>>is(Arrays.asList(new Edge(2, 1, Bond.IMPLICIT),
+                                              new Edge(2, 3, Bond.IMPLICIT))));
+        assertThat(g.edges(3), CoreMatchers
+                .<List<Edge>>is(Arrays.asList(new Edge(3, 0, Bond.IMPLICIT),
+                                              new Edge(3, 2, Bond.IMPLICIT))));
+    }
+
 }
