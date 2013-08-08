@@ -157,6 +157,8 @@ final class Parser {
             int u = stack.pop();
             if (bond != Bond.DOT)
                 g.addEdge(new Edge(u, v, bond));
+            if (arrangement.containsKey(u))
+                arrangement.get(u).add(v);
             bond = Bond.IMPLICIT;
         }
         stack.push(v);
