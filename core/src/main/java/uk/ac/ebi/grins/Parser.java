@@ -337,10 +337,7 @@ final class Parser {
         if (!buffer.getIf(']'))
             throw InvalidSmilesException.invalidBracketAtom(buffer);
 
-        // currently we treat unspecified isotope the same as '0', this does not
-        // follow the specification but is a point of contention and most parser
-        // do this.
-        return new Atom.BracketAtom(isotope < 0 ? 0 : isotope,
+        return new Atom.BracketAtom(isotope,
                                     element,
                                     hCount,
                                     charge,
