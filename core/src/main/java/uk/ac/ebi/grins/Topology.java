@@ -327,5 +327,9 @@ abstract class Topology {
                 ws[i] = mapping[vs[i]];
             return new Tetrahedral(mapping[u], ws, p);
         }
+
+        public String toString() {
+            return u + " " + Arrays.toString(vs) + ":" + p;
+        }
     }
 }
