@@ -29,6 +29,8 @@
 
 package uk.ac.ebi.grins;
 
+import java.util.Locale;
+
 /**
  * Defines properties of a SMILES atom. The organic and aromatic subsets are
  * provided as an enumeration for efficient reuse.
@@ -36,6 +38,8 @@ package uk.ac.ebi.grins;
  * @author John May
  */
 interface Atom {
+
+    int isotope();
 
     /**
      * The element of the atom.
@@ -81,6 +85,8 @@ interface Atom {
      */
     int atomClass();
 
+    Generator.AtomToken token();
+
     static enum OrganicSubset implements Atom {
         Boron(Element.Boron),
         Carbon(Element.Carbon),
@@ -93,10 +99,16 @@ interface Atom {
         Bromine(Element.Bromine),
         Iodine(Element.Iodine);
 
-        private Element element;
+        private Element             element;
+        private Generator.AtomToken token;
 
         private OrganicSubset(Element element) {
             this.element = element;
+            this.token = new Generator.SubsetToken(element.symbol());
+        }
+
+        @Override public int isotope() {
+            return -1;
         }
 
         @Override public Element element() {
@@ -118,6 +130,10 @@ interface Atom {
         @Override public int atomClass() {
             return 0;
         }
+
+        @Override public Generator.AtomToken token() {
+            return token;
+        }
     }
 
     static enum AromaticSubset implements Atom {
@@ -128,10 +144,17 @@ interface Atom {
         Sulfur(Element.Sulfur),
         Phosphorus(Element.Phosphorus);
 
-        private Element element;
+        private       Element             element;
+        private final Generator.AtomToken token;
 
         private AromaticSubset(Element element) {
             this.element = element;
+            this.token = new Generator.SubsetToken(element.symbol()
+                                                              .toLowerCase(Locale.ENGLISH));
+        }
+
+        @Override public int isotope() {
+            return -1;
         }
 
         @Override public Element element() {
@@ -153,6 +176,10 @@ interface Atom {
         @Override public int atomClass() {
             return 0;
         }
+
+        @Override public Generator.AtomToken token() {
+            return token;
+        }
     }
 
     static class BracketAtom implements Atom {
@@ -170,7 +197,11 @@ interface Atom {
         }
 
         public BracketAtom(Element element, int hCount, int charge) {
-            this(0, element, hCount, charge, 0, false);
+            this(-1, element, hCount, charge, 0, false);
+        }
+
+        @Override public int isotope() {
+            return isotope;
         }
 
         @Override public Element element() {
@@ -191,6 +222,10 @@ interface Atom {
 
         @Override public int atomClass() {
             return atomClass;
+        }
+
+        @Override public Generator.AtomToken token() {
+            return new Generator.BracketToken(this);
         }
 
         @Override
@@ -222,7 +257,8 @@ interface Atom {
         }
 
         @Override public String toString() {
-            return "[" + isotope + element.symbol() + "H" + hCount + (charge != 0 ? charge : "") + ":" + atomClass + "]";
+            return "[" + isotope + element.symbol() + "H" + hCount + (
+                    charge != 0 ? charge : "") + ":" + atomClass + "]";
         }
     }
 
