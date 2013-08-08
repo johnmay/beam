@@ -286,6 +286,8 @@ abstract class Topology {
         private final int   p;
 
         private Tetrahedral(int u, int[] vs, int p) {
+            if (vs.length != 4)
+                throw new IllegalArgumentException("Tetrahedral topology requires 4 vertices - use the 'centre' vertex to mark implicit verticies");
             this.u = u;
             this.vs = vs;
             this.p = p;
@@ -303,21 +305,9 @@ abstract class Topology {
 
         /** @inheritDoc */
         @Override Topology orderBy(int[] rank) {
-            int q = p * parity(vs, rank);
-
-            // consider implicit hydrogen position
-            if (vs.length == 3) {
-                int count = 0;
-                for (int v : vs)
-                    if (rank[v] > rank[u])
-                        count++;
-                // (-1)^n
-                q *= (count & 0x1) == 1 ? -1 : 1;
-            }
-
             return new Tetrahedral(u,
                                    sort(vs, rank),
-                                   q);
+                                   p * parity(vs, rank));
         }
 
         /** @inheritDoc */
