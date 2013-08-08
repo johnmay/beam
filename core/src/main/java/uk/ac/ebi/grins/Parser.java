@@ -34,6 +34,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static java.util.Map.Entry;
 import static uk.ac.ebi.grins.Atom.AromaticSubset;
@@ -75,6 +77,14 @@ final class Parser {
     /** Current configuration. */
     private Configuration configuration = Configuration.UNKNOWN;
 
+
+    /**
+     * Which vertices start a new run of tokens. This includes the first vertex
+     * and all vertices which immediately follow a 'dot' bond. These are
+     * required to correctly store atom topologies.
+     */
+    private Set<Integer> start = new TreeSet<Integer>();
+
     /**
      * Create a new parser for the specified buffer.
      *
@@ -84,6 +94,7 @@ final class Parser {
     Parser(CharBuffer buffer) throws InvalidSmilesException {
         g = new ChemicalGraph(1 + (2 * (buffer.length() / 3)));
         readSmiles(buffer);
+        start.add(0); // always include first vertex as start
         createTopologies();
     }
 
@@ -157,6 +168,8 @@ final class Parser {
             int u = stack.pop();
             if (bond != Bond.DOT)
                 g.addEdge(new Edge(u, v, bond));
+            else
+                start.add(v); // start of a new run
             if (arrangement.containsKey(u))
                 arrangement.get(u).add(v);
             bond = Bond.IMPLICIT;
