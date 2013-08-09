@@ -36,12 +36,14 @@ import static uk.ac.ebi.grins.Configuration.AL1;
 import static uk.ac.ebi.grins.Configuration.AL2;
 import static uk.ac.ebi.grins.Configuration.ANTI_CLOCKWISE;
 import static uk.ac.ebi.grins.Configuration.CLOCKWISE;
+import static uk.ac.ebi.grins.Configuration.DB1;
 import static uk.ac.ebi.grins.Configuration.OH1;
 import static uk.ac.ebi.grins.Configuration.OH2;
 import static uk.ac.ebi.grins.Configuration.TB1;
 import static uk.ac.ebi.grins.Configuration.TB2;
 import static uk.ac.ebi.grins.Configuration.TH1;
 import static uk.ac.ebi.grins.Configuration.TH2;
+import static uk.ac.ebi.grins.Configuration.Type.DoubleBond;
 import static uk.ac.ebi.grins.Configuration.Type.Implicit;
 import static uk.ac.ebi.grins.Configuration.Type.Tetrahedral;
 
@@ -166,32 +168,51 @@ abstract class Topology {
     }
 
     /**
+     * Define trigonal topology of the given configuration.
+     *
+     * @param u             central atom
+     * @param vs            vertices surrounding u, the first is the vertex we
+     *                      are looking from
+     * @param configuration the trigonal configuration, @DB1, @Db1, @ or @@
+     * @return topology instance for that configuration
+     * @see Configuration
+     */
+    static Topology trigonal(int u, int[] vs, Configuration configuration) {
+
+        if (configuration.type() != Implicit
+                && configuration.type() != DoubleBond)
+            throw new IllegalArgumentException(configuration.type()
+                                                       + "invalid tetrahedral configuration");
+
+        int p = configuration.shorthand() == CLOCKWISE ? 1 : -1;
+
+        return new Trigonal(u,
+                            Arrays.copyOf(vs, vs.length),
+                            p);
+    }
+
+    /**
      * Convert an implicit configuration ('@' or '@@') c, to an explicit one
      * (e.g. @TH1).
      *
      * <blockquote><pre>
      * Implicit Valence Explicit Example
-     * @        4       @TH1     O[C@H](N)C or O[C@]([H])(N)C
-     * @@       4       @TH2     O[C@@H](N)C or O[C@@]([H])(N)C
-     *
-     * @        3       @TH1     C[S@](N)=O
-     * @@       3       @TH2     C[S@@](N)=O
-     *
-     * @        2       @AL1     OC=[C@]=CO
-     * @        2       @AL2     OC=[C@@]=CO
-     *
-     * @        5       @TB1     S[As@](F)(Cl)(Br)C=O
-     * @@       5       @TB2     S[As@@](F)(Cl)(Br)C=O
-     *
-     * @        5       @OH1     S[Co@@](F)(Cl)(Br)(I)C=O
-     * @@       5       @OH2     O=C[Co@](F)(Cl)(Br)(I)S
-     * </pre></blockquote>
      *
      * @param g chemical graph
      * @param u the atom to which the configuration is associated
      * @param c implicit configuration ({@link Configuration#ANTI_CLOCKWISE or
      *          Configuration#CLOCKWISE})
      * @return an explicit configuration or {@link Configuration#UNKNOWN}
+     * @ 4       @TH1     O[C@H](N)C or O[C@]([H])(N)C
+     * @@ 4       @TH2     O[C@@H](N)C or O[C@@]([H])(N)C
+     * @ 3       @TH1     C[S@](N)=O
+     * @@ 3       @TH2     C[S@@](N)=O
+     * @ 2       @AL1     OC=[C@]=CO
+     * @ 2       @AL2     OC=[C@@]=CO
+     * @ 5       @TB1     S[As@](F)(Cl)(Br)C=O
+     * @@ 5       @TB2     S[As@@](F)(Cl)(Br)C=O
+     * @ 5       @OH1     S[Co@@](F)(Cl)(Br)(I)C=O
+     * @@ 5       @OH2     O=C[Co@](F)(Cl)(Br)(I)S </pre></blockquote>
      */
     static Configuration toExplicit(ChemicalGraph g, int u, Configuration c) {
 
@@ -199,7 +220,7 @@ abstract class Topology {
         if (c.type() != Implicit)
             return c;
 
-        int deg     = g.degree(u);
+        int deg = g.degree(u);
         int valence = deg + g.atom(u).hydrogens();
 
         // tetrahedral topology, square planar must always be explicit
@@ -223,8 +244,20 @@ abstract class Topology {
                 }
             }
 
-            // TODO: double bond stereo as atom specification
+            // for the atom centric double bond configuration check there is
+            // a double bond and it's not sill tetrahedral specification such
+            // as [C@-](N)(O)C
+            int nDoubleBonds = 0;
+            for (Edge e : g.edges(u)) {
+                if (e.bond() == Bond.DOUBLE)
+                    nDoubleBonds++;
+            }
 
+            if (nDoubleBonds == 1) {
+                return c == ANTI_CLOCKWISE ? DB1 : DB2;
+            } else {
+                return Configuration.UNKNOWN;
+            }
         }
 
         // odd number of cumulated double bond systems (e.g. allene)
@@ -256,6 +289,8 @@ abstract class Topology {
         // only tetrahedral is handled for now
         if (c.type() == Tetrahedral) {
             return tetrahedral(u, vs, c);
+        } else if (c.type() == DoubleBond) {
+            return trigonal(u, vs, c);
         }
 
         return unknown();
@@ -316,6 +351,49 @@ abstract class Topology {
             for (int i = 0; i < vs.length; i++)
                 ws[i] = mapping[vs[i]];
             return new Tetrahedral(mapping[u], ws, p);
+        }
+
+        public String toString() {
+            return u + " " + Arrays.toString(vs) + ":" + p;
+        }
+    }
+
+    private static final class Trigonal extends Topology {
+        private final int   u;
+        private final int[] vs;
+        private final int   p;
+
+        private Trigonal(int u, int[] vs, int p) {
+            if (vs.length != 3)
+                throw new IllegalArgumentException("Trigonal topology requires 3 vertices - use the 'centre' vertex to mark implicit verticies");
+            this.u = u;
+            this.vs = vs;
+            this.p = p;
+        }
+
+        /** @inheritDoc */
+        @Override int atom() {
+            return u;
+        }
+
+        /** @inheritDoc */
+        @Override Configuration configuration() {
+            return p < 0 ? Configuration.DB1 : Configuration.DB2;
+        }
+
+        /** @inheritDoc */
+        @Override Topology orderBy(int[] rank) {
+            return new Trigonal(u,
+                                sort(vs, rank),
+                                p * parity(vs, rank));
+        }
+
+        /** @inheritDoc */
+        @Override Topology transform(final int[] mapping) {
+            int[] ws = new int[vs.length];
+            for (int i = 0; i < vs.length; i++)
+                ws[i] = mapping[vs[i]];
+            return new Trigonal(mapping[u], ws, p);
         }
 
         public String toString() {
