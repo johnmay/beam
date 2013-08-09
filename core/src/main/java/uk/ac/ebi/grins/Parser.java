@@ -121,7 +121,7 @@ final class Parser {
      * Create the topologies (stereo configurations) for the chemical graph. The
      * topologies define spacial arrangement around atoms.
      */
-    private void createTopologies() {
+    private void createTopologies() throws InvalidSmilesException {
         // create topologies (stereo configurations)
         for (Entry<Integer, Configuration> e : configurations.entrySet())
             addTopology(e.getKey(),
@@ -138,7 +138,7 @@ final class Parser {
      * @param c explicit configuration of that vertex
      * @see Topology#toExplicit(ChemicalGraph, int, Configuration)
      */
-    private void addTopology(int u, Configuration c) {
+    private void addTopology(int u, Configuration c) throws InvalidSmilesException {
 
         // stereo on ring closure - use local arrangement
         if (arrangement.containsKey(u)) {
@@ -146,14 +146,28 @@ final class Parser {
             List<Edge> es = new ArrayList<Edge>(vs.length);
             for (int v : vs)
                 es.add(g.edge(u, v));
+            vs = insertThImplicitRef(u, vs); // XXX: temp fix
             g.addTopology(Topology.create(u, vs, es, c));
         } else {
             int[] vs = new int[g.degree(u)];
             List<Edge> es = g.edges(u);
             for (int i = 0; i < vs.length; i++)
                 vs[i] = es.get(i).other(u);
+            vs = insertThImplicitRef(u, vs); // XXX: temp fix
             g.addTopology(Topology.create(u, vs, es, c));
         }
+    }
+
+    // XXX: temporary fix for correcting configurations
+    private int[] insertThImplicitRef(int u, int[] vs) throws InvalidSmilesException {
+        if (vs.length == 4)
+            return vs;
+        if (vs.length != 3)
+            throw new InvalidSmilesException("invaid number of verticies for TH1/TH2");
+        if (start.contains(u))
+            return new int[]{u, vs[0], vs[1], vs[2]};
+        else
+            return new int[]{vs[0], u, vs[1], vs[2]};
     }
 
     /**
