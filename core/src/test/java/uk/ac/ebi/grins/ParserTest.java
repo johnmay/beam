@@ -29,6 +29,7 @@
 
 package uk.ac.ebi.grins;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -47,6 +48,16 @@ public class ParserTest {
         assertThat(Parser.decideBond(Bond.DOUBLE, Bond.DOUBLE), is(Bond.DOUBLE));
         assertThat(Parser.decideBond(Bond.DOUBLE, Bond.IMPLICIT), is(Bond.DOUBLE));
         assertThat(Parser.decideBond(Bond.IMPLICIT, Bond.DOUBLE), is(Bond.DOUBLE));
+    }
+
+    @Test public void invalidTetrahedral() throws InvalidSmilesException {
+        ChemicalGraph g = Parser.parse("[C@-](N)(O)C");
+        Assert.assertThat(g.topologyOf(0), is(Topology.unknown()));
+    }
+
+    @Test public void invalidTetrahedral2() throws InvalidSmilesException {
+        ChemicalGraph g = Parser.parse("[C@](N)(O)C");
+        Assert.assertThat(g.topologyOf(0), is(Topology.unknown()));
     }
 
 
