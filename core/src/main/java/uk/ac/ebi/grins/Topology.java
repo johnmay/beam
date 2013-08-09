@@ -37,6 +37,7 @@ import static uk.ac.ebi.grins.Configuration.AL2;
 import static uk.ac.ebi.grins.Configuration.ANTI_CLOCKWISE;
 import static uk.ac.ebi.grins.Configuration.CLOCKWISE;
 import static uk.ac.ebi.grins.Configuration.DB1;
+import static uk.ac.ebi.grins.Configuration.DB2;
 import static uk.ac.ebi.grins.Configuration.OH1;
 import static uk.ac.ebi.grins.Configuration.OH2;
 import static uk.ac.ebi.grins.Configuration.TB1;
