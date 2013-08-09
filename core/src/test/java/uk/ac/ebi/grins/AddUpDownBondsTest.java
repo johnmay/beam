@@ -163,6 +163,12 @@ public class AddUpDownBondsTest {
                   "C\\C(\\[H])=C(\\[H])/C(/[H])=C(\\[H])/C");
     }
 
+    @Test public void problematic() throws InvalidSmilesException {
+        // need to 'flip' the second double bond to alternate embedding
+        transform("C(\\[H])(=C(\\C)[H])C(=C(/C)[H])/[H]",
+                  "C(\\[H])(=C(\\C)/[H])C(=C(/C)[H])/[H]");
+    }
+
     /** Ensure cumulated double bonds don't break the transformation */
     @Test public void allene() throws InvalidSmilesException {
         transform("CC=C=CC",
