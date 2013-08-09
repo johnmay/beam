@@ -154,11 +154,11 @@ final class AddUpDownBonds {
         if (implicit == null || explicit == null)
             return;
 
-        int v = implicit.either();
-        int w = implicit.other(v);
 
-        Edge existing = acc.put(implicit, new Edge(v,
-                                                   w,
+        int v = implicit.other(u);
+
+        Edge existing = acc.put(implicit, new Edge(u,
+                                                   v,
                                                    explicit.bond(u)
                                                            .inverse()));
 
