@@ -64,6 +64,35 @@ public class RemoveUpDownBondsTest {
                   "C\\C([H])=C(/[H])C(\\[H])=C(/[H])C");
     }
 
+    @Test public void e_e_hexadiene_expH2() throws Exception {
+        transform("[H]\\C(\\C(\\[H])=C(\\C)/[H])=C(/C)\\[H]",
+                  "[H]\\C(\\C([H])=C(\\C)[H])=C(/C)[H]");
+    }
+
+    @Test public void e_e_hexadiene_expH3() throws Exception {
+        transform("[H]/C(/C(=C(/C)\\[H])[H])=C(/[H])\\C",
+                  "[H]/C(/C(=C(/C)[H])[H])=C(/[H])C");
+    }
+
+    @Test public void e_e_hexadiene_expH4() throws Exception {
+        transform("C\\C(\\[H])=C(/[H])\\C(=C(/[H])\\C)\\[H]",
+                  "C\\C([H])=C(/[H])\\C(=C(/[H])C)[H]");
+    }
+
+    @Test public void e_e_hexadiene_expH5() throws Exception {
+        transform("[H]/C(/C)=C(/[H])\\C(\\[H])=C(/[H])\\C",
+                  "[H]/C(C)=C(/[H])\\C([H])=C(/[H])C");
+    }
+
+    @Test public void e_e_hexadiene_permute() throws Exception {
+        String input = "C\\C(=C(\\C(=C(/[H])\\C)\\[H])/[H])\\[H]";
+        int[] p = new int[]{7, 2, 4, 1, 3, 6, 8, 9, 0, 5};
+        ChemicalGraph g = Parser.parse(input);
+        Assert.assertThat(Generator.generate(g.permute(p)),
+                          is("[H]\\C(\\C(=C(/[H])\\C)\\[H])=C(\\[H])/C"));
+        Assert.assertThat(Generator.generate(new RemoveUpDownBonds().transform(g.permute(p))),
+                          is("[H]\\C(\\C(=C(/[H])C)[H])=C(\\[H])C"));
+    }
 
     static void transform(String smi, String exp) throws
                                                   InvalidSmilesException {

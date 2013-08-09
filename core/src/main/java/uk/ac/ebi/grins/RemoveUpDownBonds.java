@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -61,13 +62,24 @@ final class RemoveUpDownBonds {
         int[] ordering = new DepthFirstOrder(g).visited;
 
         Map<Edge, Edge> replacements = new HashMap<Edge, Edge>();
+        Set<Integer> dbCentres = new TreeSet<Integer>();
 
         // change edges (only changed added to replacement)
         for (int u = 0; u < g.order(); u++) {
             for (final Edge e : g.edges(u)) {
                 if (e.other(u) > u && e.bond() == Bond.DOUBLE) {
                     removeRedundant(g, e, ordering, replacements);
+                    dbCentres.add(u);
+                    dbCentres.add(e.other(u));
                 }
+            }
+        }
+
+        // ensure we haven't accidentally removed one between two
+        for (Edge e : new HashSet<Edge>(replacements.keySet())) {
+            if (dbCentres.contains(e.either())
+                    && dbCentres.contains(e.other(e.either()))) {
+                replacements.remove(e);
             }
         }
 
@@ -155,22 +167,16 @@ final class RemoveUpDownBonds {
             }
         }
 
-        if (edges.size() > 1) {
+        if (edges.size() == 2) {
             Iterator<Edge> it = edges.iterator();
             Edge explicit = it.next();
-
-            // Ensure we don't complete remove all stereo bonds in conjugated
-            // system. If the 'higher' order edge has already been replaced
-            // don't make the other edge implicit
-            if (!acc.containsKey(it.next())) {
-
-                int v = explicit.either();
-                int w = explicit.other(v);
-                acc.put(explicit, new Edge(v,
-                                           w,
-                                           Bond.IMPLICIT));
-            }
-
+            int v = explicit.either();
+            int w = explicit.other(v);
+            acc.put(explicit, new Edge(v,
+                                       w,
+                                       Bond.IMPLICIT));
+        } else {
+            throw new InvalidSmilesException("Too many up/down bonds on double bonded atom");
         }
     }
 
