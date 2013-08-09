@@ -175,7 +175,7 @@ final class RemoveUpDownBonds {
             acc.put(explicit, new Edge(v,
                                        w,
                                        Bond.IMPLICIT));
-        } else {
+        } else if (edges.size() > 2) {
             throw new InvalidSmilesException("Too many up/down bonds on double bonded atom");
         }
     }
