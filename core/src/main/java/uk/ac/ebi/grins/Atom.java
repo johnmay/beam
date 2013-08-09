@@ -85,6 +85,12 @@ interface Atom {
      */
     int atomClass();
 
+    /**
+     * Is the atom a member of the organic or aromatic subset? If not it's a
+     * bracket atom.
+     */
+    boolean subset();
+
     Generator.AtomToken token();
 
     static enum OrganicSubset implements Atom {
@@ -131,6 +137,10 @@ interface Atom {
             return 0;
         }
 
+        @Override public boolean subset() {
+            return true;
+        }
+
         @Override public Generator.AtomToken token() {
             return token;
         }
@@ -150,7 +160,7 @@ interface Atom {
         private AromaticSubset(Element element) {
             this.element = element;
             this.token = new Generator.SubsetToken(element.symbol()
-                                                              .toLowerCase(Locale.ENGLISH));
+                                                          .toLowerCase(Locale.ENGLISH));
         }
 
         @Override public int isotope() {
@@ -179,6 +189,10 @@ interface Atom {
 
         @Override public Generator.AtomToken token() {
             return token;
+        }
+
+        @Override public boolean subset() {
+            return true;
         }
     }
 
@@ -226,6 +240,10 @@ interface Atom {
 
         @Override public Generator.AtomToken token() {
             return new Generator.BracketToken(this);
+        }
+
+        @Override public boolean subset() {
+            return false;
         }
 
         @Override
