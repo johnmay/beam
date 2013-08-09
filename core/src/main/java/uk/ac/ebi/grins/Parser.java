@@ -146,14 +146,24 @@ final class Parser {
             List<Edge> es = new ArrayList<Edge>(vs.length);
             for (int v : vs)
                 es.add(g.edge(u, v));
-            vs = insertThImplicitRef(u, vs); // XXX: temp fix
+
+            if(c.type() == Configuration.Type.Tetrahedral)
+                vs = insertThImplicitRef(u, vs); // XXX: temp fix
+            else if(c.type() == Configuration.Type.DoubleBond)
+                vs = insertDbImplicitRef(u, vs); // XXX: temp fix
+
             g.addTopology(Topology.create(u, vs, es, c));
         } else {
             int[] vs = new int[g.degree(u)];
             List<Edge> es = g.edges(u);
             for (int i = 0; i < vs.length; i++)
                 vs[i] = es.get(i).other(u);
-            vs = insertThImplicitRef(u, vs); // XXX: temp fix
+
+            if(c.type() == Configuration.Type.Tetrahedral)
+                vs = insertThImplicitRef(u, vs); // XXX: temp fix
+            else if(c.type() == Configuration.Type.DoubleBond)
+                vs = insertDbImplicitRef(u, vs); // XXX: temp fix
+
             g.addTopology(Topology.create(u, vs, es, c));
         }
     }
@@ -168,6 +178,18 @@ final class Parser {
             return new int[]{u, vs[0], vs[1], vs[2]};
         else
             return new int[]{vs[0], u, vs[1], vs[2]};
+    }
+
+    // XXX: temporary fix for correcting configurations
+    private int[] insertDbImplicitRef(int u, int[] vs) throws InvalidSmilesException {
+        if (vs.length == 3)
+            return vs;
+        if (vs.length != 2)
+            throw new InvalidSmilesException("invaid number of verticies for DB1/DB2");
+        if (start.contains(u))
+            return new int[]{u, vs[0], vs[1]};
+        else
+            return new int[]{vs[0], u, vs[1]};
     }
 
     /**
