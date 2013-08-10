@@ -61,7 +61,7 @@ public class RemoveUpDownBondsTest {
 
     @Test public void e_e_hexadiene_expH() throws InvalidSmilesException {
         transform("C\\C(\\[H])=C(/[H])\\C(\\[H])=C(/[H])\\C",
-                  "C\\C([H])=C(/[H])C(\\[H])=C(/[H])C");
+                  "C\\C([H])=C(/[H])\\C([H])=C(/[H])C");
     }
 
     @Test public void e_e_hexadiene_expH2() throws Exception {
