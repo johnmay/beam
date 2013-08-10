@@ -162,7 +162,7 @@ final class AddUpDownBonds {
                                                    explicit.bond(u)
                                                            .inverse()));
 
-        if (existing != null && existing.bond() != explicit.bond(u).inverse())
+        if (existing != null && existing.bond(u) != explicit.bond(u).inverse())
             throw new InvalidSmilesException("unable to assign explict type for " + implicit);
 
     }
