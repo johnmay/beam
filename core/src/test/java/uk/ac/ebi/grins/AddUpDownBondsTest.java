@@ -96,15 +96,9 @@ public class AddUpDownBondsTest {
     }
 
     @Test
-    public void conjugated() throws Exception {
-        transform("C/C=C(/C)C(/[H])=C/C",
-                  "C/C=C(/C)\\C(/[H])=C/C");
-    }
-
-    @Test(expected = InvalidSmilesException.class)
-    public void invalidConjugated() throws Exception {
+    public void conjugated2() throws Exception {
         transform("C/C=C(/C)C(\\[H])=C/C",
-                  "n/a");
+                  "C/C=C(/C)\\C(\\[H])=C/C");
     }
 
     @Test public void e_e_hexadiene_implH() throws InvalidSmilesException {
@@ -163,12 +157,6 @@ public class AddUpDownBondsTest {
                   "C\\C(\\[H])=C(\\[H])/C(/[H])=C(\\[H])/C");
     }
 
-    @Test public void problematic() throws InvalidSmilesException {
-        // need to 'flip' the second double bond to alternate embedding
-        transform("C(\\[H])(=C(\\C)[H])C(=C(/C)[H])/[H]",
-                  "C(\\[H])(=C(\\C)/[H])C(=C(/C)[H])/[H]");
-    }
-
     /** Ensure cumulated double bonds don't break the transformation */
     @Test public void allene() throws InvalidSmilesException {
         transform("CC=C=CC",
@@ -179,6 +167,29 @@ public class AddUpDownBondsTest {
     @Test public void cumullene() throws InvalidSmilesException {
         transform("CC=C=C=CC",
                   "CC=C=C=CC");
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void invalidConjugated() throws Exception {
+        transform("C/C=C(/C)C(/[H])=C/C",
+                  "n/a");
+    }
+
+    /**
+     * One double bond has an end point with no directional bonds. Fully
+     * specifying the other double bond adds one directional bond giving it a
+     * readable configuration.
+     */
+    @Test public void partial1() throws InvalidSmilesException {
+        transform("[H]\\C(C([H])=C(\\C)[H])=C(/C)[H]",
+                  "[H]\\C(\\C([H])=C(\\C)/[H])=C(/C)\\[H]");
+    }
+
+
+    /** The directional label between two double bonds is missing. */
+    @Test public void middle() throws InvalidSmilesException {
+        transform("C(\\[H])(=C(\\C)[H])C(=C(/C)[H])/[H]",
+                  "C(\\[H])(=C(\\C)/[H])/C(=C(/C)\\[H])/[H]");
     }
 
     static void transform(String smi, String exp) throws
