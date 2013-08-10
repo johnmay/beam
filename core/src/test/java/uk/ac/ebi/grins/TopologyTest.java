@@ -310,12 +310,6 @@ public class TopologyTest {
     }
 
     @Test
-    public void create_db() {
-        assertThat(Topology.create(0, new int[0], Collections
-                .<Edge>emptyList(), Configuration.DB1), is(Topology.unknown()));
-    }
-
-    @Test
     public void create_al() {
         assertThat(Topology.create(0, new int[0], Collections
                 .<Edge>emptyList(), Configuration.AL1), is(Topology.unknown()));
