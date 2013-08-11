@@ -39,90 +39,94 @@ public class ToTrigonalTopologyTest {
 
 
     @Test public void difluoroethene_impl1() throws InvalidSmilesException {
-        transform("F/C=C/F", "F[C@H]=[C@H]F");
+        transform("F/C=C/F", "F[C@H]=[C@@H]F");
     }
 
     @Test public void difluoroethene_impl2() throws InvalidSmilesException {
-        transform("F/C=C\\F", "F[C@H]=[C@@H]F");
+        transform("F/C=C\\F", "F[C@H]=[C@H]F");
     }
 
     @Test public void difluoroethene_impl3() throws InvalidSmilesException {
-        transform("F\\C=C\\F", "F[C@@H]=[C@@H]F");
+        transform("F\\C=C\\F", "F[C@@H]=[C@H]F");
     }
 
     @Test public void difluoroethene_impl4() throws InvalidSmilesException {
-        transform("F\\C=C/F", "F[C@@H]=[C@H]F");
+        transform("F\\C=C/F", "F[C@@H]=[C@@H]F");
     }
 
     @Test public void difluoroethene_exp1() throws InvalidSmilesException {
-        transform("F/C([H])=C([H])/F", "F[C@]([H])=[C@]([H])F");
+        transform("F/C([H])=C([H])/F", "F[C@]([H])=[C@@]([H])F");
     }
 
     @Test public void difluoroethene_exp2() throws InvalidSmilesException {
-        transform("F/C([H])=C([H])\\F", "F[C@]([H])=[C@@]([H])F");
+        transform("F/C([H])=C([H])\\F", "F[C@]([H])=[C@]([H])F");
     }
 
     @Test public void difluoroethene_exp3() throws InvalidSmilesException {
-        transform("F\\C([H])=C([H])\\F", "F[C@@]([H])=[C@@]([H])F");
+        transform("F\\C([H])=C([H])\\F", "F[C@@]([H])=[C@]([H])F");
     }
 
     @Test public void difluoroethene_exp4() throws InvalidSmilesException {
-        transform("F\\C([H])=C([H])/F", "F[C@@]([H])=[C@]([H])F");
+        transform("F\\C([H])=C([H])/F", "F[C@@]([H])=[C@@]([H])F");
     }
 
     @Test public void difluoroethene_exp5() throws InvalidSmilesException {
-        transform("FC(\\[H])=C([H])/F", "F[C@]([H])=[C@]([H])F");
-        transform("FC(\\[H])=C(\\[H])F", "F[C@]([H])=[C@]([H])F");
-        transform("F/C([H])=C(\\[H])F", "F[C@]([H])=[C@]([H])F");
+        transform("FC(\\[H])=C([H])/F", "F[C@]([H])=[C@@]([H])F");
+        transform("FC(\\[H])=C(\\[H])F", "F[C@]([H])=[C@@]([H])F");
+        transform("F/C([H])=C(\\[H])F", "F[C@]([H])=[C@@]([H])F");
     }
 
     @Test public void difluoroethene_exp6() throws InvalidSmilesException {
-        transform("F/C(\\[H])=C([H])\\F", "F[C@]([H])=[C@@]([H])F");
-        transform("FC(\\[H])=C(/[H])F", "F[C@]([H])=[C@@]([H])F");
-        transform("F/C([H])=C(/[H])F", "F[C@]([H])=[C@@]([H])F");
+        transform("F/C(\\[H])=C([H])\\F", "F[C@]([H])=[C@]([H])F");
+        transform("FC(\\[H])=C(/[H])F", "F[C@]([H])=[C@]([H])F");
+        transform("F/C([H])=C(/[H])F", "F[C@]([H])=[C@]([H])F");
     }
 
     @Test public void difluoroethene_exp7() throws InvalidSmilesException {
-        transform("FC(/[H])=C([H])\\F", "F[C@@]([H])=[C@@]([H])F");
-        transform("FC(/[H])=C(/[H])F", "F[C@@]([H])=[C@@]([H])F");
-        transform("F\\C([H])=C(/[H])F", "F[C@@]([H])=[C@@]([H])F");
+        transform("FC(/[H])=C([H])\\F", "F[C@@]([H])=[C@]([H])F");
+        transform("FC(/[H])=C(/[H])F", "F[C@@]([H])=[C@]([H])F");
+        transform("F\\C([H])=C(/[H])F", "F[C@@]([H])=[C@]([H])F");
     }
 
     @Test public void difluoroethene_exp8() throws InvalidSmilesException {
-        transform("FC(/[H])=C([H])/F", "F[C@@]([H])=[C@]([H])F");
-        transform("FC(/[H])=C(\\[H])F", "F[C@@]([H])=[C@]([H])F");
-        transform("F\\C([H])=C(\\[H])F", "F[C@@]([H])=[C@]([H])F");
+        transform("FC(/[H])=C([H])/F", "F[C@@]([H])=[C@@]([H])F");
+        transform("FC(/[H])=C(\\[H])F", "F[C@@]([H])=[C@@]([H])F");
+        transform("F\\C([H])=C(\\[H])F", "F[C@@]([H])=[C@@]([H])F");
     }
 
     @Test public void difluoroethene_exp9() throws InvalidSmilesException {
         transform("F/C=C/F",
                   new int[]{1, 0, 2, 3},
-                  "[C@H](F)=[C@H]F");
+                  "[C@H](F)=[C@@H]F");
     }
 
     @Test public void difluoroethene_exp10() throws InvalidSmilesException {
         transform("F/C([H])=C([H])/F",
                   new int[]{1, 0, 2, 3, 4, 5},
-                  "[C@@](F)([H])=[C@]([H])F");
+                  "[C@@](F)([H])=[C@@]([H])F");
     }
 
     @Test public void difluoroethene_exp11() throws InvalidSmilesException {
         transform("F/C([H])=C([H])/F",
                   new int[]{2, 0, 1, 3, 4, 5},
-                  "[C@]([H])(F)=[C@]([H])F");
+                  "[C@]([H])(F)=[C@@]([H])F");
     }
 
     @Test public void difluoroethene_exp12() throws InvalidSmilesException {
         transform("C(\\F)([H])=C([H])/F",
-                  "[C@@](F)([H])=[C@]([H])F");
+                  "[C@@](F)([H])=[C@@]([H])F");
     }
 
     @Test public void difluoroethene_exp13() throws InvalidSmilesException {
         transform("F/C([H])=C([H])/F",
                   new int[]{2, 0, 1, 3, 5, 4},
-                  "[C@]([H])(F)=[C@@](F)[H]");
+                  "[C@]([H])(F)=[C@](F)[H]");
     }
 
+    @Test public void cyclooctatetraene() throws InvalidSmilesException {
+        transform("C/1=C/C=C\\C=C/C=C1",
+                  "[C@H]1=[C@@H][C@H]=[C@H][C@@H]=[C@@H][C@H]=[C@H]1");
+    }
 
 
     static void transform(String smi, String exp) throws

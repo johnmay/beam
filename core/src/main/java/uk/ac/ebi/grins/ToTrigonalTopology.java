@@ -141,17 +141,17 @@ final class ToTrigonalTopology {
             switch (f.bond(u)) {
                 case UP:
                     if (i == 2)
-                        parity = 1;
-                    else
                         parity = -1;
+                    else
+                        parity = 1;
                     if (f.other(u) < u)
                         parity *= -1;
                     break;
                 case DOWN:
                     if (i == 2)
-                        parity = -1;
-                    else
                         parity = 1;
+                    else
+                        parity = -1;
                     if (f.other(u) < u)
                         parity *= -1;
                     break;
@@ -162,9 +162,6 @@ final class ToTrigonalTopology {
 
         if (j < 3)
             vs[j] = u;
-
-        if (e.other(u) > u)
-            parity *= -1;
 
         if (parity == 0)
             return Topology.unknown();
