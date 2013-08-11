@@ -1,5 +1,6 @@
 package uk.ac.ebi.grins;
 
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,12 +56,12 @@ final class FromTrigonalTopology {
             }
             if (a.hydrogens() == a.element()
                                   .implicitHydrogens(nElectrons / 2)) {
-                if(a.aromatic()){
-                   // preliminary
-                   switch (a.element()) {
-                       case Carbon:
-                           return Atom.AromaticSubset.Carbon;
-                   }
+                if (a.aromatic()) {
+                    // preliminary
+                    switch (a.element()) {
+                        case Carbon:
+                            return Atom.AromaticSubset.Carbon;
+                    }
                 } else {
                     switch (a.element()) {
                         case Carbon:
@@ -133,11 +134,13 @@ final class FromTrigonalTopology {
                                                                              : 1;
 
                 // ... and which end of the double bond we're looking from
-                if (ordering[es.get(offset).other(u)] < ordering[u])
+                if (ordering[es.get(offset).other(u)] < ordering[u]) {
+
+                } else if (es.size() == 2 &&
+                        ordering[u] < ordering[es.get((offset + 1) % es.size())
+                                                 .other(u)]) {
                     j++;
-                else if (es.size() == 2 &&
-                        ordering[u] < ordering[es.get((offset + 1) % es.size()).other(u)])
-                    j++;
+                }
 
                 // now create the new labels for the non-double bond atoms
                 for (int i = 1; i < es.size(); i++) {
@@ -147,9 +150,37 @@ final class FromTrigonalTopology {
                     Edge f = new Edge(u,
                                       e.other(u),
                                       label);
+                    Edge existing = replacement.get(e);
+
+                    // check for conflict - need to rewrite existing labels
+                    if (existing != null && existing.bond(u) != label) {
+                        BitSet visited = new BitSet();
+                        visited.set(u);
+                        invertExistingDirectionalLabels(visited, e.other(u));
+                    }
                     replacement.put(e, f);
                 }
             }
         }
+
+        private void invertExistingDirectionalLabels(BitSet visited, int u) {
+            visited.set(u);
+            if (g.topologyOf(u) == null)
+                return;
+            for (Edge e : g.edges(u)) {
+                int v = e.other(u);
+                if (!visited.get(v)) {
+                    Edge f = replacement.get(e);
+                    if (f != null) {
+                        replacement.put(e,
+                                        new Edge(u, v, f.bond(u).inverse()));
+                        System.out.println("flipping " + f + replacement
+                                .get(e));
+                    }
+                    invertExistingDirectionalLabels(visited, v);
+                }
+            }
+        }
+
     }
 }

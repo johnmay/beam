@@ -37,61 +37,88 @@ import static org.hamcrest.CoreMatchers.is;
 /** @author John May */
 public class FromTrigonalTopologyTest {
 
-    @Test public void e_dichloroethene() throws Exception{
-        transform("F[C@H]=[C@H]F", "F/C=C/F");
+    @Test public void z_dichloroethene() throws Exception {
+        transform("F[C@H]=[C@H]F", "F/C=C\\F");
     }
 
-    @Test public void e_dichloroethene_alt() throws Exception{
-        transform("F[C@@H]=[C@@H]F", "F\\C=C\\F");
+    @Test public void z_dichloroethene_alt() throws Exception {
+        transform("F[C@@H]=[C@@H]F", "F\\C=C/F");
     }
 
-    @Test public void e_dichloroethene_explicitH() throws Exception{
-        transform("F[C@]([H])=[C@](F)[H]", "F/C(/[H])=C(/F)\\[H]");
+    @Test public void z_dichloroethene_explicitH() throws Exception {
+        transform("F[C@]([H])=[C@](F)[H]", "F/C(/[H])=C(\\F)/[H]");
     }
 
-    @Test public void e_dichloroethene_alt_explicitH() throws Exception{
-        transform("F[C@@]([H])=[C@@](F)[H]", "F\\C(\\[H])=C(\\F)/[H]");
+    @Test public void z_dichloroethene_alt_explicitH() throws Exception {
+        transform("F[C@@]([H])=[C@@](F)[H]", "F\\C(\\[H])=C(/F)\\[H]");
     }
 
-    @Test public void z_dichloroethene() throws Exception{
-        transform("F[C@H]=[C@@H]F", "F/C=C\\F");
+    @Test public void e_dichloroethene() throws Exception {
+        transform("F[C@H]=[C@@H]F", "F/C=C/F");
     }
 
-    @Test public void z_dichloroethene_alt() throws Exception{
-        transform("F[C@@H]=[C@H]F", "F\\C=C/F");
+    @Test public void e_dichloroethene_alt() throws Exception {
+        transform("F[C@@H]=[C@H]F", "F\\C=C\\F");
     }
 
-    @Test public void z_dichloroethene_explicitH() throws Exception{
-        transform("F[C@]([H])=[C@@](F)[H]", "F/C(/[H])=C(\\F)/[H]");
+    @Test public void e_dichloroethene_explicitH() throws Exception {
+        transform("F[C@]([H])=[C@@](F)[H]", "F/C(/[H])=C(/F)\\[H]");
     }
 
-    @Test public void z_dichloroethene_alt_explicitH() throws Exception{
-        transform("F[C@@]([H])=[C@](F)[H]", "F\\C(\\[H])=C(/F)\\[H]");
-    }
-
-    @Test public void e_dichloroethene_permuted_1() throws Exception {
-          transform("F[C@H]=[C@H]F", new int[]{1, 0, 2, 3}, "C(\\F)=C/F");
-    }
-
-    @Test public void e_dichloroethene_permuted_2() throws Exception {
-        transform("F[C@H]=[C@H]F", new int[]{3, 2, 1, 0}, "F\\C=C\\F");
-    }
-
-    @Test public void e_dichloroethene_alt_permuted_1() throws Exception {
-        transform("F[C@@H]=[C@@H]F", new int[]{1, 0, 2, 3}, "C(/F)=C\\F");
-    }
-
-    @Test public void e_dichloroethene_alt_permuted_2() throws Exception {
-        transform("F[C@@H]=[C@@H]F", new int[]{3, 2, 1, 0}, "F/C=C/F");
+    @Test public void e_dichloroethene_alt_explicitH() throws Exception {
+        transform("F[C@@]([H])=[C@](F)[H]", "F\\C(\\[H])=C(\\F)/[H]");
     }
 
     @Test public void z_dichloroethene_permuted_1() throws Exception {
-        transform("F[C@H]=[C@@H]F", new int[]{1, 0, 2, 3}, "C(\\F)=C\\F");
+        transform("F[C@H]=[C@H]F", new int[]{1, 0, 2, 3}, "C(\\F)=C\\F");
     }
 
     @Test public void z_dichloroethene_permuted_2() throws Exception {
-        transform("F[C@@H]=[C@H]F", new int[]{3, 2, 1, 0}, "F\\C=C/F");
+        transform("F[C@H]=[C@H]F", new int[]{3, 2, 1, 0}, "F\\C=C/F");
     }
+
+    @Test public void z_dichloroethene_alt_permuted_1() throws Exception {
+        transform("F[C@@H]=[C@@H]F", new int[]{1, 0, 2, 3}, "C(/F)=C/F");
+    }
+
+    @Test public void z_dichloroethene_alt_permuted_2() throws Exception {
+        transform("F[C@@H]=[C@@H]F", new int[]{3, 2, 1, 0}, "F/C=C\\F");
+    }
+
+    @Test public void e_dichloroethene_permuted_1() throws Exception {
+        transform("F[C@H]=[C@@H]F", new int[]{1, 0, 2, 3}, "C(\\F)=C/F");
+    }
+
+    @Test public void e_dichloroethene_permuted_2() throws Exception {
+        transform("F[C@@H]=[C@H]F", new int[]{3, 2, 1, 0}, "F\\C=C\\F");
+    }
+
+    @Test public void conjugated() throws InvalidSmilesException {
+        transform("F[C@H]=[C@@H][C@H]=[C@@H]F", "F/C=C/C=C/F");
+    }
+
+    /** Ensures that conflicting directional assignments are resolved. */
+    @Test public void conjugated_conflict() throws InvalidSmilesException {
+        transform("F[C@H]=[C@@H][C@@H]=[C@H]F", "F/C=C/C=C/F");
+    }
+
+
+
+    @Test public void cyclooctatetraene_1() throws InvalidSmilesException {
+        transform("[C@H]1=[C@@H][C@@H]=[C@@H][C@@H]=[C@@H][C@@H]=[C@@H]1",
+                  "C\\1=C\\C=C/C=C\\C=C1");
+    }
+
+    @Test public void cyclooctatetraene_2() throws InvalidSmilesException {
+        transform("[C@@H]1=[C@H][C@H]=[C@H][C@H]=[C@H][C@H]=[C@H]1",
+                  "C/1=C/C=C\\C=C/C=C1");
+    }
+
+//    @Test public void cyclooctatetraene_3() throws InvalidSmilesException {
+//        transform("[C@H]1=[C@@H][C@H]=[C@H][C@@H]=[C@@H][C@H]=[C@@H]1",
+//                  "C\\1=C/C=C\\C=C/C=C1");
+//    }
+
 
     static void transform(String smi, String exp) throws
                                                   InvalidSmilesException {
