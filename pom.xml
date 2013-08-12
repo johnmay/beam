@@ -13,6 +13,17 @@
         <module>func</module>
     </modules>
 
+    <distributionManagement>
+        <repository>
+            <id>ebi-repo</id>
+            <url>${ebi.repo.nexus.url}</url>
+        </repository>
+        <snapshotRepository>
+            <id>ebi-repo-snapshot</id>
+            <url>${ebi.repo.snapshots.nexus.url}</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
