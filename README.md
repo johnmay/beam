@@ -1,6 +1,6 @@
 # Grins
 
-A free and open source Java library for parsing and generating [Simplified molecular-input line-entry system (SMILES)](http://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system) line notations. The primary focus of the library is to provide an implementation of the [OpenSMILES](http://www.opensmiles.org) specification for the [Chemistry Development Kit (CDK)](http://sourceforge.net/projects/cdk/). The code is separate to avoid cluttering the CDK API with data structures specific to Grins.
+A free and open source Java toolkit dedicated to parsing and generating [Simplified molecular-input line-entry system (SMILES)](http://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system) line notations. The primary focus of the library is to handle the SMILES syntax and to provide an implementation of the [OpenSMILES](http://www.opensmiles.org) specification for the [Chemistry Development Kit (CDK)](http://sourceforge.net/projects/cdk/). The code is separate to avoid cluttering the CDK API with data structures specific to Grins.
 
 ## Goals
  - Handle tetrahedral and double bond stereo chemistry and maintain configuration through different orderings
@@ -11,6 +11,41 @@ A free and open source Java library for parsing and generating [Simplified molec
 ## Planned 
  - Generation of Universal SMILES ([O’Boyle, 2012](http://www.jcheminf.com/content/4/1/22))
  - Allene, Square Planar, Trigongal Bipyramidal and Octahedral topologies
+
+## Examples
+
+_grins is still in a development and some APIs will likely change until a release is made._
+
+Excellent round tripping, preserving exactly how the input was specified. Disregarding inputs with redundant brackets and erroneous/repeated ring numbers - the actually input will generally be identical to the output.
+
+```java
+// bond labels
+ChemicalGraph.fromSmiles("C1=CC=CC=C1");    // kekule      (implicit single bonds)
+ChemicalGraph.fromSmiles("C-1=C-C=C-C=C1"); // kekule      (explicit single bonds)
+ChemicalGraph.fromSmiles("c1ccccc1");       // delocalised (implicit aromatic bonds)
+ChemicalGraph.fromSmiles("c:1:c:c:c:c:c1"); // delocalised (explicit aromatic bonds)
+
+// bracket atoms stay as bracket atoms
+ChemicalGraph.fromSmiles("[CH]1=[CH][CH]=[CH][CH]=[CH]1");
+ChemicalGraph.fromSmiles("[CH]1=[CH]C=C[CH]=[CH]1");       // mix bracket and subset atoms
+```
+
+Although preserving the representation was one of the design goals for grins it is common practise to normalise.
+As such there are several utilities for standardising outputs.
+
+```java
+// examples coming soon
+```
+
+Randomly generate different SMILES notations preserving stereo-configuration.
+
+```java
+ChemicalGraph g  = ChemicalGraph.fromSmiles("CCC[C@@](C)(O)[C@H](C)N");
+StringBuilder sb = new StringBuilder(g.toSmiles());
+for (int i = 0; i < 25; i++)
+    sb.append('.').append(Functions.randomise(g).toSmiles());
+System.out.println(sb);
+```
 
 ## License BSD 2-Clause
 
