@@ -174,8 +174,6 @@ final class FromTrigonalTopology {
                     if (f != null) {
                         replacement.put(e,
                                         new Edge(u, v, f.bond(u).inverse()));
-                        System.out.println("flipping " + f + replacement
-                                .get(e));
                     }
                     invertExistingDirectionalLabels(visited, v);
                 }
