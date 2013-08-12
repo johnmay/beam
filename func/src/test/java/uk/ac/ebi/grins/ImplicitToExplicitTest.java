@@ -37,10 +37,8 @@ import org.mockito.Mockito;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static uk.ac.ebi.grins.Bond.AROMATIC;
 import static uk.ac.ebi.grins.Bond.DOUBLE;
 import static uk.ac.ebi.grins.Bond.IMPLICIT;
@@ -64,7 +62,7 @@ public class ImplicitToExplicitTest {
         g.addEdge(new Edge(4, 5, IMPLICIT));
         g.addEdge(new Edge(5, 0, IMPLICIT));
 
-        ChemicalGraph h = new ImplicitToExplicit().transform(g);
+        ChemicalGraph h = new ImplicitToExplicit().apply(g);
 
         Assert.assertThat(g, CoreMatchers.is(CoreMatchers.not(CoreMatchers
                                                                       .sameInstance(h))));
@@ -91,7 +89,7 @@ public class ImplicitToExplicitTest {
         g.addEdge(new Edge(4, 5, IMPLICIT));
         g.addEdge(new Edge(5, 0, IMPLICIT));
 
-        ChemicalGraph h = new ImplicitToExplicit().transform(g);
+        ChemicalGraph h = new ImplicitToExplicit().apply(g);
 
         Assert.assertThat(g, CoreMatchers.is(CoreMatchers.not(CoreMatchers
                                                                       .sameInstance(h))));
@@ -118,7 +116,7 @@ public class ImplicitToExplicitTest {
         g.addEdge(new Edge(4, 5, IMPLICIT));
         g.addEdge(new Edge(5, 0, DOUBLE));
 
-        ChemicalGraph h = new ImplicitToExplicit().transform(g);
+        ChemicalGraph h = new ImplicitToExplicit().apply(g);
 
         Assert.assertThat(g, CoreMatchers.is(CoreMatchers.not(CoreMatchers
                                                                       .sameInstance(h))));

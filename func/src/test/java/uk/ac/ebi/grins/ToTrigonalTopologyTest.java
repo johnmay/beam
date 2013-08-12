@@ -136,7 +136,7 @@ public class ToTrigonalTopologyTest {
         ToTrigonalTopology ttt = new ToTrigonalTopology();
         ExplicitToImplicit eti = new ExplicitToImplicit();
         Assert.assertThat(Generator
-                                  .generate(eti.apply(ttt.apply(ite.transform(Parser.parse(smi))))),
+                                  .generate(eti.apply(ttt.apply(ite.apply(Parser.parse(smi))))),
                           CoreMatchers.is(exp));
     }
 
@@ -146,8 +146,8 @@ public class ToTrigonalTopologyTest {
         ToTrigonalTopology ttt = new ToTrigonalTopology();
         ExplicitToImplicit eti = new ExplicitToImplicit();
         Assert.assertThat(Generator
-                                  .generate(eti.apply(ttt.apply(ite.transform(Parser.parse(smi)
-                                                                                    .permute(p))))),
+                                  .generate(eti.apply(ttt.apply(ite.apply(Parser.parse(smi)
+                                                                                .permute(p))))),
                           CoreMatchers.is(exp));
     }
 

@@ -35,7 +35,7 @@ package uk.ac.ebi.grins;
  *
  * @author John May
  */
-final class ImplicitToExplicit {
+final class ImplicitToExplicit implements Function<ChemicalGraph,ChemicalGraph> {
 
     /**
      * Transform all implicit to explicit bonds. The original graph is
@@ -44,7 +44,7 @@ final class ImplicitToExplicit {
      * @param g a chemical graph
      * @return new chemical graph but with all explicit bonds
      */
-    public ChemicalGraph transform(final ChemicalGraph g) {
+    public ChemicalGraph apply(final ChemicalGraph g) {
 
         ChemicalGraph h = new ChemicalGraph(g.order());
 

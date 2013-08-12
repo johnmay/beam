@@ -127,7 +127,7 @@ public class FromTrigonalTopologyTest {
         FromTrigonalTopology ftt = new FromTrigonalTopology();
         ExplicitToImplicit eti = new ExplicitToImplicit();
         Assert.assertThat(Generator
-                                  .generate(eti.apply(ftt.apply(ite.transform(Parser.parse(smi))))),
+                                  .generate(eti.apply(ftt.apply(ite.apply(Parser.parse(smi))))),
                           CoreMatchers.is(exp));
     }
 
@@ -137,8 +137,8 @@ public class FromTrigonalTopologyTest {
         FromTrigonalTopology ftt = new FromTrigonalTopology();
         ExplicitToImplicit eti = new ExplicitToImplicit();
         Assert.assertThat(Generator
-                                  .generate(eti.apply(ftt.apply(ite.transform(Parser.parse(smi)
-                                                                                    .permute(p))))),
+                                  .generate(eti.apply(ftt.apply(ite.apply(Parser.parse(smi)
+                                                                                .permute(p))))),
                           CoreMatchers.is(exp));
     }
 }

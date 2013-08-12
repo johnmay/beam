@@ -123,7 +123,7 @@ public class ToSubsetAtomsTest {
         ExplicitToImplicit eti = new ExplicitToImplicit();
         String actual = Generator.generate(eti.apply(
                 tsa.apply(
-                        ite.transform(g))));
+                        ite.apply(g))));
         Assert.assertThat(actual, CoreMatchers.is(expected));
     }
 
