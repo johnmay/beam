@@ -308,6 +308,6 @@ interface Atom {
         }
     }
 
-    public static Atom EXPLICIT_HYDROGEN = new BracketAtom(Element.Hydrogen, 0, 0);
+    static Atom EXPLICIT_HYDROGEN = new BracketAtom(Element.Hydrogen, 0, 0);
 
 }
