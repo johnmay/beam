@@ -288,6 +288,17 @@ public final class ChemicalGraph {
     }
 
     /**
+     * Apply a function to the chemical graph.
+     *
+     * @param f   a function which transforms a graph into something.
+     * @param <T> output type of the function
+     * @return the output of the function
+     */
+    public <T> T apply(Function<ChemicalGraph, T> f) {
+        return f.apply(this);
+    }
+
+    /**
      * Sort the edges of each vertex in the chemical graph. Ensures that when
      * invoking {@link #edges(int)} the connected vertices will be in natural
      * order. The actual order of atoms does not change. The atom order can be
