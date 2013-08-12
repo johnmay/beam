@@ -16,7 +16,19 @@ A free and open source Java toolkit dedicated to parsing and generating [Simplif
 
 _grins is still in a development and some APIs will likely change until a release is made._
 
-Excellent round tripping, preserving exactly how the input was specified. Disregarding inputs with redundant brackets and erroneous/repeated ring numbers - the actually input will generally be identical to the output.
+The main 'molecule' class in _grins_ is the 'ChemicalGraph' it provides convenience methods for reading SMILES directly.
+
+```java
+ChemicalGraph g = ChemicalGraph.fromSmiles("CCO");
+```
+
+and for write it back to SMILES string.
+
+```java
+String smi = g.toSmiles();
+```
+
+Grins provides excellent round tripping, preserving exactly how the input was specified. Disregarding inputs with redundant brackets and erroneous/repeated ring numbers - the actually input will generally be identical to the output.
 
 ```java
 // bond labels
