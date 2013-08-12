@@ -9,6 +9,10 @@ import java.util.Random;
  */
 public final class Functions {
 
+    /// non-instantiable
+    private Functions() {
+    }
+
     /**
      * Randomise the atom order of the provided chemical graph.
      *
