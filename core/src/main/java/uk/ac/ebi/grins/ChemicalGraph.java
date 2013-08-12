@@ -294,7 +294,7 @@ public final class ChemicalGraph {
      * @param <T> output type of the function
      * @return the output of the function
      */
-    public <T> T apply(Function<ChemicalGraph, T> f) throws Exception {
+    <T> T apply(Function<ChemicalGraph, T> f) throws Exception {
         return f.apply(this);
     }
 
