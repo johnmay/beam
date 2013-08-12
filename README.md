@@ -59,6 +59,14 @@ for (int i = 0; i < 25; i++)
 System.out.println(sb);
 ```
 
+Using atom-based double-bond configuration.
+
+```java
+ChemicalGraph g   = ChemicalGraph.fromSmiles("F/C=C/F");
+ChemicalGraph h   = Functions.atomBasedDBStereo(g);
+String        smi = h.toSmiles(); // F[C@H]=[C@@H]F
+```
+
 ## How to Grin
 
 Grins is still in development but you can obtain the latest build from the [EBI snapshots repository](http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots/). An example configuration for maven is shown below.
