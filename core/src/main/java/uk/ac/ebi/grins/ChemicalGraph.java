@@ -215,6 +215,31 @@ public final class ChemicalGraph {
     }
 
     /**
+     * Convenience method to create a graph from a provided SMILES string.
+     *
+     * @param smi string containing SMILES line notation.
+     * @return graph instance from the SMILES
+     * @throws InvalidSmilesException thrown if there was a syntax error while
+     *                                parsing the SMILES.
+     */
+    public static ChemicalGraph fromSmiles(String smi) throws
+                                                       InvalidSmilesException {
+        if (smi == null)
+            throw new NullPointerException("no SMILES provided");
+        return Parser.parse(smi);
+    }
+
+    /**
+     * Convenience method to write a SMILES string for the current configuration
+     * of the molecule.
+     *
+     * @return the SMILES string for the molecule.
+     */
+    public String toSmiles() {
+        return Generator.generate(this);
+    }
+
+    /**
      * Permute the vertices of a graph using a given permutation.
      *
      * <blockquote><pre>
