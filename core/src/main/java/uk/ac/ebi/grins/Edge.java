@@ -120,13 +120,13 @@ public final class Edge {
         return "Vertex " + x + ", is not an endpoint of the edge " + toString();
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return u ^ v;
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;
