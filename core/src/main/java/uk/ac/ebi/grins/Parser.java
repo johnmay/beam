@@ -232,6 +232,9 @@ final class Parser {
             switch (c) {
 
                 // aliphatic subset
+                case '*':
+                    addAtom(Atom.AliphaticSubset.Unknown);
+                    break;
                 case 'B':
                     if (buffer.getIf('r'))
                         addAtom(Atom.AliphaticSubset.Bromine);
