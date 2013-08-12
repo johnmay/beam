@@ -29,48 +29,261 @@
 
 package uk.ac.ebi.grins;
 
-/** @author John May */
+/**
+ * A builder for {@link Atom} instantiation.
+ *
+ * <blockquote><pre>
+ *
+ * // [C]
+ * Atom a = AtomBuilder.aliphatic(Element.Carbon)
+ *                     .build();
+ *
+ * // [CH4]
+ * Atom a = AtomBuilder.aliphatic(Element.Carbon)
+ *                     .hydrogens(4)
+ *                     .build();
+ *
+ * // [13CH4]
+ * Atom a = AtomBuilder.aliphatic(Element.Carbon)
+ *                     .hydrogens(4)
+ *                     .isotope(13)
+ *                     .build();
+ *
+ * // [CH3-]
+ * Atom a = AtomBuilder.aliphatic(Element.Carbon)
+ *                     .hydrogens(3)
+ *                     .charge(-1)
+ *                     .build();
+ *
+ * // or
+ * Atom a = AtomBuilder.aliphatic(Element.Carbon)
+ *                     .hydrogens(3)
+ *                     .anion()
+ *                     .build();
+ *
+ * // [CH4:1]
+ * Atom a = AtomBuilder.aliphatic(Element.Carbon)
+ *                     .hydrogens(4)
+ *                     .atomClass(1)
+ *                     .build();
+ * </pre></blockquote>
+ *
+ * @author John May
+ */
 public final class AtomBuilder {
 
-    private final Element e;
+    private final Element element;
     private int isotope = -1,
             hCount      = 0,
             charge      = 0,
             atomClass   = 0;
     private boolean aromatic;
 
-    private AtomBuilder(Element e) {
-        this.e = e;
+    private AtomBuilder(Element element, boolean aromatic) {
+        this.element = element;
+        this.aromatic = aromatic;
     }
 
-    public static AtomBuilder create(Element e) {
+    /**
+     * Start building an aliphatic atom of the given element.
+     *
+     * <blockquote><pre>
+     * Atom a = AtomBuilder.aliphatic(Element.Carbon)
+     *                     .build();
+     * </pre></blockquote>
+     *
+     * @param e element type
+     * @return an atom builder to configure additional properties
+     * @throws NullPointerException the element was null
+     */
+    public static AtomBuilder aliphatic(Element e) {
         if (e == null)
             throw new NullPointerException("no element provided");
-        return new AtomBuilder(e);
+        return new AtomBuilder(e, false);
     }
 
-    public static AtomBuilder create(String symbol) {
-        Element e = Element.ofSymbol(symbol);
+    /**
+     * Start building an aromatic atom of the given element.
+     *
+     * <blockquote><pre>
+     * Atom a = AtomBuilder.aromatic(Element.Carbon)
+     *                     .build();
+     * </pre></blockquote>
+     *
+     * @param e element type
+     * @return an atom builder to configure additional properties
+     * @throws NullPointerException     the element was null
+     * @throws IllegalArgumentException the element cannot be aromatic
+     */
+    public static AtomBuilder aromatic(Element e) {
         if (e == null)
-            e = Element.Unknown;
-        AtomBuilder ab = new AtomBuilder(e);
+            throw new NullPointerException("no element provided");
+        if (!e.aromatic())
+            throw new IllegalArgumentException(e + " cannot be aromatic");
+        return new AtomBuilder(e, true);
+    }
+
+    /**
+     * Start building an aliphatic atom of the given element symbol. If an
+     * element of the symbol could not be found then the element type is set to
+     * {@link Element#Unknown}.
+     *
+     * <blockquote><pre>
+     * Atom a = AtomBuilder.aliphatic("C")
+     *                     .build();
+     * </pre></blockquote>
+     *
+     * @param symbol symbol of an element
+     * @return an atom builder to configure additional properties
+     * @throws NullPointerException the element was null
+     */
+    public static AtomBuilder aliphatic(String symbol) {
+        if (symbol == null)
+            throw new NullPointerException("no symbol provided");
+        return aliphatic(ofSymbolOrUnknown(symbol));
+    }
+
+    /**
+     * Start building an aromatic atom of the given element symbol. If an
+     * element of the symbol could not be found then the element type is set to
+     * {@link Element#Unknown}.
+     *
+     * <blockquote><pre>
+     * Atom a = AtomBuilder.aromatic("C")
+     *                     .build();
+     * </pre></blockquote>
+     *
+     * @param symbol symbol of an element
+     * @return an atom builder to configure additional properties
+     * @throws NullPointerException     the element was null
+     * @throws IllegalArgumentException the element cannot be aromatic
+     */
+    public static AtomBuilder aromatic(String symbol) {
+        if (symbol == null)
+            throw new NullPointerException("no symbol provided");
+        return aromatic(ofSymbolOrUnknown(symbol));
+    }
+
+
+    /**
+     * Start building an aliphatic or aromatic atom of the given element symbol.
+     * If an element of the symbol could not be found then the element type is
+     * set to {@link Element#Unknown}.
+     *
+     * <blockquote><pre>
+     * Atom a = AtomBuilder.create("C") // aliphatic
+     *                     .build();
+     * Atom a = AtomBuilder.create("c") // aromatic
+     *                     .build();
+     * </pre></blockquote>
+     *
+     * @param symbol symbol of an element - lower case indicates the atom should
+     *               be aromatic
+     * @return an atom builder to configure additional properties
+     * @throws NullPointerException     the element was null
+     * @throws IllegalArgumentException the element cannot be aromatic
+     */
+    public static AtomBuilder create(String symbol) {
+        Element e = ofSymbolOrUnknown(symbol);
         if (symbol != null
-             && !symbol.isEmpty()
-             && Character.isLowerCase(symbol.charAt(0))) {
+                && !symbol.isEmpty()
+                && Character.isLowerCase(symbol.charAt(0))) {
             if (!e.aromatic())
                 throw new IllegalArgumentException("Attempting to create an aromatic atom for an element which cannot be aromatic");
-            ab.aromatic = true;
+            return new AtomBuilder(e, true);
         }
-        return ab;
+        return new AtomBuilder(e, false);
     }
 
+    /**
+     * Get the element of the given symbol - if no symbol is found then the
+     * {@link Element#Unknown} is returned.
+     *
+     * @param symbol an atom symbol
+     * @return the element of the given symbol (or unknown)
+     */
+    private static Element ofSymbolOrUnknown(String symbol) {
+        Element e = Element.ofSymbol(symbol);
+        return e != null ? e : Element.Unknown;
+    }
+
+    /**
+     * Assign the given formal charge to the atom which will be created.
+     *
+     * @param charge formal-charge
+     * @return an atom builder to configure additional properties
+     */
+    public AtomBuilder charge(int charge) {
+        this.charge = charge;
+        return this;
+    }
+
+    /**
+     * Assign a formal-charge of -1 to the atom which will be created.
+     *
+     * @return an atom builder to configure additional properties
+     */
+    public AtomBuilder anion() {
+        return charge(-1);
+    }
+
+    /**
+     * Assign a formal-charge of +1 to the atom which will be created.
+     *
+     * @return an atom builder to configure additional properties
+     */
+    public AtomBuilder cation() {
+        return charge(+1);
+    }
+
+    /**
+     * Assign the isotope number to the atom which will be created. An isotope
+     * number of '-1' means unspecified (default).
+     *
+     * @param isotope isotope number >= 0.
+     * @return an atom builder to configure additional properties
+     */
+    public AtomBuilder isotope(int isotope) {
+        this.isotope = isotope;
+        return this;
+    }
+
+    /**
+     * Assign the atom class to the atom which will be created. A class
+     * of '0' means unspecified (default).
+     *
+     * @param c atom class 1..n
+     * @return an atom builder to configure additional properties
+     * @throws IllegalArgumentException the atom class was negative
+     */
+    public AtomBuilder atomClass(int c) {
+        if (c < 0)
+            throw new IllegalArgumentException("atom class must be positive");
+        this.atomClass = c;
+        return this;
+    }
+
+    /**
+     * Create the atom with the configured attributed.
+     *
+     * @return an atom
+     */
     public Atom build() {
         return new AtomImpl.BracketAtom(isotope,
-                                        e,
+                                        element,
                                         hCount,
                                         charge,
                                         atomClass,
                                         aromatic);
     }
 
+    /**
+     * Access an atom implementation which can be used for all explicit
+     * hydrogens.
+     *
+     * @return an explicit hydrogen to be used in assembly molecules
+     */
+    public Atom explicitHydrogen() {
+        return AtomImpl.EXPLICIT_HYDROGEN;
+    }
 }
