@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
  *
  * @author John May
  */
-public class DaylightRoundTripping {
+public class DaylightRoundTrippingTest {
 
     // 3. SMILES - A Simplified Chemical Language
 
