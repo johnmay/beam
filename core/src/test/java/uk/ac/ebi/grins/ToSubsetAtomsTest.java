@@ -105,7 +105,7 @@ public class ToSubsetAtomsTest {
     }
 
     private Atom toSubset(Atom a, int bondOrderSum) {
-        return new ToSubsetAtoms().toSubset(a, bondOrderSum);
+        return ToSubsetAtoms.toSubset(a, bondOrderSum);
     }
 
     private void transform(String input, String expected) throws

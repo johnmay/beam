@@ -38,7 +38,7 @@ final class ToSubsetAtoms {
         return h;
     }
 
-    Atom toSubset(Atom a, int bondOrderSum) {
+    static Atom toSubset(Atom a, int bondOrderSum) {
 
         // atom is already a subset atom
         if (a.subset())
