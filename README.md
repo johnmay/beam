@@ -59,6 +59,40 @@ for (int i = 0; i < 25; i++)
 System.out.println(sb);
 ```
 
+## How to Grin
+
+Grins is still in development but you can obtain the latest build from the [EBI snapshots repository](http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots/). An example configuration for maven is shown below.
+
+```xml
+<project>
+...
+<repositories>
+   <repository>
+      <id>ebi-repo</id>
+      <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo/</url>
+   </repository>
+   <repository>
+      <id>ebi-repo-snapshots</id>
+      <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots/</url>
+   </repository>
+</repositories>
+...
+<dependencies>
+    <dependency>
+        <groupId>uk.ac.ebi.grins</groupId>
+        <artifactId>grins-core</artifactId>
+        <version>LATEST</version>
+    </dependency>
+    <dependency>
+        <groupId>uk.ac.ebi.grins</groupId>
+        <artifactId>grins-func</artifactId>
+        <version>LATEST</version>
+    </dependency>
+</dependencies>
+...
+</project>
+```
+
 ## License BSD 2-Clause
 
 Copyright (c) 2013, European Bioinformatics Institute (EMBL-EBI)
