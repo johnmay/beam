@@ -95,7 +95,7 @@ interface Atom {
 
     Generator.AtomToken token();
 
-    static enum OrganicSubset implements Atom {
+    static enum AliphaticSubset implements Atom {
         Boron(Element.Boron),
         Carbon(Element.Carbon),
         Nitrogen(Element.Nitrogen),
@@ -117,7 +117,7 @@ interface Atom {
                 atoms.put(a.element(), a);
         }
 
-        private OrganicSubset(Element element) {
+        private AliphaticSubset(Element element) {
             this.element = element;
             this.token = new Generator.SubsetToken(element.symbol());
         }

@@ -48,12 +48,12 @@ public class ImplicitToExplicitTest {
 
     @Test public void cycloHexane() throws Exception {
         ChemicalGraph g = new ChemicalGraph(6);
-        g.addAtom(Atom.OrganicSubset.Carbon);
-        g.addAtom(Atom.OrganicSubset.Carbon);
-        g.addAtom(Atom.OrganicSubset.Carbon);
-        g.addAtom(Atom.OrganicSubset.Carbon);
-        g.addAtom(Atom.OrganicSubset.Carbon);
-        g.addAtom(Atom.OrganicSubset.Carbon);
+        g.addAtom(Atom.AliphaticSubset.Carbon);
+        g.addAtom(Atom.AliphaticSubset.Carbon);
+        g.addAtom(Atom.AliphaticSubset.Carbon);
+        g.addAtom(Atom.AliphaticSubset.Carbon);
+        g.addAtom(Atom.AliphaticSubset.Carbon);
+        g.addAtom(Atom.AliphaticSubset.Carbon);
         g.addEdge(new Edge(0, 1, IMPLICIT));
         g.addEdge(new Edge(1, 2, IMPLICIT));
         g.addEdge(new Edge(2, 3, IMPLICIT));
@@ -100,12 +100,12 @@ public class ImplicitToExplicitTest {
 
     @Test public void kekuleBenzene() throws Exception {
         ChemicalGraph g = new ChemicalGraph(6);
-        g.addAtom(Atom.OrganicSubset.Carbon);
-        g.addAtom(Atom.OrganicSubset.Carbon);
-        g.addAtom(Atom.OrganicSubset.Carbon);
-        g.addAtom(Atom.OrganicSubset.Carbon);
-        g.addAtom(Atom.OrganicSubset.Carbon);
-        g.addAtom(Atom.OrganicSubset.Carbon);
+        g.addAtom(Atom.AliphaticSubset.Carbon);
+        g.addAtom(Atom.AliphaticSubset.Carbon);
+        g.addAtom(Atom.AliphaticSubset.Carbon);
+        g.addAtom(Atom.AliphaticSubset.Carbon);
+        g.addAtom(Atom.AliphaticSubset.Carbon);
+        g.addAtom(Atom.AliphaticSubset.Carbon);
         g.addEdge(new Edge(0, 1, IMPLICIT));
         g.addEdge(new Edge(1, 2, DOUBLE));
         g.addEdge(new Edge(2, 3, IMPLICIT));

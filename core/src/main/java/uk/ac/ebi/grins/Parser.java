@@ -39,7 +39,6 @@ import java.util.TreeSet;
 
 import static java.util.Map.Entry;
 import static uk.ac.ebi.grins.Atom.AromaticSubset;
-import static uk.ac.ebi.grins.Atom.OrganicSubset;
 
 
 /**
@@ -235,33 +234,33 @@ final class Parser {
                 // organic subset
                 case 'B':
                     if (buffer.getIf('r'))
-                        addAtom(OrganicSubset.Bromine);
+                        addAtom(Atom.AliphaticSubset.Bromine);
                     else
-                        addAtom(OrganicSubset.Boron);
+                        addAtom(Atom.AliphaticSubset.Boron);
                     break;
                 case 'C':
                     if (buffer.getIf('l'))
-                        addAtom(OrganicSubset.Chlorine);
+                        addAtom(Atom.AliphaticSubset.Chlorine);
                     else
-                        addAtom(OrganicSubset.Carbon);
+                        addAtom(Atom.AliphaticSubset.Carbon);
                     break;
                 case 'N':
-                    addAtom(OrganicSubset.Nitrogen);
+                    addAtom(Atom.AliphaticSubset.Nitrogen);
                     break;
                 case 'O':
-                    addAtom(OrganicSubset.Oxygen);
+                    addAtom(Atom.AliphaticSubset.Oxygen);
                     break;
                 case 'P':
-                    addAtom(OrganicSubset.Phosphorus);
+                    addAtom(Atom.AliphaticSubset.Phosphorus);
                     break;
                 case 'S':
-                    addAtom(OrganicSubset.Sulfur);
+                    addAtom(Atom.AliphaticSubset.Sulfur);
                     break;
                 case 'F':
-                    addAtom(OrganicSubset.Fluorine);
+                    addAtom(Atom.AliphaticSubset.Fluorine);
                     break;
                 case 'I':
-                    addAtom(OrganicSubset.Iodine);
+                    addAtom(Atom.AliphaticSubset.Iodine);
                     break;
 
                 // aromatic subset

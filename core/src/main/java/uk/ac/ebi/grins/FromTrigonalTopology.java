@@ -65,7 +65,7 @@ final class FromTrigonalTopology {
                 } else {
                     switch (a.element()) {
                         case Carbon:
-                            return Atom.OrganicSubset.Carbon;
+                            return Atom.AliphaticSubset.Carbon;
                     }
                 }
             }
