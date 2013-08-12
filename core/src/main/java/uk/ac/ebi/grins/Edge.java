@@ -115,6 +115,16 @@ public final class Edge {
         throw new IllegalArgumentException(invalidEndpointMessage(x));
     }
 
+
+    /**
+     * Inverse of the edge label but keep the vertices the same.
+     *
+     * @return inverse edge
+     */
+    Edge inverse() {
+        return bond.inverse().edge(u, v);
+    }
+
     /** Helper method to print error message. */
     private String invalidEndpointMessage(final int x) {
         return "Vertex " + x + ", is not an endpoint of the edge " + toString();

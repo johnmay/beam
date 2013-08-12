@@ -173,7 +173,7 @@ final class FromTrigonalTopology {
                     Edge f = replacement.get(e);
                     if (f != null) {
                         replacement.put(e,
-                                        new Edge(u, v, f.bond(u).inverse()));
+                                        f.inverse());
                     }
                     invertExistingDirectionalLabels(visited, v);
                 }
