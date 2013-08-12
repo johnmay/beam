@@ -151,7 +151,7 @@ public enum Bond {
      * label.
      *
      * <blockquote><pre>
-     * Edge e = Bond.Implicit.edge(2, 3);
+     * Edge e = Bond.IMPLICIT.edge(2, 3);
      * </pre></blockquote>
      *
      * @param u an end point of the edge

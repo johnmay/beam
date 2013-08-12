@@ -36,10 +36,10 @@ package uk.ac.ebi.grins;
  * <blockquote>
  * <pre>
  * // an edge between the vertices 1 and 2 the bond label is implicit
- * Edge e = Bond.Implicit.edge(1, 2);
+ * Edge e = Bond.IMPLICIT.edge(1, 2);
  *
  * // an edge between the vertices 5 and 3 the bond label is double
- * Edge e = Bond.Double.edge(1, 2);
+ * Edge e = Bond.DOUBLE.edge(1, 2);
  * </pre>
  * </blockquote>
  *
@@ -101,7 +101,7 @@ public final class Edge {
      * Access the bond label relative to a specified endpoint.
      *
      * <blockquote><pre>
-     * Edge e = Bond.Up.edge(2, 3);
+     * Edge e = Bond.UP.edge(2, 3);
      * e.bond(2); // UP
      * e.bond(3); // DOWN
      * </pre></blockquote>
