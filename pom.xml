@@ -12,6 +12,10 @@
         <module>core</module>
     </modules>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <licenses>
         <license>
             <name>The BSD 2-Clause License</name>
