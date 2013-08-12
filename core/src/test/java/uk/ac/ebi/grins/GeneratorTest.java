@@ -89,6 +89,22 @@ public class GeneratorTest {
         roundTrip("C[C@H](N)O");
     }
 
+    @Test public void ring_closures1() throws Exception {
+        roundTrip("C1=CN=CC2=NC=N[C@@H]21");
+    }
+
+    @Test public void ring_closures2() throws Exception  {
+        roundTrip("C1=CN=CC2=NC=N[C@H]21");
+    }
+
+    @Test public void ring_closures3() throws Exception {
+        roundTrip("C1=CC(=CC2=NC(=N[C@@H]21)C(F)(F)F)N");
+    }
+
+    @Test public void ring_closures4() throws Exception  {
+        roundTrip("C1=CC(=CC2=NC(=N[C@H]21)C(F)(F)F)N");
+    }
+
 
     @Test public void lowRingNumberOrder() throws InvalidSmilesException {
         roundTrip("C1=CC2=CC=CC=C2C=C1");
