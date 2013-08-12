@@ -29,7 +29,9 @@
 
 package uk.ac.ebi.grins;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Defines properties of a SMILES atom. The organic and aromatic subsets are
@@ -108,6 +110,13 @@ interface Atom {
         private Element             element;
         private Generator.AtomToken token;
 
+        private static final Map<Element, Atom> atoms = new HashMap<Element, Atom>();
+
+        static {
+            for (Atom a : values())
+                atoms.put(a.element(), a);
+        }
+
         private OrganicSubset(Element element) {
             this.element = element;
             this.token = new Generator.SubsetToken(element.symbol());
@@ -144,6 +153,13 @@ interface Atom {
         @Override public Generator.AtomToken token() {
             return token;
         }
+
+        static Atom ofElement(Element e) {
+            Atom a = atoms.get(e);
+            if (a == null)
+                throw new IllegalArgumentException(e + "can not be an organic subset atom");
+            return a;
+        }
     }
 
     static enum AromaticSubset implements Atom {
@@ -156,6 +172,13 @@ interface Atom {
 
         private       Element             element;
         private final Generator.AtomToken token;
+
+        private static final Map<Element, Atom> atoms = new HashMap<Element, Atom>();
+
+        static {
+            for (Atom a : values())
+                atoms.put(a.element(), a);
+        }
 
         private AromaticSubset(Element element) {
             this.element = element;
@@ -193,6 +216,13 @@ interface Atom {
 
         @Override public boolean subset() {
             return true;
+        }
+
+        static Atom ofElement(Element e) {
+            Atom a = atoms.get(e);
+            if (a == null)
+                throw new IllegalArgumentException(e + "can not be an aromatic subset atom");
+            return a;
         }
     }
 
