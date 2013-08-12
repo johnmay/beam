@@ -226,4 +226,20 @@ public class AtomBuilderTest {
                             .atomClass(-10)
                             .build();
     }
+
+    @Test
+    public void aliphatic_carbon_3_hydrogens() {
+        Atom a = AtomBuilder.aliphatic(Element.Carbon)
+                            .hydrogens(3)
+                            .build();
+        assertThat(a.element(), is(Element.Carbon));
+        assertThat(a.hydrogens(), is(3));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void aliphatic_carbon_negative_hydrogens() {
+        Atom a = AtomBuilder.aliphatic(Element.Carbon)
+                            .hydrogens(-3)
+                            .build();
+    }
 }

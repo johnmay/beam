@@ -208,6 +208,19 @@ public final class AtomBuilder {
     }
 
     /**
+     * Assign the given hydrogen count to the atom which will be created.
+     *
+     * @param hCount number of hydrogens
+     * @return an atom builder to configure additional properties
+     */
+    public AtomBuilder hydrogens(int hCount) {
+        if (hCount < 0)
+            throw new IllegalArgumentException("the number of hydrogens must be positive");
+        this.hCount = hCount;
+        return this;
+    }
+
+    /**
      * Assign the given formal charge to the atom which will be created.
      *
      * @param charge formal-charge
@@ -249,8 +262,8 @@ public final class AtomBuilder {
     }
 
     /**
-     * Assign the atom class to the atom which will be created. A class
-     * of '0' means unspecified (default).
+     * Assign the atom class to the atom which will be created. A class of '0'
+     * means unspecified (default).
      *
      * @param c atom class 1..n
      * @return an atom builder to configure additional properties
