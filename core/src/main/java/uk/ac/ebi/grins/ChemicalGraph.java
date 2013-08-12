@@ -43,7 +43,7 @@ import java.util.Map;
  *
  * @author John May
  */
-final class ChemicalGraph {
+public final class ChemicalGraph {
 
     /** The vertex labels, atoms. */
     private Atom[] atoms;
@@ -98,7 +98,7 @@ final class ChemicalGraph {
      * @return the atom at that index
      * @throws IllegalArgumentException no atom exists
      */
-    Atom atom(int i) {
+    public Atom atom(int i) {
         return atoms[checkRange(i)];
     }
 
@@ -136,7 +136,7 @@ final class ChemicalGraph {
      * @throws IllegalArgumentException attempting to access the edges of an
      *                                  atom which does not exist
      */
-    List<Edge> edges(int u) {
+    public List<Edge> edges(int u) {
         return Collections.unmodifiableList(edges[checkRange(u)]);
     }
 
@@ -148,7 +148,7 @@ final class ChemicalGraph {
      * @param v another vertex
      * @return whether they are adjacent
      */
-    boolean adjacent(int u, int v) {
+    public boolean adjacent(int u, int v) {
         checkRange(v);
         for (Edge e : edges(u))
             if (e.other(u) == v)
@@ -164,7 +164,7 @@ final class ChemicalGraph {
      * @return the edge connected u and v
      * @throws IllegalArgumentException u and v are not adjacent
      */
-    Edge edge(int u, int v) {
+    public Edge edge(int u, int v) {
         for (Edge e : edges(u))
             if (e.other(u) == v)
                 return e;
@@ -201,7 +201,7 @@ final class ChemicalGraph {
      *
      * @return number of vertices
      */
-    int order() {
+    public int order() {
         return order;
     }
 
@@ -210,7 +210,7 @@ final class ChemicalGraph {
      *
      * @return number of edges
      */
-    int size() {
+    public int size() {
         return size;
     }
 
@@ -257,11 +257,26 @@ final class ChemicalGraph {
     }
 
     /**
+     * Access the atoms of the chemical graph.
+     *
+     * <blockquote><pre>
+     * for (Atom a : g.atoms()) {
+     *
+     * }
+     * </pre></blockquote>
+     *
+     * @return iterable of atoms
+     */
+    public Iterable<Atom> atoms() {
+        return Arrays.asList(atoms).subList(0, order);
+    }
+
+    /**
      * Access the edges of the chemical graph.
      *
      * @return iterable of edges
      */
-    Iterable<Edge> edges() {
+    public Iterable<Edge> edges() {
         List<Edge> es = new ArrayList<Edge>(size);
         for (int u = 0; u < order; u++) {
             for (Edge e : this.edges[u]) {

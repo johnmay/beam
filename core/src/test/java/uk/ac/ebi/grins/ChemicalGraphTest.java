@@ -40,6 +40,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -375,6 +376,25 @@ public class ChemicalGraphTest {
         assertThat(g.edges(3), CoreMatchers
                 .<List<Edge>>is(Arrays.asList(new Edge(3, 0, Bond.IMPLICIT),
                                               new Edge(3, 2, Bond.IMPLICIT))));
+    }
+
+    @Test public void atoms() {
+        ChemicalGraph g = new ChemicalGraph(20);
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        Iterable<Atom> atoms = g.atoms();
+        Iterator<Atom> it    = atoms.iterator();
+        assertTrue(it.hasNext());
+        assertNotNull(it.next());
+        assertTrue(it.hasNext());
+        assertNotNull(it.next());
+        assertTrue(it.hasNext());
+        assertNotNull(it.next());
+        assertTrue(it.hasNext());
+        assertNotNull(it.next());
+        assertFalse(it.hasNext());
     }
 
 }
