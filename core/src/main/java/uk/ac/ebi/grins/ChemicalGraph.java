@@ -257,6 +257,22 @@ final class ChemicalGraph {
     }
 
     /**
+     * Access the edges of the chemical graph.
+     *
+     * @return iterable of edges
+     */
+    Iterable<Edge> edges() {
+        List<Edge> es = new ArrayList<Edge>(size);
+        for (int u = 0; u < order; u++) {
+            for (Edge e : this.edges[u]) {
+                if (e.other(u) > u)
+                    es.add(e);
+            }
+        }
+        return Collections.unmodifiableCollection(es);
+    }
+
+    /**
      * Sort the edges of each vertex in the chemical graph. Ensures that when
      * invoking {@link #edges(int)} the connected vertices will be in natural
      * order. The actual order of atoms does not change. The atom order can be

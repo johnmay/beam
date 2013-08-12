@@ -33,6 +33,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -139,6 +140,24 @@ public class ChemicalGraphTest {
         assertThat(g.edges(1), hasItems(new Edge(0, 1, Bond.IMPLICIT),
                                         new Edge(1, 0, Bond.IMPLICIT)));
     }
+
+    @Test public void testEdgesIterable() {
+        ChemicalGraph g = new ChemicalGraph(2);
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addAtom(mock(Atom.class));
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+
+        Iterable<Edge> es = g.edges();
+        Iterator<Edge> it = es.iterator();
+        assertTrue(it.hasNext());
+        assertThat(it.next(), is(new Edge(0, 1, Bond.IMPLICIT)));
+        assertTrue(it.hasNext());
+        assertThat(it.next(), is(new Edge(1, 2, Bond.IMPLICIT)));
+        assertFalse(it.hasNext());
+    }
+
 
     @Test public void testDegree() {
         ChemicalGraph g = new ChemicalGraph(5);
