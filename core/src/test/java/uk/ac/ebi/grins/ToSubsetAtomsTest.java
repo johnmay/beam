@@ -73,34 +73,34 @@ public class ToSubsetAtomsTest {
     }
 
     @Test public void aliphaticSubset() throws Exception {
-        for (Atom a : Atom.AliphaticSubset.values()){
+        for (Atom a : AtomImpl.AliphaticSubset.values()){
             assertThat(toSubset(a, 0), is(sameInstance(a)));
         }
     }
 
     @Test public void aromaticSubset() throws Exception {
-        for (Atom a : Atom.AromaticSubset.values()){
+        for (Atom a : AtomImpl.AromaticSubset.values()){
             assertThat(toSubset(a, 0), is(sameInstance(a)));
         }
     }
 
     @Test public void atomWithCharge() throws Exception {
-        Atom a = new Atom.BracketAtom(-1, Element.Oxygen, 0, -1, 0, false);
+        Atom a = new AtomImpl.BracketAtom(-1, Element.Oxygen, 0, -1, 0, false);
         assertThat(toSubset(a, 0), is(sameInstance(a)));
     }
 
     @Test public void atomWithClassLabel() throws Exception {
-        Atom a = new Atom.BracketAtom(-1, Element.Oxygen, 1, 0, 1, false);
+        Atom a = new AtomImpl.BracketAtom(-1, Element.Oxygen, 1, 0, 1, false);
         assertThat(toSubset(a, 0), is(sameInstance(a)));
     }
 
     @Test public void atomWithIsotopeLabel() throws Exception {
-        Atom a = new Atom.BracketAtom(0, Element.Sulfur, 0, 0, 0, false);
+        Atom a = new AtomImpl.BracketAtom(0, Element.Sulfur, 0, 0, 0, false);
         assertThat(toSubset(a, 0), is(sameInstance(a)));
     }
 
     @Test public void atomWithRequiredHydrogens() throws Exception {
-        Atom a = new Atom.BracketAtom(0, Element.Oxygen, 2, 0, 0, false);
+        Atom a = new AtomImpl.BracketAtom(0, Element.Oxygen, 2, 0, 0, false);
         assertThat(toSubset(a, 0), is(sameInstance(a)));
     }
 

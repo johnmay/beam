@@ -60,9 +60,9 @@ final class ToSubsetAtoms {
             return a;
 
         if (a.aromatic()) {
-            return Atom.AromaticSubset.ofElement(a.element());
+            return AtomImpl.AromaticSubset.ofElement(a.element());
         } else {
-            return Atom.AliphaticSubset.ofElement(a.element());
+            return AtomImpl.AliphaticSubset.ofElement(a.element());
         }
     }
 

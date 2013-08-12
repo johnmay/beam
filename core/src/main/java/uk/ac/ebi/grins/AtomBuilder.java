@@ -65,12 +65,12 @@ public final class AtomBuilder {
     }
 
     public Atom build() {
-        return new Atom.BracketAtom(isotope,
-                                    e,
-                                    hCount,
-                                    charge,
-                                    atomClass,
-                                    aromatic);
+        return new AtomImpl.BracketAtom(isotope,
+                                        e,
+                                        hCount,
+                                        charge,
+                                        atomClass,
+                                        aromatic);
     }
 
 }

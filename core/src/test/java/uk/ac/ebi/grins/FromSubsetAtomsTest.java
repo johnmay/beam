@@ -40,20 +40,20 @@ public class FromSubsetAtomsTest {
 
     @Test public void bracketAtom() {
         // should provide identity of bracket atom
-        Atom input  = new Atom.BracketAtom(Element.Carbon, 1, 0);
+        Atom input  = new AtomImpl.BracketAtom(Element.Carbon, 1, 0);
         Atom output = FromSubsetAtoms.fromSubset(input, 0);
         assertThat(input, is(sameInstance(output)));
     }
 
     @Test public void aliphatic_carbon() {
-        Atom actual = FromSubsetAtoms.fromSubset(Atom.AliphaticSubset.Carbon, 3);
-        Atom expect = new Atom.BracketAtom(Element.Carbon, 1, 0);
+        Atom actual = FromSubsetAtoms.fromSubset(AtomImpl.AliphaticSubset.Carbon, 3);
+        Atom expect = new AtomImpl.BracketAtom(Element.Carbon, 1, 0);
         assertThat(expect, is(actual));
     }
 
     @Test public void aromatic_carbon() {
-        Atom actual = FromSubsetAtoms.fromSubset(Atom.AromaticSubset.Carbon, 3);
-        Atom expect = new Atom.BracketAtom(-1, Element.Carbon, 1, 0, 0, true);
+        Atom actual = FromSubsetAtoms.fromSubset(AtomImpl.AromaticSubset.Carbon, 3);
+        Atom expect = new AtomImpl.BracketAtom(-1, Element.Carbon, 1, 0, 0, true);
         assertThat(expect, is(actual));
     }
 

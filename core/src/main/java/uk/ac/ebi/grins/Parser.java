@@ -38,7 +38,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static java.util.Map.Entry;
-import static uk.ac.ebi.grins.Atom.AromaticSubset;
 
 
 /**
@@ -233,57 +232,57 @@ final class Parser {
 
                 // aliphatic subset
                 case '*':
-                    addAtom(Atom.AliphaticSubset.Unknown);
+                    addAtom(AtomImpl.AliphaticSubset.Unknown);
                     break;
                 case 'B':
                     if (buffer.getIf('r'))
-                        addAtom(Atom.AliphaticSubset.Bromine);
+                        addAtom(AtomImpl.AliphaticSubset.Bromine);
                     else
-                        addAtom(Atom.AliphaticSubset.Boron);
+                        addAtom(AtomImpl.AliphaticSubset.Boron);
                     break;
                 case 'C':
                     if (buffer.getIf('l'))
-                        addAtom(Atom.AliphaticSubset.Chlorine);
+                        addAtom(AtomImpl.AliphaticSubset.Chlorine);
                     else
-                        addAtom(Atom.AliphaticSubset.Carbon);
+                        addAtom(AtomImpl.AliphaticSubset.Carbon);
                     break;
                 case 'N':
-                    addAtom(Atom.AliphaticSubset.Nitrogen);
+                    addAtom(AtomImpl.AliphaticSubset.Nitrogen);
                     break;
                 case 'O':
-                    addAtom(Atom.AliphaticSubset.Oxygen);
+                    addAtom(AtomImpl.AliphaticSubset.Oxygen);
                     break;
                 case 'P':
-                    addAtom(Atom.AliphaticSubset.Phosphorus);
+                    addAtom(AtomImpl.AliphaticSubset.Phosphorus);
                     break;
                 case 'S':
-                    addAtom(Atom.AliphaticSubset.Sulfur);
+                    addAtom(AtomImpl.AliphaticSubset.Sulfur);
                     break;
                 case 'F':
-                    addAtom(Atom.AliphaticSubset.Fluorine);
+                    addAtom(AtomImpl.AliphaticSubset.Fluorine);
                     break;
                 case 'I':
-                    addAtom(Atom.AliphaticSubset.Iodine);
+                    addAtom(AtomImpl.AliphaticSubset.Iodine);
                     break;
 
                 // aromatic subset
                 case 'b':
-                    addAtom(AromaticSubset.Boron);
+                    addAtom(AtomImpl.AromaticSubset.Boron);
                     break;
                 case 'c':
-                    addAtom(AromaticSubset.Carbon);
+                    addAtom(AtomImpl.AromaticSubset.Carbon);
                     break;
                 case 'n':
-                    addAtom(AromaticSubset.Nitrogen);
+                    addAtom(AtomImpl.AromaticSubset.Nitrogen);
                     break;
                 case 'o':
-                    addAtom(AromaticSubset.Oxygen);
+                    addAtom(AtomImpl.AromaticSubset.Oxygen);
                     break;
                 case 'p':
-                    addAtom(AromaticSubset.Phosphorus);
+                    addAtom(AtomImpl.AromaticSubset.Phosphorus);
                     break;
                 case 's':
-                    addAtom(AromaticSubset.Sulfur);
+                    addAtom(AtomImpl.AromaticSubset.Sulfur);
                     break;
 
                 // bracket atom
@@ -388,12 +387,12 @@ final class Parser {
         if (!buffer.getIf(']'))
             throw InvalidSmilesException.invalidBracketAtom(buffer);
 
-        return new Atom.BracketAtom(isotope,
-                                    element,
-                                    hCount,
-                                    charge,
-                                    atomClass,
-                                    aromatic);
+        return new AtomImpl.BracketAtom(isotope,
+                                        element,
+                                        hCount,
+                                        charge,
+                                        atomClass,
+                                        aromatic);
     }
 
     /**

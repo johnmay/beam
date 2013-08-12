@@ -113,13 +113,13 @@ public class TopologyTest {
 
         // N[C@]([H])(C)C(=O)O
         ChemicalGraph g = new ChemicalGraph(7);
-        g.addAtom(Atom.AliphaticSubset.Nitrogen);
-        g.addAtom(new Atom.BracketAtom(Element.Carbon, 0, 0));
-        g.addAtom(Atom.EXPLICIT_HYDROGEN);
-        g.addAtom(Atom.AliphaticSubset.Carbon);
-        g.addAtom(Atom.AliphaticSubset.Carbon);
-        g.addAtom(Atom.AliphaticSubset.Oxygen);
-        g.addAtom(Atom.AliphaticSubset.Oxygen);
+        g.addAtom(AtomImpl.AliphaticSubset.Nitrogen);
+        g.addAtom(new AtomImpl.BracketAtom(Element.Carbon, 0, 0));
+        g.addAtom(AtomImpl.EXPLICIT_HYDROGEN);
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(AtomImpl.AliphaticSubset.Oxygen);
+        g.addAtom(AtomImpl.AliphaticSubset.Oxygen);
 
         g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
         g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
@@ -136,12 +136,12 @@ public class TopologyTest {
 
         // N[C@]([H])(C)C(=O)O
         ChemicalGraph g = new ChemicalGraph(7);
-        g.addAtom(Atom.AliphaticSubset.Nitrogen);
-        g.addAtom(new Atom.BracketAtom(Element.Carbon, 1, 0));
-        g.addAtom(Atom.AliphaticSubset.Carbon);
-        g.addAtom(Atom.AliphaticSubset.Carbon);
-        g.addAtom(Atom.AliphaticSubset.Oxygen);
-        g.addAtom(Atom.AliphaticSubset.Oxygen);
+        g.addAtom(AtomImpl.AliphaticSubset.Nitrogen);
+        g.addAtom(new AtomImpl.BracketAtom(Element.Carbon, 1, 0));
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(AtomImpl.AliphaticSubset.Oxygen);
+        g.addAtom(AtomImpl.AliphaticSubset.Oxygen);
 
         g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
         g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
@@ -156,11 +156,11 @@ public class TopologyTest {
     @Test public void implicitToExplicit_sulfoxide() {
         // C[S@](CC)=O
         ChemicalGraph g = new ChemicalGraph(5);
-        g.addAtom(Atom.AliphaticSubset.Carbon);
-        g.addAtom(new Atom.BracketAtom(Element.Sulfur, 0, 0));
-        g.addAtom(Atom.AliphaticSubset.Carbon);
-        g.addAtom(Atom.AliphaticSubset.Carbon);
-        g.addAtom(Atom.AliphaticSubset.Oxygen);
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(new AtomImpl.BracketAtom(Element.Sulfur, 0, 0));
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(AtomImpl.AliphaticSubset.Oxygen);
 
         g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
         g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
@@ -175,13 +175,13 @@ public class TopologyTest {
 
         // OC(Cl)=[C@]=C(C)F
         ChemicalGraph g = new ChemicalGraph(7);
-        g.addAtom(Atom.AliphaticSubset.Oxygen);
-        g.addAtom(Atom.AliphaticSubset.Carbon);
-        g.addAtom(Atom.AliphaticSubset.Chlorine);
-        g.addAtom(new Atom.BracketAtom(Element.Carbon, 0, 0));
-        g.addAtom(Atom.AliphaticSubset.Carbon);
-        g.addAtom(Atom.AliphaticSubset.Carbon);
-        g.addAtom(Atom.AliphaticSubset.Fluorine);
+        g.addAtom(AtomImpl.AliphaticSubset.Oxygen);
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(AtomImpl.AliphaticSubset.Chlorine);
+        g.addAtom(new AtomImpl.BracketAtom(Element.Carbon, 0, 0));
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(AtomImpl.AliphaticSubset.Fluorine);
 
         g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
         g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
@@ -197,13 +197,13 @@ public class TopologyTest {
     @Test public void implicitToExplicit_trigonalBipyramidal() {
         // O=C[As@](F)(Cl)(Br)S
         ChemicalGraph g = new ChemicalGraph(7);
-        g.addAtom(Atom.AliphaticSubset.Oxygen);
-        g.addAtom(Atom.AliphaticSubset.Carbon);
-        g.addAtom(new Atom.BracketAtom(Element.Arsenic, 0, 0));
-        g.addAtom(Atom.AliphaticSubset.Fluorine);
-        g.addAtom(Atom.AliphaticSubset.Chlorine);
-        g.addAtom(Atom.AliphaticSubset.Bromine);
-        g.addAtom(Atom.AliphaticSubset.Sulfur);
+        g.addAtom(AtomImpl.AliphaticSubset.Oxygen);
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(new AtomImpl.BracketAtom(Element.Arsenic, 0, 0));
+        g.addAtom(AtomImpl.AliphaticSubset.Fluorine);
+        g.addAtom(AtomImpl.AliphaticSubset.Chlorine);
+        g.addAtom(AtomImpl.AliphaticSubset.Bromine);
+        g.addAtom(AtomImpl.AliphaticSubset.Sulfur);
 
         g.addEdge(new Edge(0, 1, Bond.DOUBLE));
         g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
@@ -221,14 +221,14 @@ public class TopologyTest {
     @Test public void implicitToExplicit_octahedral() {
         // S[Co@@](F)(Cl)(Br)(I)C=O
         ChemicalGraph g = new ChemicalGraph(8);
-        g.addAtom(Atom.AliphaticSubset.Sulfur);
-        g.addAtom(new Atom.BracketAtom(Element.Cobalt, 0, 0));
-        g.addAtom(Atom.AliphaticSubset.Fluorine);
-        g.addAtom(Atom.AliphaticSubset.Chlorine);
-        g.addAtom(Atom.AliphaticSubset.Bromine);
-        g.addAtom(Atom.AliphaticSubset.Iodine);
-        g.addAtom(Atom.AliphaticSubset.Carbon);
-        g.addAtom(Atom.AliphaticSubset.Oxygen);
+        g.addAtom(AtomImpl.AliphaticSubset.Sulfur);
+        g.addAtom(new AtomImpl.BracketAtom(Element.Cobalt, 0, 0));
+        g.addAtom(AtomImpl.AliphaticSubset.Fluorine);
+        g.addAtom(AtomImpl.AliphaticSubset.Chlorine);
+        g.addAtom(AtomImpl.AliphaticSubset.Bromine);
+        g.addAtom(AtomImpl.AliphaticSubset.Iodine);
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(AtomImpl.AliphaticSubset.Oxygen);
 
         g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
         g.addEdge(new Edge(1, 2, Bond.IMPLICIT));

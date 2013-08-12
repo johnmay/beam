@@ -60,12 +60,12 @@ final class FromTrigonalTopology {
                     // preliminary
                     switch (a.element()) {
                         case Carbon:
-                            return Atom.AromaticSubset.Carbon;
+                            return AtomImpl.AromaticSubset.Carbon;
                     }
                 } else {
                     switch (a.element()) {
                         case Carbon:
-                            return Atom.AliphaticSubset.Carbon;
+                            return AtomImpl.AliphaticSubset.Carbon;
                     }
                 }
             }

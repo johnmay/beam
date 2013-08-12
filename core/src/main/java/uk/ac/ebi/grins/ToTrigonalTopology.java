@@ -115,13 +115,13 @@ final class ToTrigonalTopology {
         for (Edge e : g.edges(u)) {
             nElectrons += e.bond().electrons();
         }
-        return new Atom.BracketAtom(-1,
-                                    a.element(),
-                                    a.element()
-                                     .implicitHydrogens(nElectrons / 2),
-                                    0,
-                                    0,
-                                    a.aromatic());
+        return new AtomImpl.BracketAtom(-1,
+                                        a.element(),
+                                        a.element()
+                                        .implicitHydrogens(nElectrons / 2),
+                                        0,
+                                        0,
+                                        a.aromatic());
     }
 
     private Topology toTrigonal(ChemicalGraph g, Edge e, int u) {

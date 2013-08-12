@@ -138,18 +138,18 @@ public class ParsingBracketAtomTest {
     }
 
     private Atom atom(Element e) {
-        return new Atom.BracketAtom(e, 0, 0);
+        return new AtomImpl.BracketAtom(e, 0, 0);
     }
 
     private Atom atom(Element e, int hCount) {
-        return new Atom.BracketAtom(e, hCount, 0);
+        return new AtomImpl.BracketAtom(e, hCount, 0);
     }
 
     private Atom atom(Element e, int hCount, int charge) {
-        return new Atom.BracketAtom(e, hCount, charge);
+        return new AtomImpl.BracketAtom(e, hCount, charge);
     }
 
     private Atom atom(int isotope, Element e, int hCount, int charge) {
-        return new Atom.BracketAtom(isotope, e, hCount, charge, 0, false);
+        return new AtomImpl.BracketAtom(isotope, e, hCount, charge, 0, false);
     }
 }

@@ -35,12 +35,12 @@ final class FromSubsetAtoms {
 
         int hCount = a.element().implicitHydrogens(bondOrderSum);
 
-        return new Atom.BracketAtom(-1,
-                                    a.element(),
-                                    hCount,
-                                    0,
-                                    0,
-                                    a.aromatic());
+        return new AtomImpl.BracketAtom(-1,
+                                        a.element(),
+                                        hCount,
+                                        0,
+                                        0,
+                                        a.aromatic());
     }
 
     private int bondOrderSum(final List<Edge> es) {
