@@ -35,7 +35,7 @@ package uk.ac.ebi.grins;
  *
  * @author John May
  */
-final class ImplicitToExplicit implements Function<ChemicalGraph,ChemicalGraph> {
+final class ImplicitToExplicit extends AbstractFunction<ChemicalGraph,ChemicalGraph> {
 
     /**
      * Transform all implicit to explicit bonds. The original graph is

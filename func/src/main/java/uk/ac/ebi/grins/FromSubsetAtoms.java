@@ -8,7 +8,7 @@ import java.util.List;
  *
  * @author John May
  */
-final class FromSubsetAtoms implements Function<ChemicalGraph,ChemicalGraph>{
+final class FromSubsetAtoms extends AbstractFunction<ChemicalGraph,ChemicalGraph> {
 
     public ChemicalGraph apply(ChemicalGraph g) {
 

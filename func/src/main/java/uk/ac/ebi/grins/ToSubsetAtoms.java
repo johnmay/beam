@@ -11,7 +11,7 @@ import static uk.ac.ebi.grins.Configuration.UNKNOWN;
  *
  * @author John May
  */
-final class ToSubsetAtoms implements Function<ChemicalGraph,ChemicalGraph> {
+final class ToSubsetAtoms extends AbstractFunction<ChemicalGraph,ChemicalGraph> {
 
     public ChemicalGraph apply(ChemicalGraph g) {
 

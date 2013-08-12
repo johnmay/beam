@@ -39,7 +39,7 @@ import java.util.Map;
  *
  * @author John May
  */
-final class AddUpDownBonds implements Function<ChemicalGraph,ChemicalGraph> {
+final class AddUpDownBonds extends AbstractFunction<ChemicalGraph,ChemicalGraph> {
 
     /**
      * Transform all implicit up/down to their explicit type. The original graph
