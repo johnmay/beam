@@ -1,5 +1,6 @@
 package uk.ac.ebi.grins;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Random;
@@ -28,15 +29,15 @@ public class GeneratorTest {
         assertThat(Generator.generate(g), is(input));
     }
 
-    @Test public void test() throws InvalidSmilesException {
+    @Ignore public void test() throws InvalidSmilesException {
         System.out.println(randomPermutations("[C@]([H])(N)(C)C(=O)O", 50));
     }
 
-    @Test public void test2() throws InvalidSmilesException {
+    @Ignore public void test2() throws InvalidSmilesException {
         System.out.println(randomPermutations("[C@H](N)(C)C(=O)O", 50));
     }
 
-    @Test public void test3() throws InvalidSmilesException {
+    @Ignore public void test3() throws InvalidSmilesException {
         System.out.println(randomPermutations("[C@H]12CCCC[C@@]1(C)OCCC2", 50));
     }
 
