@@ -32,14 +32,14 @@ Grins provides excellent round tripping, preserving exactly how the input was sp
 
 ```java
 // bond labels
-ChemicalGraph.fromSmiles("C1=CC=CC=C1");    // kekule      (implicit single bonds)
-ChemicalGraph.fromSmiles("C-1=C-C=C-C=C1"); // kekule      (explicit single bonds)
-ChemicalGraph.fromSmiles("c1ccccc1");       // delocalised (implicit aromatic bonds)
-ChemicalGraph.fromSmiles("c:1:c:c:c:c:c1"); // delocalised (explicit aromatic bonds)
+ChemicalGraph.fromSmiles("C1=CC=CC=C1").toSmiles();    // kekule      (implicit single bonds)
+ChemicalGraph.fromSmiles("C-1=C-C=C-C=C1").toSmiles(); // kekule      (explicit single bonds)
+ChemicalGraph.fromSmiles("c1ccccc1").toSmiles();       // delocalised (implicit aromatic bonds)
+ChemicalGraph.fromSmiles("c:1:c:c:c:c:c1").toSmiles(); // delocalised (explicit aromatic bonds)
 
 // bracket atoms stay as bracket atoms
-ChemicalGraph.fromSmiles("[CH]1=[CH][CH]=[CH][CH]=[CH]1");
-ChemicalGraph.fromSmiles("[CH]1=[CH]C=C[CH]=[CH]1");       // mix bracket and subset atoms
+ChemicalGraph.fromSmiles("[CH]1=[CH][CH]=[CH][CH]=[CH]1").toSmiles();
+ChemicalGraph.fromSmiles("[CH]1=[CH]C=C[CH]=[CH]1").toSmiles();       // mix bracket and subset atoms
 ```
 
 Although preserving the representation was one of the design goals for grins it is common practise to normalise.
