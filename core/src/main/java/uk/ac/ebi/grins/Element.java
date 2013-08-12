@@ -35,12 +35,60 @@ import java.util.Map;
 /**
  * Enumeration of valid OpenSMILES elements.
  *
+ * <h4>Organic subsets</h4> Several of the elements belong to the organic
+ * subset. Atoms of an organic element type can be written just as their symbol
+ * (see. <a href="http://www.opensmiles.org/opensmiles.html#orgsbst">Organic
+ * Subset, OpenSMILES Specification</a>).
+ *
+ * <ul> <li>{@link #Unknown} (<code>*</code>)</li> <li>{@link #Boron}</li>
+ * <li>{@link #Carbon}</li> <li>{@link #Nitrogen}</li> <li>{@link #Oxygen}</li>
+ * <li>{@link #Fluorine}</li> <li>{@link #Phosphorus}</li> <li>{@link
+ * #Sulfur}</li> <li>{@link #Chlorine}</li> <li>{@link #Bromine}</li> <li>{@link
+ * #Iodine}</li> </ul>
+ *
+ * <h4>Usage</h4>
+ *
+ * Elements can be created by either using the value directly or by looking up
+ * it's symbol. If the element may be aromatic the lower-case symbol can also be
+ * used. For example the variable 'e' in the three statements below all have the
+ * same value, {@link Element#Carbon}.
+ *
+ * <blockquote><pre>
+ * Element e = Element.Carbon;
+ * Element e = Element.ofSymbol("C");
+ * Element e = Element.ofSymbol("c");
+ * </pre></blockquote>
+ *
+ * When the symbol is invalid the result wil be null.
+ * <blockquote><pre>
+ * Element e = Element.ofSymbol("R1"); // e = null
+ * </blockquote></pre>
+ *
+ * The {@link Element#Unknown} element can be used to represent generic/alias
+ * atoms.
+ * <blockquote><pre>
+ * Element e = Element.Unknown;
+ * Element e = Element.ofSymbol("*");
+ * </blockquote></pre>
+ *
+ * To access the symbol of an already created element. Use {@link
+ * Element#symbol()}.
+ *
+ * <blockquote><pre>
+ * Atom    a = ...;
+ * Element e = a.element();
+ *
+ * String  symbol = e.symbol();
+ * </blockquote></pre>
+ *
  * @author John May
+ * @see <a href="http://www.opensmiles.org/opensmiles.html#inatoms">Atoms,
+ *      OpenSMILES Specification</a>
  */
-enum Element {
+public enum Element {
 
-    /** Unspecified/Unknown element */
-    Unknown("*"),
+    /** Unspecified/Unknown element (*) */
+    Unknown("*", false, 0),
 
     Hydrogen("H"),
     Helium("He"),
@@ -211,7 +259,7 @@ enum Element {
      *
      * @return element symbol
      */
-    String symbol() {
+    public String symbol() {
         return symbol;
     }
 
@@ -266,7 +314,7 @@ enum Element {
      * @param symbol the element symbol
      * @return element for the symbol, or null if none found
      */
-    static Element ofSymbol(final String symbol) {
+    public static Element ofSymbol(final String symbol) {
         return elementMap.get(symbol);
     }
 
@@ -281,7 +329,8 @@ enum Element {
         if (!buffer.hasRemaining())
             return null;
         char c = buffer.get();
-        if (buffer.hasRemaining() && buffer.next() >= 'a' && buffer.next() <= 'z') {
+        if (buffer.hasRemaining() && buffer.next() >= 'a' && buffer
+                .next() <= 'z') {
             return elementMap.get(new String(new char[]{c, buffer.get()}));
         }
         return elementMap.get(Character.toString(c));
