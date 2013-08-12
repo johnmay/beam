@@ -49,28 +49,13 @@ final class FromTrigonalTopology extends AbstractFunction<ChemicalGraph,Chemical
 
     private Atom reducedAtom(ChemicalGraph g, int u) {
         Atom a = g.atom(u);
-        if (a.isotope() < 0 && a.atomClass() == 0 && a.charge() == 0) {
-            int nElectrons = 0;
-            for (Edge e : g.edges(u)) {
-                nElectrons += e.bond().electrons();
-            }
-            if (a.hydrogens() == a.element()
-                                  .implicitHydrogens(nElectrons / 2)) {
-                if (a.aromatic()) {
-                    // preliminary
-                    switch (a.element()) {
-                        case Carbon:
-                            return AtomImpl.AromaticSubset.Carbon;
-                    }
-                } else {
-                    switch (a.element()) {
-                        case Carbon:
-                            return AtomImpl.AliphaticSubset.Carbon;
-                    }
-                }
-            }
+
+        int nElectrons = 0;
+        for (Edge e : g.edges(u)) {
+          nElectrons += e.bond().electrons();
         }
-        return a;
+
+        return ToSubsetAtoms.toSubset(g.atom(u), nElectrons / 2);
     }
 
     private static final class Traversal {
