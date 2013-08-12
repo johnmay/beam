@@ -120,38 +120,38 @@ public class BondTest {
     }
 
     @Test public void dotSymbol() throws Exception {
-        assertThat(DOT.symbol(), is("."));
+        assertThat(DOT.token(), is("."));
     }
 
     @Test public void singleSymbol() throws Exception {
-        assertThat(SINGLE.symbol(), is("-"));
+        assertThat(SINGLE.token(), is("-"));
     }
 
     @Test public void doubleSymbol() throws Exception {
-        assertThat(DOUBLE.symbol(), is("="));
+        assertThat(DOUBLE.token(), is("="));
     }
 
     @Test public void tripleSymbol() throws Exception {
-        assertThat(TRIPLE.symbol(), is("#"));
+        assertThat(TRIPLE.token(), is("#"));
     }
 
     @Test public void quadrupleSymbol() throws Exception {
-        assertThat(QUADRUPLE.symbol(), is("$"));
+        assertThat(QUADRUPLE.token(), is("$"));
     }
 
     @Test public void aromaticSymbol() throws Exception {
-        assertThat(AROMATIC.symbol(), is(":"));
+        assertThat(AROMATIC.token(), is(":"));
     }
 
     @Test public void upSymbol() throws Exception {
-        assertThat(UP.symbol(), is("/"));
+        assertThat(UP.token(), is("/"));
     }
 
     @Test public void downSymbol() throws Exception {
-        assertThat(DOWN.symbol(), is("\\"));
+        assertThat(DOWN.token(), is("\\"));
     }
 
     @Test public void implicitSymbol() throws Exception {
-        assertThat(IMPLICIT.symbol(), is(""));
+        assertThat(IMPLICIT.token(), is(""));
     }
 }

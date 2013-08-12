@@ -145,7 +145,7 @@ final class Generator {
             }
         }
 
-        sb.append(b.symbol());
+        sb.append(b.token());
         tokens[u].append(sb);
 
         for (Edge e : g.edges(u)) {

@@ -30,11 +30,25 @@
 package uk.ac.ebi.grins;
 
 /**
- * Enumeration of valid connections between atoms. The connections include all
- * the valid undirected and directed bond types and {@link #DOT}. Opposed to the
+ * Enumeration of valid {@link Edge} labels. The connections include all the
+ * valid undirected and directed bond types and {@link #DOT}. Opposed to the
  * other types, {@link #DOT} indicates that two atoms are not connected. <p/>
  *
+ * <table style="font-family: Courier, monospace;"> <tr><th>{@link
+ * Bond}</th><th>{@link #token()}</th><th>{@link #electrons()}</th><th>{@link
+ * #inverse()}</th></tr> <tr><td>{@link #DOT}</td><td>.</td><td>0</td><td></td></tr>
+ * <tr><td>{@link #IMPLICIT}</td><td></td><td>undefined (2 or
+ * 3)</td><td></td></tr> <tr><td>{@link #SINGLE}</td><td>-</td><td>2</td><td></td></tr>
+ * <tr><td>{@link #AROMATIC}</td><td>:</td><td>3</td><td></td></tr>
+ * <tr><td>{@link #DOUBLE}</td><td>=</td><td>4</td><td></td></tr> <tr><td>{@link
+ * #TRIPLE}</td><td>#</td><td>6</td><td></td></tr> <tr><td>{@link
+ * #QUADRUPLE}</td><td>$</td><td>8</td><td></td></tr> <tr><td>{@link
+ * #UP}</td><td>/</td><td>2</td><td>{@link #DOWN}</td></tr> <tr><td>{@link
+ * #DOWN}</td><td>\</td><td>2</td><td>{@link #UP}</td></tr> </table>
+ *
  * @author John May
+ * @see <a href="http://www.opensmiles.org/opensmiles.html#bonds">Bonds,
+ *      OpenSMILES Specification</a>
  */
 public enum Bond {
 
@@ -87,31 +101,36 @@ public enum Bond {
         }
     };
 
-    /** The symbol for the bond in the SMILES grammar. */
-    private final String symbol;
+    /** The token for the bond in the SMILES grammar. */
+    private final String token;
 
     /** The total number of electrons shared, i.e. not the number of pairs. */
     private final int electrons;
 
-    private Bond(String symbol, int electrons) {
-        this.symbol = symbol;
+    private Bond(String token, int electrons) {
+        this.token = token;
         this.electrons = electrons;
     }
 
-
     /**
-     * The symbol of the bond in the SMILES grammar.
+     * The token of the bond in the SMILES grammar.
      *
-     * @return bond symbol
+     * @return bond token
      */
-    public final String symbol() {
-        return symbol;
+    public final String token() {
+        return token;
     }
 
     /**
-     * The total number electrons shared between atoms.
+     * The total number electrons (not pairs) shared between atoms. If the label
+     * is implicit the value is undefined and invoking the method throws a
+     * runtime exception. When the number of electrons is required all implicit
+     * labels should be converted to either single or aromatic.
      *
      * @return number of electrons
+     * @throws IllegalArgumentException the bond is implicit (single or
+     *                                  aromatic) and as such the number of
+     *                                  electrons is unknown.
      */
     public int electrons() {
         return electrons;
@@ -127,8 +146,25 @@ public enum Bond {
         return this;
     }
 
+    /**
+     * Create an edge between the vertices {@code u} and {@code v} with this
+     * label.
+     *
+     * <blockquote><pre>
+     * Edge e = Bond.Implicit.edge(2, 3);
+     * </pre></blockquote>
+     *
+     * @param u an end point of the edge
+     * @param v the other endpoint of the edge
+     * @return a new edge labeled with this value
+     * @see Edge
+     */
+    public Edge edge(int u, int v) {
+        return new Edge(u, v, this);
+    }
+
     /** @inheritDoc */
     public final String toString() {
-        return symbol;
+        return token;
     }
 }
