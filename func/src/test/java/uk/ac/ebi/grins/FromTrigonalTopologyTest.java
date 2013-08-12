@@ -29,6 +29,7 @@
 
 package uk.ac.ebi.grins;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -127,7 +128,7 @@ public class FromTrigonalTopologyTest {
         ExplicitToImplicit eti = new ExplicitToImplicit();
         Assert.assertThat(Generator
                                   .generate(eti.transform(ftt.transform(ite.transform(Parser.parse(smi))))),
-                          is(exp));
+                          CoreMatchers.is(exp));
     }
 
     static void transform(String smi, int[] p, String exp) throws
@@ -138,6 +139,6 @@ public class FromTrigonalTopologyTest {
         Assert.assertThat(Generator
                                   .generate(eti.transform(ftt.transform(ite.transform(Parser.parse(smi)
                                                                                             .permute(p))))),
-                          is(exp));
+                          CoreMatchers.is(exp));
     }
 }

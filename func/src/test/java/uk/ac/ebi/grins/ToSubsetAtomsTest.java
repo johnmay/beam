@@ -1,5 +1,7 @@
 package uk.ac.ebi.grins;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -74,34 +76,40 @@ public class ToSubsetAtomsTest {
 
     @Test public void aliphaticSubset() throws Exception {
         for (Atom a : AtomImpl.AliphaticSubset.values()){
-            assertThat(toSubset(a, 0), is(sameInstance(a)));
+            Assert.assertThat(toSubset(a, 0), CoreMatchers.is(CoreMatchers
+                                                                      .sameInstance(a)));
         }
     }
 
     @Test public void aromaticSubset() throws Exception {
         for (Atom a : AtomImpl.AromaticSubset.values()){
-            assertThat(toSubset(a, 0), is(sameInstance(a)));
+            Assert.assertThat(toSubset(a, 0), CoreMatchers.is(CoreMatchers
+                                                                      .sameInstance(a)));
         }
     }
 
     @Test public void atomWithCharge() throws Exception {
         Atom a = new AtomImpl.BracketAtom(-1, Element.Oxygen, 0, -1, 0, false);
-        assertThat(toSubset(a, 0), is(sameInstance(a)));
+        Assert.assertThat(toSubset(a, 0), CoreMatchers.is(CoreMatchers
+                                                                  .sameInstance(a)));
     }
 
     @Test public void atomWithClassLabel() throws Exception {
         Atom a = new AtomImpl.BracketAtom(-1, Element.Oxygen, 1, 0, 1, false);
-        assertThat(toSubset(a, 0), is(sameInstance(a)));
+        Assert.assertThat(toSubset(a, 0), CoreMatchers.is(CoreMatchers
+                                                                  .sameInstance(a)));
     }
 
     @Test public void atomWithIsotopeLabel() throws Exception {
         Atom a = new AtomImpl.BracketAtom(0, Element.Sulfur, 0, 0, 0, false);
-        assertThat(toSubset(a, 0), is(sameInstance(a)));
+        Assert.assertThat(toSubset(a, 0), CoreMatchers.is(CoreMatchers
+                                                                  .sameInstance(a)));
     }
 
     @Test public void atomWithRequiredHydrogens() throws Exception {
         Atom a = new AtomImpl.BracketAtom(0, Element.Oxygen, 2, 0, 0, false);
-        assertThat(toSubset(a, 0), is(sameInstance(a)));
+        Assert.assertThat(toSubset(a, 0), CoreMatchers.is(CoreMatchers
+                                                                  .sameInstance(a)));
     }
 
     private Atom toSubset(Atom a, int bondOrderSum) {
@@ -117,7 +125,7 @@ public class ToSubsetAtomsTest {
         String actual = Generator.generate(eti.transform(
                                            tsa.transform(
                                            ite.transform(g))));
-        assertThat(actual, is(expected));
+        Assert.assertThat(actual, CoreMatchers.is(expected));
     }
 
 }

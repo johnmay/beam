@@ -29,6 +29,7 @@
 
 package uk.ac.ebi.grins;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -195,6 +196,7 @@ public class AddUpDownBondsTest {
     static void transform(String smi, String exp) throws
                                                   InvalidSmilesException {
         Assert.assertThat(Generator.generate(new AddUpDownBonds()
-                                                     .transform(Parser.parse(smi))), is(exp));
+                                                     .transform(Parser.parse(smi))), CoreMatchers
+                .is(exp));
     }
 }

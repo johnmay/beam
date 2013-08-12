@@ -1,5 +1,7 @@
 package uk.ac.ebi.grins;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -42,19 +44,20 @@ public class FromSubsetAtomsTest {
         // should provide identity of bracket atom
         Atom input  = new AtomImpl.BracketAtom(Element.Carbon, 1, 0);
         Atom output = FromSubsetAtoms.fromSubset(input, 0);
-        assertThat(input, is(sameInstance(output)));
+        Assert.assertThat(input, CoreMatchers.is(CoreMatchers
+                                                         .sameInstance(output)));
     }
 
     @Test public void aliphatic_carbon() {
         Atom actual = FromSubsetAtoms.fromSubset(AtomImpl.AliphaticSubset.Carbon, 3);
         Atom expect = new AtomImpl.BracketAtom(Element.Carbon, 1, 0);
-        assertThat(expect, is(actual));
+        Assert.assertThat(expect, CoreMatchers.is(actual));
     }
 
     @Test public void aromatic_carbon() {
         Atom actual = FromSubsetAtoms.fromSubset(AtomImpl.AromaticSubset.Carbon, 3);
         Atom expect = new AtomImpl.BracketAtom(-1, Element.Carbon, 1, 0, 0, true);
-        assertThat(expect, is(actual));
+        Assert.assertThat(expect, CoreMatchers.is(actual));
     }
 
     private void transform(String input, String expected) throws
@@ -66,7 +69,7 @@ public class FromSubsetAtomsTest {
         String actual = Generator.generate(eti.transform(
                                            fsa.transform(
                                            ite.transform(g))));
-        assertThat(actual, is(expected));
+        Assert.assertThat(actual, CoreMatchers.is(expected));
     }
 
 }

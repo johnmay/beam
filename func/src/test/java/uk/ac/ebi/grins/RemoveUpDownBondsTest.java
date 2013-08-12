@@ -29,6 +29,7 @@
 
 package uk.ac.ebi.grins;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -89,15 +90,16 @@ public class RemoveUpDownBondsTest {
         int[] p = new int[]{7, 2, 4, 1, 3, 6, 8, 9, 0, 5};
         ChemicalGraph g = Parser.parse(input);
         Assert.assertThat(Generator.generate(g.permute(p)),
-                          is("[H]\\C(\\C(=C(/[H])\\C)\\[H])=C(\\[H])/C"));
+                          CoreMatchers
+                                  .is("[H]\\C(\\C(=C(/[H])\\C)\\[H])=C(\\[H])/C"));
         Assert.assertThat(Generator.generate(new RemoveUpDownBonds().transform(g.permute(p))),
-                          is("[H]\\C(\\C(=C(/[H])C)[H])=C(\\[H])C"));
+                          CoreMatchers.is("[H]\\C(\\C(=C(/[H])C)[H])=C(\\[H])C"));
     }
 
     static void transform(String smi, String exp) throws
                                                   InvalidSmilesException {
         Assert.assertThat(Generator.generate(new RemoveUpDownBonds()
                                                      .transform(Parser.parse(smi))),
-                          is(exp));
+                          CoreMatchers.is(exp));
     }
 }

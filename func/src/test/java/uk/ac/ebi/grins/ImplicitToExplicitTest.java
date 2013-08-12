@@ -29,7 +29,10 @@
 
 package uk.ac.ebi.grins;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
@@ -63,11 +66,12 @@ public class ImplicitToExplicitTest {
 
         ChemicalGraph h = new ImplicitToExplicit().transform(g);
 
-        assertThat(g, is(not(sameInstance(h))));
+        Assert.assertThat(g, CoreMatchers.is(CoreMatchers.not(CoreMatchers
+                                                                      .sameInstance(h))));
 
         for (int u = 0; u < h.order(); u++) {
             for (Edge e : h.edges(u)) {
-                assertThat(e.bond(), is(SINGLE));
+                Assert.assertThat(e.bond(), CoreMatchers.is(SINGLE));
             }
         }
     }
@@ -89,11 +93,12 @@ public class ImplicitToExplicitTest {
 
         ChemicalGraph h = new ImplicitToExplicit().transform(g);
 
-        assertThat(g, is(not(sameInstance(h))));
+        Assert.assertThat(g, CoreMatchers.is(CoreMatchers.not(CoreMatchers
+                                                                      .sameInstance(h))));
 
         for (int u = 0; u < h.order(); u++) {
             for (Edge e : h.edges(u)) {
-                assertThat(e.bond(), is(AROMATIC));
+                Assert.assertThat(e.bond(), CoreMatchers.is(AROMATIC));
             }
         }
     }
@@ -115,46 +120,57 @@ public class ImplicitToExplicitTest {
 
         ChemicalGraph h = new ImplicitToExplicit().transform(g);
 
-        assertThat(g, is(not(sameInstance(h))));
+        Assert.assertThat(g, CoreMatchers.is(CoreMatchers.not(CoreMatchers
+                                                                      .sameInstance(h))));
 
 
-        assertThat(h.edges(0), hasItems(new Edge(0, 1, SINGLE),
-                                        new Edge(0, 5, DOUBLE)));
-        assertThat(h.edges(1), hasItems(new Edge(1, 0, SINGLE),
-                                        new Edge(1, 2, DOUBLE)));
-        assertThat(h.edges(2), hasItems(new Edge(2, 1, DOUBLE),
-                                        new Edge(2, 3, SINGLE)));
-        assertThat(h.edges(3), hasItems(new Edge(3, 2, SINGLE),
-                                        new Edge(3, 4, DOUBLE)));
-        assertThat(h.edges(4), hasItems(new Edge(4, 3, DOUBLE),
-                                        new Edge(4, 5, SINGLE)));
-        assertThat(h.edges(5), hasItems(new Edge(5, 0, DOUBLE),
-                                        new Edge(5, 4, SINGLE)));
+        Assert.assertThat(h.edges(0), CoreMatchers
+                .hasItems(new Edge(0, 1, SINGLE),
+                          new Edge(0, 5, DOUBLE)));
+        Assert.assertThat(h.edges(1), CoreMatchers
+                .hasItems(new Edge(1, 0, SINGLE),
+                          new Edge(1, 2, DOUBLE)));
+        Assert.assertThat(h.edges(2), CoreMatchers
+                .hasItems(new Edge(2, 1, DOUBLE),
+                          new Edge(2, 3, SINGLE)));
+        Assert.assertThat(h.edges(3), CoreMatchers
+                .hasItems(new Edge(3, 2, SINGLE),
+                          new Edge(3, 4, DOUBLE)));
+        Assert.assertThat(h.edges(4), CoreMatchers
+                .hasItems(new Edge(4, 3, DOUBLE),
+                          new Edge(4, 5, SINGLE)));
+        Assert.assertThat(h.edges(5), CoreMatchers
+                .hasItems(new Edge(5, 0, DOUBLE),
+                          new Edge(5, 4, SINGLE)));
     }
 
     @Test public void aromaticType() {
-        Atom a = mock(Atom.class);
-        Atom b = mock(Atom.class);
-        when(a.aromatic()).thenReturn(true);
-        when(b.aromatic()).thenReturn(true);
-        assertThat(ImplicitToExplicit.type(a, b), is(Bond.AROMATIC));
+        Atom a = Mockito.mock(Atom.class);
+        Atom b = Mockito.mock(Atom.class);
+        Mockito.when(a.aromatic()).thenReturn(true);
+        Mockito.when(b.aromatic()).thenReturn(true);
+        Assert.assertThat(ImplicitToExplicit.type(a, b), CoreMatchers
+                .is(Bond.AROMATIC));
     }
 
     @Test public void singleType() {
-        Atom a = mock(Atom.class);
-        Atom b = mock(Atom.class);
+        Atom a = Mockito.mock(Atom.class);
+        Atom b = Mockito.mock(Atom.class);
 
-        when(a.aromatic()).thenReturn(true);
-        when(b.aromatic()).thenReturn(false);
-        assertThat(ImplicitToExplicit.type(a, b), is(Bond.SINGLE));
+        Mockito.when(a.aromatic()).thenReturn(true);
+        Mockito.when(b.aromatic()).thenReturn(false);
+        Assert.assertThat(ImplicitToExplicit.type(a, b), CoreMatchers
+                .is(Bond.SINGLE));
 
-        when(a.aromatic()).thenReturn(false);
-        when(b.aromatic()).thenReturn(true);
-        assertThat(ImplicitToExplicit.type(a, b), is(Bond.SINGLE));
+        Mockito.when(a.aromatic()).thenReturn(false);
+        Mockito.when(b.aromatic()).thenReturn(true);
+        Assert.assertThat(ImplicitToExplicit.type(a, b), CoreMatchers
+                .is(Bond.SINGLE));
 
-        when(a.aromatic()).thenReturn(false);
-        when(b.aromatic()).thenReturn(false);
-        assertThat(ImplicitToExplicit.type(a, b), is(Bond.SINGLE));
+        Mockito.when(a.aromatic()).thenReturn(false);
+        Mockito.when(b.aromatic()).thenReturn(false);
+        Assert.assertThat(ImplicitToExplicit.type(a, b), CoreMatchers
+                .is(Bond.SINGLE));
     }
 
     @Test public void toExplicitEdge_NonImplicitIdentity() {
@@ -162,8 +178,9 @@ public class ImplicitToExplicitTest {
         for (Bond b : Bond.values()) {
             if (b != IMPLICIT) {
                 Edge e = new Edge(0, 1, SINGLE);
-                assertThat(ImplicitToExplicit
-                                   .toExplicitEdge(g, e), is(sameInstance(e)));
+                Assert.assertThat(ImplicitToExplicit
+                                          .toExplicitEdge(g, e), CoreMatchers
+                                          .is(CoreMatchers.sameInstance(e)));
             }
         }
     }
@@ -171,20 +188,21 @@ public class ImplicitToExplicitTest {
     @Test public void toExplicitEdge() {
         ChemicalGraph g = new ChemicalGraph(2);
 
-        Atom u = mock(Atom.class);
-        Atom v = mock(Atom.class);
+        Atom u = Mockito.mock(Atom.class);
+        Atom v = Mockito.mock(Atom.class);
 
-        when(u.aromatic()).thenReturn(false);
-        when(v.aromatic()).thenReturn(false);
+        Mockito.when(u.aromatic()).thenReturn(false);
+        Mockito.when(v.aromatic()).thenReturn(false);
 
         g.addAtom(u);
         g.addAtom(v);
 
         Edge e = new Edge(0, 1, IMPLICIT);
-        assertThat(ImplicitToExplicit.toExplicitEdge(g, e),
-                   is(not(sameInstance(e))));
-        assertThat(ImplicitToExplicit.toExplicitEdge(g, e),
-                   is(new Edge(0, 1, SINGLE)));
+        Assert.assertThat(ImplicitToExplicit.toExplicitEdge(g, e),
+                          CoreMatchers.is(CoreMatchers.not(CoreMatchers
+                                                                   .sameInstance(e))));
+        Assert.assertThat(ImplicitToExplicit.toExplicitEdge(g, e),
+                          CoreMatchers.is(new Edge(0, 1, SINGLE)));
 
 
     }

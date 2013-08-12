@@ -29,6 +29,7 @@
 
 package uk.ac.ebi.grins;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -44,18 +45,18 @@ public class ExplicitToImplicitTest {
     public void phenylbenzene() throws Exception {
         ChemicalGraph g = Parser.parse("c:1:c:c:c(c:c1)-c:2:c:c:c:c:c2");
         Assert.assertThat(Generator.generate(g),
-                          is("c:1:c:c:c(c:c1)-c:2:c:c:c:c:c2"));
+                          CoreMatchers.is("c:1:c:c:c(c:c1)-c:2:c:c:c:c:c2"));
         Assert.assertThat(Generator.generate(f.transform(g)),
-                          is("c1ccc(cc1)-c2ccccc2"));
+                          CoreMatchers.is("c1ccc(cc1)-c2ccccc2"));
     }
 
     @Test
     public void benzene() throws Exception {
         ChemicalGraph g = Parser.parse("c:1:c:c:c:c:c1");
         Assert.assertThat(Generator.generate(g),
-                          is("c:1:c:c:c:c:c1"));
+                          CoreMatchers.is("c:1:c:c:c:c:c1"));
         Assert.assertThat(Generator.generate(f.transform(g)),
-                          is("c1ccccc1"));
+                          CoreMatchers.is("c1ccccc1"));
     }
 
 }
