@@ -41,7 +41,7 @@ abstract class AbstractFunction<S, T> implements Function<S, T> {
         return new Composition<S, T, U>(this, g);
     }
 
-    static final class Composition<S, T, U> implements Function<S, U> {
+    private static final class Composition<S, T, U> implements Function<S, U> {
         final Function<S, T> f;
         final Function<T, U> g;
 
@@ -50,11 +50,11 @@ abstract class AbstractFunction<S, T> implements Function<S, T> {
             this.g = g;
         }
 
-        @Override public U apply(S s) throws Exception {
+        public U apply(S s) throws Exception {
             return g.apply(f.apply(s));
         }
 
-        @Override public <P> Function<S, P> with(Function<U, P> g) {
+        public <P> Function<S, P> with(Function<U, P> g) {
             return new Composition<S, U, P>(this, g);
         }
     }
