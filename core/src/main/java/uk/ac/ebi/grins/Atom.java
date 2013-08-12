@@ -87,10 +87,7 @@ interface Atom {
      */
     int atomClass();
 
-    /**
-     * Is the atom a member of the organic or aromatic subset? If not it's a
-     * bracket atom.
-     */
+    /** Is the atom a member of the organic subset? If not it's a bracket atom. */
     boolean subset();
 
     Generator.AtomToken token();
@@ -157,7 +154,7 @@ interface Atom {
         static Atom ofElement(Element e) {
             Atom a = atoms.get(e);
             if (a == null)
-                throw new IllegalArgumentException(e + "can not be an organic subset atom");
+                throw new IllegalArgumentException(e + "can not be an aliphatic subset atom");
             return a;
         }
     }

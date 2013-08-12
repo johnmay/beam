@@ -231,7 +231,7 @@ final class Parser {
             char c = buffer.get();
             switch (c) {
 
-                // organic subset
+                // aliphatic subset
                 case 'B':
                     if (buffer.getIf('r'))
                         addAtom(Atom.AliphaticSubset.Bromine);
