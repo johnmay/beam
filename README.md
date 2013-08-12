@@ -22,7 +22,7 @@ The main 'molecule' class in _grins_ is the 'ChemicalGraph' it provides convenie
 ChemicalGraph g = ChemicalGraph.fromSmiles("CCO");
 ```
 
-and for write it back to SMILES string.
+and for writing it back to SMILES notation.
 
 ```java
 String smi = g.toSmiles();
