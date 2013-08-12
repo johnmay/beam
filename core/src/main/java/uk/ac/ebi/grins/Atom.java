@@ -29,18 +29,21 @@
 
 package uk.ac.ebi.grins;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
 /**
- * Defines properties of a SMILES atom. The organic and aromatic subsets are
- * provided as an enumeration for efficient reuse.
+ * Defines properties of a atom that can be encoded in SMILES. Atoms can be
+ * built using the {@link AtomBuilder} class.
  *
  * @author John May
+ * @see AtomBuilder
  */
-interface Atom {
+public interface Atom {
 
+    /**
+     * The isotope number of the atom. If the isotope is undefined (default) a
+     * value -1 is returned.
+     *
+     * @return isotope number
+     */
     int isotope();
 
     /**
@@ -53,7 +56,7 @@ interface Atom {
     /**
      * Whether this atom is aromatic.
      *
-     * @return atom is aromatic
+     * @return atom is aromatic (true) or aliphatic (false)
      */
     boolean aromatic();
 
@@ -87,11 +90,19 @@ interface Atom {
      */
     int atomClass();
 
-    /** Is the atom a member of the organic subset? If not it's a bracket atom. */
+    /**
+     * (internal) Is the atom a member of the organic (aromatic/aliphatic)
+     * subset implementation?
+     *
+     * @return whether the atom is a subset - implementation
+     */
     boolean subset();
 
+    /**
+     * (internal) The token to write for the atom when generating a SMILES
+     * string.
+     *
+     * @return the atom token
+     */
     Generator.AtomToken token();
-
-
-
 }
