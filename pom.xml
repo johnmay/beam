@@ -19,7 +19,7 @@
             <url>${ebi.repo.nexus.url}</url>
         </repository>
         <snapshotRepository>
-            <id>ebi-repo-snapshot</id>
+            <id>ebi-repo-snapshots</id>
             <url>${ebi.repo.snapshots.nexus.url}</url>
         </snapshotRepository>
     </distributionManagement>
