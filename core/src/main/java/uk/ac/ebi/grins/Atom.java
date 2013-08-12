@@ -93,6 +93,7 @@ interface Atom {
     Generator.AtomToken token();
 
     static enum AliphaticSubset implements Atom {
+        Unknown(Element.Unknown),
         Boron(Element.Boron),
         Carbon(Element.Carbon),
         Nitrogen(Element.Nitrogen),

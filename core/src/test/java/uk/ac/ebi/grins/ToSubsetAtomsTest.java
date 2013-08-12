@@ -9,11 +9,11 @@ import static org.junit.Assert.assertThat;
 /** @author John May */
 public class ToSubsetAtomsTest {
 
-    @Test public void inorganic() throws Exception {
-        transform("[*]", "[*]");
+    @Test public void unknown() throws Exception {
+        transform("[*]", "*");
     }
 
-    @Test public void inorganic2() throws Exception {
+    @Test public void inorganic() throws Exception {
         transform("[Ne]", "[Ne]");
     }
 

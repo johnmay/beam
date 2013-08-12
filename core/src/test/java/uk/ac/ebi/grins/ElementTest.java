@@ -41,6 +41,7 @@ import static org.junit.Assert.assertTrue;
 import static uk.ac.ebi.grins.Element.Arsenic;
 import static uk.ac.ebi.grins.Element.Boron;
 import static uk.ac.ebi.grins.Element.Bromine;
+import static uk.ac.ebi.grins.Element.Calcium;
 import static uk.ac.ebi.grins.Element.Carbon;
 import static uk.ac.ebi.grins.Element.Chlorine;
 import static uk.ac.ebi.grins.Element.Fluorine;
@@ -117,9 +118,18 @@ public class ElementTest {
         }
     }
 
+    @Test
+    public void unknownHydrogens() {
+        assertThat(Unknown.implicitHydrogens(0), is(0));
+        assertThat(Unknown.implicitHydrogens(1), is(0));
+        assertThat(Unknown.implicitHydrogens(2), is(0));
+        assertThat(Unknown.implicitHydrogens(3), is(0));
+        assertThat(Unknown.implicitHydrogens(4), is(0));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void inorganicHydrogens() {
-        Unknown.implicitHydrogens(0);
+        Calcium.implicitHydrogens(0);
     }
 
     @Test

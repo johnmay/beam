@@ -16,7 +16,7 @@ public class AtomTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void aliphaticSubsetInvalidElement() {
-        Atom.AliphaticSubset.ofElement(Element.Unknown);
+        Atom.AliphaticSubset.ofElement(Element.Californium);
     }
 
     @Test public void aromaticSubsetFromElement() {
