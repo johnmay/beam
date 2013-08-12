@@ -36,13 +36,13 @@ import java.io.IOException;
  *
  * @author John May
  */
-public class InvalidSmilesException extends IOException {
+final class InvalidSmilesException extends IOException {
 
-    public InvalidSmilesException(String message, CharBuffer buffer) {
+    InvalidSmilesException(String message, CharBuffer buffer) {
         super(message + display(buffer));
     }
 
-    public InvalidSmilesException(String message) {
+    InvalidSmilesException(String message) {
         super(message);
     }
 
