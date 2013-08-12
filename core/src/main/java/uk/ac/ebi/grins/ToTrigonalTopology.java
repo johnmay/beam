@@ -30,6 +30,7 @@
 package uk.ac.ebi.grins;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,44 +133,59 @@ final class ToTrigonalTopology {
 
         // vertex information for topology
         int j = 0;
-        int[] vs = new int[3];
+        int[] vs = new int[]{
+                e.other(u), // double bond
+                u,          // for implicit H
+                u,          // for implicit H
+        };
 
-        vs[j++] = e.other(u);
-
-        for (int i = 1; i < es.size(); i++) {
-            Edge f = es.get((i + offset) % es.size());
-            switch (f.bond(u)) {
-                case UP:
-                    if (i == 2)
-                        parity = -1;
-                    else
-                        parity = 1;
-                    if (f.other(u) < u)
-                        parity *= -1;
-                    break;
-                case DOWN:
-                    if (i == 2)
-                        parity = 1;
-                    else
-                        parity = -1;
-                    if (f.other(u) < u)
-                        parity *= -1;
-                    break;
+        if (es.size() == 2) {
+            Edge e1 = es.get((offset + 1) % 2);
+            Bond b = e1.bond(u);
+            if (isUp(b)) {
+                vs[1] = e1.other(u);
+            } else if (isDown(b)) {
+                vs[2] = e1.other(u);
             }
-
-            vs[j++] = f.other(u);
+        } else if (es.size() == 3) {
+            Edge e1 = es.get((offset + 1) % 3);
+            Edge e2 = es.get((offset + 2) % 3);
+            Bond b1 = e1.bond(u);
+            Bond b2 = e2.bond(u);
+            if (b1 == Bond.SINGLE || b1 == Bond.IMPLICIT) {
+                if (isUp(b2)) {
+                    vs[1] = e2.other(u);
+                    vs[2] = e1.other(u);
+                } else if (isDown(b2)) {
+                    vs[1] = e1.other(u);
+                    vs[2] = e2.other(u);
+                }
+            } else {
+                if (isUp(b1)) {
+                    vs[1] = e1.other(u);
+                    vs[2] = e2.other(u);
+                } else if (isDown(b1)) {
+                    vs[1] = e2.other(u);
+                    vs[2] = e1.other(u);
+                }
+            }
         }
 
-        if (j < 3)
-            vs[j] = u;
 
-        if (parity == 0)
-            return Topology.unknown();
 
-        Configuration c = parity > 0 ? Configuration.DB1
-                                     : Configuration.DB2;
+        Configuration c = es.get(offset).other(u) < u ? Configuration.DB1
+                                                      : Configuration.DB2;
+
 
         return Topology.trigonal(u, vs, c);
+    }
+
+    static boolean isUp(Bond b) {
+        return b == Bond.UP;
+    }
+
+    static boolean isDown(Bond b) {
+        return b == Bond.DOWN;
     }
 
     private List<Edge> doubleBondLabelledEdges(ChemicalGraph g) {
