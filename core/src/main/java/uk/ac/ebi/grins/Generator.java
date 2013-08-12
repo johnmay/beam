@@ -132,14 +132,16 @@ final class Generator {
         // assign ring numbers
         if (rings.containsKey(u)) {
             for (RingClosure rc : rings.get(u)) {
+                // as we are composing tokens, make sure apply in reverse
                 if (rc.register(rnum)) {
                     int v = rc.other(u);
                     tokens[u] = new RingNumberToken(new RingBondToken(tokens[u],
                                                                       rc.bond(u)),
                                                     rnum);
-                    tokens[v] = new RingNumberToken(tokens[v],
-                                                    rnum);
                     rnum++;
+                } else {
+                    tokens[u] = new RingNumberToken(tokens[u],
+                                                    rc.rnum);
                 }
                 remaining--;
             }
