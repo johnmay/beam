@@ -31,10 +31,22 @@ package uk.ac.ebi.grins;
 
 /**
  * An edge defines two vertex end points and an associated {@link Bond} label.
+ * Edges are created from their {@link Bond} label as follows.
+ *
+ * <blockquote>
+ * <pre>
+ * // an edge between the vertices 1 and 2 the bond label is implicit
+ * Edge e = Bond.Implicit.edge(1, 2);
+ *
+ * // an edge between the vertices 5 and 3 the bond label is double
+ * Edge e = Bond.Double.edge(1, 2);
+ * </pre>
+ * </blockquote>
  *
  * @author John May
+ * @see Bond
  */
-final class Edge {
+public final class Edge {
 
     /** Endpoints of the edge. */
     private final int u, v;
@@ -43,8 +55,8 @@ final class Edge {
     private final Bond bond;
 
     Edge(final int u, final int v, final Bond bond) {
-        this.u = u;
-        this.v = v;
+        this.u    = u;
+        this.v    = v;
         this.bond = bond;
     }
 
@@ -54,7 +66,7 @@ final class Edge {
      *
      * @return either endpoint
      */
-    int either() {
+    public int either() {
         return u;
     }
 
@@ -63,8 +75,10 @@ final class Edge {
      *
      * @param x an endpoint of the edge
      * @return the other endpoint
+     * @throws IllegalArgumentException {@code x} was not an endpoint of this
+     *                                  edge
      */
-    int other(final int x) {
+    public int other(final int x) {
         if (x == u) return v;
         if (x == v) return u;
         throw new IllegalArgumentException(invalidEndpointMessage(x));
@@ -79,7 +93,7 @@ final class Edge {
      * @return bond label
      * @see #bond(int)
      */
-    Bond bond() {
+    public Bond bond() {
         return bond;
     }
 
@@ -87,7 +101,7 @@ final class Edge {
      * Access the bond label relative to a specified endpoint.
      *
      * <blockquote><pre>
-     * Edge e = new Edge(2, 3, UP);
+     * Edge e = Bond.Up.edge(2, 3);
      * e.bond(2); // UP
      * e.bond(3); // DOWN
      * </pre></blockquote>
@@ -95,7 +109,7 @@ final class Edge {
      * @param x endpoint to which the label is relative to
      * @return the bond label
      */
-    Bond bond(final int x) {
+    public Bond bond(final int x) {
         if (x == u) return bond;
         if (x == v) return bond.inverse();
         throw new IllegalArgumentException(invalidEndpointMessage(x));
