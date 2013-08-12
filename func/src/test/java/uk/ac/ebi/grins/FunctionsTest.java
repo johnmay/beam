@@ -19,4 +19,16 @@ public class FunctionsTest {
         assertThat(Functions.reverse(g).toSmiles(),
                    is("OCCC(CC(C)CO)C"));
     }
+
+    @Test public void atomBasedDBStereo() throws Exception {
+        ChemicalGraph g = ChemicalGraph.fromSmiles("F/C=C/F");
+        assertThat(Functions.atomBasedDBStereo(g).toSmiles(),
+                   is("F[C@H]=[C@@H]F"));
+    }
+
+    @Test public void bondBasedDBStereo() throws Exception {
+        ChemicalGraph g = ChemicalGraph.fromSmiles("F[C@H]=[C@@H]F");
+        assertThat(Functions.bondBasedDBStereo(g).toSmiles(),
+                   is("F/C=C/F"));
+    }
 }

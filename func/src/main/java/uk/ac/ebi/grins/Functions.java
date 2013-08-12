@@ -1,6 +1,5 @@
 package uk.ac.ebi.grins;
 
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -9,6 +8,18 @@ import java.util.Random;
  * @author John May
  */
 public final class Functions {
+
+    // convert to atom-based double-bond configurations
+    private static final ToTrigonalTopology ttt = new ToTrigonalTopology();
+
+    // convert to bond-based double-bond configuration
+    private static final FromTrigonalTopology ftt = new FromTrigonalTopology();
+
+    // bond label conversion -> to implicit
+    private static final ExplicitToImplicit eti = new ExplicitToImplicit();
+
+    // bond label conversion -> to explicit
+    private static final ImplicitToExplicit ite = new ImplicitToExplicit();
 
     /// non-instantiable
     private Functions() {
@@ -34,6 +45,29 @@ public final class Functions {
      */
     public static ChemicalGraph reverse(ChemicalGraph g) {
         return g.permute(reverse(g.order()));
+    }
+
+    /**
+     * Convert any directional bond based stereo configuration to atom-based
+     * specification.
+     *
+     * @param g chemical graph graph
+     * @return a copy of the original graph but with directional bonds removed
+     *         and atom-based double-bond stereo configruation.
+     */
+    public static ChemicalGraph atomBasedDBStereo(ChemicalGraph g) {
+        return eti.apply(ttt.apply(ite.apply(g)));
+    }
+
+    /**
+     * Convert a graph with atom-based double-bond stereo configuration to
+     * bond-based specification (direction UP and DOWN bonds).
+     *
+     * @param g chemical graph graph
+     * @return a copy of the original graph but with bond-based stereo-chemistry
+     */
+    public static ChemicalGraph bondBasedDBStereo(ChemicalGraph g) {
+        return eti.apply(ftt.apply(ite.apply(g)));
     }
 
     private static int[] ident(int n) {
