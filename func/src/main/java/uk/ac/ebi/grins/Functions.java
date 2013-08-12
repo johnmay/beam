@@ -1,5 +1,6 @@
 package uk.ac.ebi.grins;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -25,14 +26,14 @@ public final class Functions {
     }
 
     /**
-     * Invert the atom order of the provided chemical graph.
+     * Reverse the atom order of the provided chemical graph.
      *
      * @param g chemical graph
      * @return a copy of the original graph with the order of the atoms
-     *         inverted
+     *         reversed
      */
-    public static ChemicalGraph inverse(ChemicalGraph g) {
-        return g.permute(inv(ident(g.order())));
+    public static ChemicalGraph reverse(ChemicalGraph g) {
+        return g.permute(reverse(g.order()));
     }
 
     private static int[] ident(int n) {
@@ -50,6 +51,14 @@ public final class Functions {
         return p;
     }
 
+    private static int[] reverse(int n) {
+        int[] p = new int[n];
+        for (int i = 0; i < n; i++)
+            p[i] = n - i - 1;
+        return p;
+    }
+
+    // inverse of permutation
     private static int[] inv(int[] p) {
         int[] q = p.clone();
         for (int i = 0; i < p.length; i++)
