@@ -8,9 +8,9 @@ import java.util.List;
  *
  * @author John May
  */
-final class FromSubsetAtoms {
+final class FromSubsetAtoms implements Function<ChemicalGraph,ChemicalGraph>{
 
-    ChemicalGraph transform(ChemicalGraph g) {
+    public ChemicalGraph apply(ChemicalGraph g) {
 
         ChemicalGraph h = new ChemicalGraph(g.order());
 

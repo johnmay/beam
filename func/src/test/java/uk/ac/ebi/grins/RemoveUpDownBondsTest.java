@@ -92,14 +92,14 @@ public class RemoveUpDownBondsTest {
         Assert.assertThat(Generator.generate(g.permute(p)),
                           CoreMatchers
                                   .is("[H]\\C(\\C(=C(/[H])\\C)\\[H])=C(\\[H])/C"));
-        Assert.assertThat(Generator.generate(new RemoveUpDownBonds().transform(g.permute(p))),
+        Assert.assertThat(Generator.generate(new RemoveUpDownBonds().apply(g.permute(p))),
                           CoreMatchers.is("[H]\\C(\\C(=C(/[H])C)[H])=C(\\[H])C"));
     }
 
     static void transform(String smi, String exp) throws
                                                   InvalidSmilesException {
         Assert.assertThat(Generator.generate(new RemoveUpDownBonds()
-                                                     .transform(Parser.parse(smi))),
+                                                     .apply(Parser.parse(smi))),
                           CoreMatchers.is(exp));
     }
 }

@@ -54,7 +54,7 @@ final class ImplicitToExplicit {
             h.addTopology(g.topologyOf(u));
         }
 
-        // transform edges
+        // apply edges
         for (int u = 0; u < g.order(); u++) {
             for (final Edge e : g.edges(u)) {
                 if (e.other(u) > u)

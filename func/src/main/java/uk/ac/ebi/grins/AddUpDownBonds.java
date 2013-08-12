@@ -39,7 +39,7 @@ import java.util.Map;
  *
  * @author John May
  */
-final class AddUpDownBonds {
+final class AddUpDownBonds implements Function<ChemicalGraph,ChemicalGraph> {
 
     /**
      * Transform all implicit up/down to their explicit type. The original graph
@@ -48,7 +48,7 @@ final class AddUpDownBonds {
      * @param g a chemical graph
      * @return new chemical graph but with all explicit bonds
      */
-    public ChemicalGraph transform(final ChemicalGraph g)
+    public ChemicalGraph apply(final ChemicalGraph g)
             throws InvalidSmilesException {
 
         ChemicalGraph h = new ChemicalGraph(g.order());

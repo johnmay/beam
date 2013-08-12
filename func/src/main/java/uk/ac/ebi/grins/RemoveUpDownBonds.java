@@ -46,9 +46,9 @@ import java.util.TreeSet;
  *
  * @author John May
  */
-final class RemoveUpDownBonds {
+final class RemoveUpDownBonds implements Function<ChemicalGraph,ChemicalGraph> {
 
-    public ChemicalGraph transform(final ChemicalGraph g)
+    public ChemicalGraph apply(final ChemicalGraph g)
             throws InvalidSmilesException {
 
         ChemicalGraph h = new ChemicalGraph(g.order());

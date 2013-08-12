@@ -46,7 +46,7 @@ public class ExplicitToImplicitTest {
         ChemicalGraph g = Parser.parse("c:1:c:c:c(c:c1)-c:2:c:c:c:c:c2");
         Assert.assertThat(Generator.generate(g),
                           CoreMatchers.is("c:1:c:c:c(c:c1)-c:2:c:c:c:c:c2"));
-        Assert.assertThat(Generator.generate(f.transform(g)),
+        Assert.assertThat(Generator.generate(f.apply(g)),
                           CoreMatchers.is("c1ccc(cc1)-c2ccccc2"));
     }
 
@@ -55,7 +55,7 @@ public class ExplicitToImplicitTest {
         ChemicalGraph g = Parser.parse("c:1:c:c:c:c:c1");
         Assert.assertThat(Generator.generate(g),
                           CoreMatchers.is("c:1:c:c:c:c:c1"));
-        Assert.assertThat(Generator.generate(f.transform(g)),
+        Assert.assertThat(Generator.generate(f.apply(g)),
                           CoreMatchers.is("c1ccccc1"));
     }
 

@@ -5,7 +5,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
 /** @author John May */
@@ -122,9 +121,9 @@ public class ToSubsetAtomsTest {
         ImplicitToExplicit ite = new ImplicitToExplicit();
         ToSubsetAtoms tsa = new ToSubsetAtoms();
         ExplicitToImplicit eti = new ExplicitToImplicit();
-        String actual = Generator.generate(eti.transform(
-                                           tsa.transform(
-                                           ite.transform(g))));
+        String actual = Generator.generate(eti.apply(
+                tsa.apply(
+                        ite.transform(g))));
         Assert.assertThat(actual, CoreMatchers.is(expected));
     }
 

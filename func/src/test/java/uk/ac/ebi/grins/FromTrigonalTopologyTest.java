@@ -116,7 +116,7 @@ public class FromTrigonalTopologyTest {
     }
 
 //    @Test public void cyclooctatetraene_3() throws InvalidSmilesException {
-//        transform("[C@H]1=[C@@H][C@H]=[C@H][C@@H]=[C@@H][C@H]=[C@@H]1",
+//        apply("[C@H]1=[C@@H][C@H]=[C@H][C@@H]=[C@@H][C@H]=[C@@H]1",
 //                  "C\\1=C/C=C\\C=C/C=C1");
 //    }
 
@@ -127,7 +127,7 @@ public class FromTrigonalTopologyTest {
         FromTrigonalTopology ftt = new FromTrigonalTopology();
         ExplicitToImplicit eti = new ExplicitToImplicit();
         Assert.assertThat(Generator
-                                  .generate(eti.transform(ftt.transform(ite.transform(Parser.parse(smi))))),
+                                  .generate(eti.apply(ftt.apply(ite.transform(Parser.parse(smi))))),
                           CoreMatchers.is(exp));
     }
 
@@ -137,8 +137,8 @@ public class FromTrigonalTopologyTest {
         FromTrigonalTopology ftt = new FromTrigonalTopology();
         ExplicitToImplicit eti = new ExplicitToImplicit();
         Assert.assertThat(Generator
-                                  .generate(eti.transform(ftt.transform(ite.transform(Parser.parse(smi)
-                                                                                            .permute(p))))),
+                                  .generate(eti.apply(ftt.apply(ite.transform(Parser.parse(smi)
+                                                                                    .permute(p))))),
                           CoreMatchers.is(exp));
     }
 }

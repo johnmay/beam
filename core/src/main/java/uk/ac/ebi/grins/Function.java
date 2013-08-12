@@ -13,6 +13,6 @@ public interface Function<S, T> {
      * @param s input instance
      * @return output instance
      */
-    T apply(S s);
+    T apply(S s) throws Exception;
 
 }

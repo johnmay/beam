@@ -48,9 +48,9 @@ import java.util.Map;
  *
  * @author John May
  */
-final class ToTrigonalTopology {
+final class ToTrigonalTopology implements Function<ChemicalGraph,ChemicalGraph> {
 
-    public ChemicalGraph transform(ChemicalGraph g) {
+    public ChemicalGraph apply(ChemicalGraph g) {
 
         ChemicalGraph h = new ChemicalGraph(g.order());
 

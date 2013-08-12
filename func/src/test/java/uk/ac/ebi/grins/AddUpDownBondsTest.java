@@ -196,7 +196,7 @@ public class AddUpDownBondsTest {
     static void transform(String smi, String exp) throws
                                                   InvalidSmilesException {
         Assert.assertThat(Generator.generate(new AddUpDownBonds()
-                                                     .transform(Parser.parse(smi))), CoreMatchers
+                                                     .apply(Parser.parse(smi))), CoreMatchers
                 .is(exp));
     }
 }

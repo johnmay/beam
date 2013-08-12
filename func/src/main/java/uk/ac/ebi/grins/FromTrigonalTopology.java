@@ -14,9 +14,9 @@ import static uk.ac.ebi.grins.Configuration.Type.DoubleBond;
  *
  * @author John May
  */
-final class FromTrigonalTopology {
+final class FromTrigonalTopology implements Function<ChemicalGraph,ChemicalGraph> {
 
-    ChemicalGraph transform(ChemicalGraph g) {
+    public ChemicalGraph apply(ChemicalGraph g) {
         ChemicalGraph h = new ChemicalGraph(g.order());
 
         // copy atom/topology information this is unchanged

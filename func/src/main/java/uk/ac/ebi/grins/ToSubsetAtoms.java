@@ -11,9 +11,9 @@ import static uk.ac.ebi.grins.Configuration.UNKNOWN;
  *
  * @author John May
  */
-final class ToSubsetAtoms {
+final class ToSubsetAtoms implements Function<ChemicalGraph,ChemicalGraph> {
 
-    ChemicalGraph transform(ChemicalGraph g) {
+    public ChemicalGraph apply(ChemicalGraph g) {
 
         ChemicalGraph h = new ChemicalGraph(g.order());
 
