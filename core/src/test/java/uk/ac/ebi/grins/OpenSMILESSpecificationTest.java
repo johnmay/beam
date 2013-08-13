@@ -670,7 +670,7 @@ public class OpenSMILESSpecificationTest {
         roundTrip("C((C))O", "C(C)O");
     }
 
-    @Test
+    @Test(expected = InvalidSmilesException.class)
     public void extra_paratheses_2() {
         roundTrip("(N1CCCC1)", "N1CCCC1");
     }

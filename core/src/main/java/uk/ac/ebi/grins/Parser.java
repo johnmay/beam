@@ -338,6 +338,9 @@ final class Parser {
 
                 // branching
                 case '(':
+                    if (stack.empty())
+                        throw new InvalidSmilesException("cannot open branch with no previous atom",
+                                                         buffer);
                     stack.push(stack.peek());
                     break;
                 case ')':
