@@ -315,7 +315,7 @@ final class Parser {
                     ring(c - '0');
                     break;
                 case '%':
-                    int num = buffer.getNumber();
+                    int num = buffer.getNumber(2);
                     if (num < 0)
                         throw new InvalidSmilesException("number (<digit>+) must follow '%'", buffer);
                     ring(num);
