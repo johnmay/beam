@@ -93,7 +93,7 @@ public class GeneratorTest {
         roundTrip("C1=CN=CC2=NC=N[C@@H]21");
     }
 
-    @Test public void ring_closures2() throws Exception  {
+    @Test public void ring_closures2() throws Exception {
         roundTrip("C1=CN=CC2=NC=N[C@H]21");
     }
 
@@ -101,7 +101,7 @@ public class GeneratorTest {
         roundTrip("C1=CC(=CC2=NC(=N[C@@H]21)C(F)(F)F)N");
     }
 
-    @Test public void ring_closures4() throws Exception  {
+    @Test public void ring_closures4() throws Exception {
         roundTrip("C1=CC(=CC2=NC(=N[C@H]21)C(F)(F)F)N");
     }
 
@@ -157,12 +157,82 @@ public class GeneratorTest {
         assertThat(Generator.generate(Parser.parse(smi)), is(exp));
     }
 
+    @Test public void reuseNumbering() throws InvalidSmilesException {
+        Generator generator = new Generator(ChemicalGraph.fromSmiles("c1cc1c2ccc2"),
+                                            new Generator.ReuseRingNumbering(1));
+        assertThat(generator.string(), is("c1cc1c1ccc1"));
+    }
+
     @Test public void sodiumChloride() throws InvalidSmilesException {
         roundTrip("[Na+].[Cl-]");
     }
 
     @Test public void disconnected() throws InvalidSmilesException {
         roundTrip("CCCC.OOOO.C[CH]C.CNO");
+    }
+
+    @Test public void reusingNumbering() {
+        Generator.RingNumbering rnums = new Generator.ReuseRingNumbering(0);
+        for (int i = 0; i < 50; i++) {
+            int rnum = rnums.next();
+            assertThat(rnum, is(i));
+            rnums.use(rnum);
+        }
+        rnums.free(40);
+        rnums.free(20);
+        rnums.free(4);
+        assertThat(rnums.next(), is(4));
+        rnums.use(4);
+        assertThat(rnums.next(), is(20));
+        rnums.use(20);
+        assertThat(rnums.next(), is(40));
+        rnums.use(40);
+        for (int i = 50; i < 100; i++) {
+            int rnum = rnums.next();
+            assertThat(rnum, is(i));
+            rnums.use(rnum);
+        }
+    }
+
+    @Test public void iterativeNumbering() {
+        Generator.RingNumbering rnums = new Generator.IterativeRingNumbering(0);
+        for (int i = 0; i < 50; i++) {
+            int rnum = rnums.next();
+            assertThat(rnum, is(i));
+            rnums.use(rnum);
+        }
+        rnums.free(40);
+        rnums.free(25);
+        assertThat(rnums.next(), is(50));
+        rnums.use(50);
+        assertThat(rnums.next(), is(51));
+        rnums.use(51);
+        assertThat(rnums.next(), is(52));
+        rnums.use(52);
+        for (int i = 53; i < 100; i++) {
+            int rnum = rnums.next();
+            assertThat(rnum, is(i));
+            rnums.use(rnum);
+        }
+        rnums.free(20);
+        rnums.free(5);
+        assertThat(rnums.next(), is(5));
+        rnums.use(5);
+        assertThat(rnums.next(), is(20));
+        rnums.use(20);
+        assertThat(rnums.next(), is(25));
+        rnums.use(25);
+        assertThat(rnums.next(), is(40));
+        rnums.use(40);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void maxRingNumbers() {
+        Generator.RingNumbering rnums = new Generator.IterativeRingNumbering(0);
+        for (int i = 0; i < 101; i++) {
+            int rnum = rnums.next();
+            rnums.use(rnum);
+        }
     }
 
     static void roundTrip(String smi) throws InvalidSmilesException {

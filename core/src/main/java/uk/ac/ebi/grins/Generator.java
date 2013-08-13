@@ -46,18 +46,20 @@ final class Generator {
     private final ChemicalGraph g;
     private final StringBuilder sb;
 
-    private final int[] visitedAt;
-    private int i, rnum = 1;
+    private final int[]                           visitedAt;
+    private       int                             i;
     private final AtomToken[]                     tokens;
     private final Map<Integer, List<RingClosure>> rings;
+    private final RingNumbering                   rnums;
 
     /**
      * Create a new generator the given chemical graph.
      *
      * @param g chemical graph
      */
-    Generator(ChemicalGraph g) {
+    Generator(ChemicalGraph g, RingNumbering rnums) {
         this.g = g;
+        this.rnums = rnums;
         this.sb = new StringBuilder(g.order() * 2);
         this.visitedAt = new int[g.order()];
         this.tokens = new AtomToken[g.order()];
@@ -133,15 +135,17 @@ final class Generator {
         if (rings.containsKey(u)) {
             for (RingClosure rc : rings.get(u)) {
                 // as we are composing tokens, make sure apply in reverse
+                int rnum = rnums.next();
                 if (rc.register(rnum)) {
                     int v = rc.other(u);
                     tokens[u] = new RingNumberToken(new RingBondToken(tokens[u],
                                                                       rc.bond(u)),
                                                     rnum);
-                    rnum++;
+                    rnums.use(rnum);
                 } else {
                     tokens[u] = new RingNumberToken(tokens[u],
                                                     rc.rnum);
+                    rnums.free(rc.rnum);
                 }
                 remaining--;
             }
@@ -233,22 +237,7 @@ final class Generator {
      * @return SMILES gor the provided chemical graph
      */
     static String generate(final ChemicalGraph g) {
-        return new Generator(g).string();
-    }
-
-    public static void main(String[] args) throws InvalidSmilesException {
-        System.out.println(Generator
-                                   .generate(Parser.parse("C1/CCCCCCCCCCC\\C=1")));
-        System.out.println(Generator
-                                   .generate(Parser.parse("C=1/CCCCCCCCCCC\\C=1")));
-        System.out.println(Generator
-                                   .generate(Parser.parse("C=1/CCCCCCCCCCC\\C1")));
-        System.out.println(Generator
-                                   .generate(Parser.parse("C\\1CCCCCCCCCCC\\C=C1")));
-        System.out.println(Generator
-                                   .generate(Parser.parse("C1CCCCCCCCCCC\\C=C/1")));
-        System.out.println(Generator
-                                   .generate(Parser.parse("CCCC.OOOO.C[CH]C.CNO")));
+        return new Generator(g, new IterativeRingNumbering(1)).string();
     }
 
     static final class RingClosure {
@@ -389,6 +378,96 @@ final class Generator {
         @Override public void append(StringBuilder sb) {
             super.append(sb);
             sb.append(bond);
+        }
+    }
+
+    /** Defines how ring numbering proceeds. */
+    static interface RingNumbering {
+        /**
+         * The next ring number in the sequence.
+         *
+         * @return ring number
+         */
+        int next();
+
+        /**
+         * Mark the specified ring number as used.
+         *
+         * @param rnum ring number
+         */
+        void use(int rnum);
+
+        /**
+         * Mark the specified ring number as no longer used.
+         *
+         * @param rnum ring number
+         */
+        void free(int rnum);
+    }
+
+    /** Labelling of ring opening/closures always using the lowest ring number. */
+    static final class ReuseRingNumbering implements RingNumbering {
+
+        private boolean[] used = new boolean[100];
+        private final int offset;
+
+        ReuseRingNumbering(int first) {
+            this.offset = first;
+        }
+
+        @Override public int next() {
+            for (int i = offset; i < used.length; i++) {
+                if (!used[i]) {
+                    return i;
+                }
+            }
+            throw new IllegalArgumentException("no available ring numbers");
+        }
+
+        @Override public void use(int rnum) {
+            used[rnum] = true;
+        }
+
+        @Override public void free(int rnum) {
+            used[rnum] = false;
+        }
+    }
+
+    /**
+     * Iterative labelling of ring opening/closures. Once the number 99 has been
+     * used the number restarts using any free numbers.
+     */
+    static final class IterativeRingNumbering implements RingNumbering {
+
+        private boolean[] used = new boolean[100];
+        private final int offset;
+        private       int pos;
+
+        IterativeRingNumbering(int first) {
+            this.offset = first;
+            this.pos = offset;
+        }
+
+        @Override public int next() {
+            while (pos < 100 && used[pos])
+                pos++;
+            if (pos < 100)
+                return pos;
+            pos = offset;
+            while (pos < 100 && used[pos])
+                pos++;
+            if (pos < 100)
+                return pos;
+            else
+                throw new IllegalArgumentException("no more ring numbers can be assigned");
+        }
+
+        @Override public void use(int rnum) {
+            used[rnum] = true;
+        }
+
+        @Override public void free(int rnum) {
+            used[rnum] = false;
         }
     }
 }
