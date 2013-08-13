@@ -215,6 +215,10 @@ public class CharBufferTest {
         assertThat(buffer.next(), is('C'));
     }
 
+    @Test public void getThreeDigitNumber_2DigitsOnly() {
+        assertThat(CharBuffer.fromString("123").getNumber(2), is(12));
+    }
+
     @Test public void getNumberWithLeadingZeros() {
         assertThat(CharBuffer.fromString("0002").getNumber(), is(2));
         CharBuffer buffer = CharBuffer.fromString("002H");

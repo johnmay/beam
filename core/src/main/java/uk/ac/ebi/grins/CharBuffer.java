@@ -157,13 +157,32 @@ final class CharBuffer {
      * not represent a number then -1 is returned and the buffer is not
      * progressed.
      *
-     * @return the processing
+     * @return the number read, < 0 if no number read
      */
     int getNumber() {
         if (!nextIsDigit())
             return -1;
         int num = getAsDigit();
         while (nextIsDigit())
+            num = (num * 10) + getAsDigit();
+        return num;
+    }
+
+    /**
+     * Get a sequence of specified digits from the buffer as a positive integer.
+     * The buffer is progressed until the end of the number. If the characters do
+     * not represent a number then -1 is returned and the buffer is not
+     * progressed.
+     *
+     * @param nDigits the number of digits to read
+     *
+     * @return the number read, < 0 if no number read
+     */
+    int getNumber(int nDigits) {
+        if (!nextIsDigit())
+            return -1;
+        int num = getAsDigit();
+        while (--nDigits > 0 && nextIsDigit())
             num = (num * 10) + getAsDigit();
         return num;
     }
