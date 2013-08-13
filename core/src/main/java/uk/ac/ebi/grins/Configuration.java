@@ -39,25 +39,42 @@ import static uk.ac.ebi.grins.Configuration.Type.Tetrahedral;
 import static uk.ac.ebi.grins.Configuration.Type.TrigonalBipyramidal;
 
 /**
- * Enumeration of valid relative configurations for atoms.
+ * Enumeration of atom-based relative configurations. Each value defines a
+ * configuration of a given topology.
  *
  * @author John May
+ * @see <a href="http://www.opensmiles.org/opensmiles.html#chirality">Chirality,
+ *      OpenSMILES</a>
  */
-enum Configuration {
+public enum Configuration {
 
-    // atoms have unknown configuration
+    /**
+     * An atoms has unknown/no configuration.
+     */
     UNKNOWN(None, ""),
 
-    // shorthand for TH, AL or atom-stereo double bond
+    /** Shorthand for TH1, AL1, DB1, TB1 or OH1 configurations. */
     ANTI_CLOCKWISE(Implicit, "@"),
+
+    /** Shorthand for TH2, AL2, DB2, TB2 or OH2 configurations. */
     CLOCKWISE(Implicit, "@@"),
 
-    // tetrahedral (Sp3)
+    /** Tetrahedral, neighbors proceed anti-clockwise looking from the first atom. */
     TH1(Tetrahedral, "@TH1", ANTI_CLOCKWISE),
+
+    /** Tetrahedral, neighbors proceed clockwise looking from the first atom. */
     TH2(Tetrahedral, "@TH2", CLOCKWISE),
 
-    // double bond (Sp2)
+    /**
+     * Atom-based double bond configuration, neighbors proceed anti-clockwise in
+     * a plane. <i>Note - this configuration is currently specific to grins.</i>
+     */
     DB1(DoubleBond, "@DB1", ANTI_CLOCKWISE),
+
+    /**
+     * Atom-based double bond configuration, neighbors proceed clockwise in a
+     * plane.<i>Note - this configuration is currently specific to grins.</i>
+     */
     DB2(DoubleBond, "@DB2", CLOCKWISE),
 
     // extended tetrahedral, allene-like (Sp)
@@ -282,7 +299,7 @@ enum Configuration {
                 return Configuration.ANTI_CLOCKWISE;
             }
         }
-        return Configuration.UNKNOWN;
+        return UNKNOWN;
     }
 
     /** Types of configuration. */
