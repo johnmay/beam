@@ -478,6 +478,8 @@ final class Parser {
      * @throws InvalidSmilesException bond types did not match on ring closure
      */
     private void ring(int rnum) throws InvalidSmilesException {
+        if (bond == Bond.DOT)
+            throw new InvalidSmilesException("ring bond can not be a 'dot'");
         if (rings.length <= rnum || rings[rnum] == null) {
             openRing(rnum);
         } else {
