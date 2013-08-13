@@ -3,6 +3,7 @@ package uk.ac.ebi.grins;
 import java.util.Arrays;
 import java.util.List;
 
+import static uk.ac.ebi.grins.Configuration.Type.None;
 import static uk.ac.ebi.grins.Configuration.UNKNOWN;
 
 /**
@@ -22,7 +23,7 @@ final class ToSubsetAtoms extends AbstractFunction<ChemicalGraph,ChemicalGraph> 
             // only attempt subset conversion if no known topology
             Topology t = g.topologyOf(u);
 
-            if (t.configuration() == UNKNOWN) {
+            if (t.type() == None) {
                 h.addAtom(toSubset(g.atom(u),
                                    bondOrderSum(g.edges(u))));
             } else {

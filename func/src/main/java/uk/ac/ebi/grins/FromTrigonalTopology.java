@@ -21,7 +21,7 @@ final class FromTrigonalTopology extends AbstractFunction<ChemicalGraph,Chemical
 
         // copy atom/topology information this is unchanged
         for (int u = 0; u < g.order(); u++) {
-            if (g.topologyOf(u).configuration().type() == DoubleBond) {
+            if (g.topologyOf(u).type() == DoubleBond) {
                 h.addAtom(reducedAtom(g, u));
             } else {
                 h.addAtom(g.atom(u));
@@ -104,7 +104,7 @@ final class FromTrigonalTopology extends AbstractFunction<ChemicalGraph,Chemical
 
             Topology t = g.topologyOf(u);
 
-            if (t.configuration().type() == DoubleBond) {
+            if (t.type() == DoubleBond) {
 
                 if (offset < 0)
                     throw new IllegalArgumentException("found atom-centric double bond" +
