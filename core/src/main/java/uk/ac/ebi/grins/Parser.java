@@ -291,8 +291,10 @@ final class Parser {
                 // says it's possible
                 case 'D':
                     addAtom(AtomImpl.DEUTERIUM);
+                    break;
                 case 'T':
                     addAtom(AtomImpl.TRITIUM);
+                    break;
 
                 // bracket atom
                 case '[':
