@@ -206,9 +206,10 @@ final class Parser {
                 start.add(v); // start of a new run
             if (arrangement.containsKey(u))
                 arrangement.get(u).add(v);
-            bond = Bond.IMPLICIT;
+
         }
         stack.push(v);
+        bond = Bond.IMPLICIT;
 
         // configurations used to create topologies after parsing
         if (configuration != Configuration.UNKNOWN) {
