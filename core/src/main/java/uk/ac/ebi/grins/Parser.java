@@ -543,7 +543,16 @@ final class Parser {
     private void closeRing(int rnum) throws InvalidSmilesException {
         RingBond rbond = rings[rnum];
         rings[rnum] = null;
-        g.addEdge(new Edge(rbond.u, stack.peek(),
+        int u = rbond.u;
+        int v = stack.peek();
+
+        if (u == v)
+            throw new InvalidSmilesException("Endpoints of ringbond are the same - loops are not valid");
+
+        if (g.adjacent(u, v))
+            throw new InvalidSmilesException("Endpoints of ringbond are already connected - multi-edges are not valid");
+
+        g.addEdge(new Edge(u, v,
                            decideBond(rbond.bond, bond.inverse())));
         bond = Bond.IMPLICIT;
         // adjust the arrangement replacing where this ring number was openned

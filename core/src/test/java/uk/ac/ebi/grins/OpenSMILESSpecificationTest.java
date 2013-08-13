@@ -270,20 +270,17 @@ public class OpenSMILESSpecificationTest {
         roundTrip("C12(CCCCC1)CCCCC2");
     }
 
-    @Ignore("semantic rather than syntax error")
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = InvalidSmilesException.class)
     public void multi_edge_1() throws InvalidSmilesException {
         ChemicalGraph.fromSmiles("C12CCCCC12");
     }
 
-    @Ignore("semantic rather than syntax error")
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = InvalidSmilesException.class)
     public void multi_edge_2() throws InvalidSmilesException {
         ChemicalGraph.fromSmiles("C12C2CCC1");
     }
 
-    @Ignore("semantic rather than syntax error")
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = InvalidSmilesException.class)
     public void loop() throws InvalidSmilesException {
         ChemicalGraph.fromSmiles("C11");
     }
