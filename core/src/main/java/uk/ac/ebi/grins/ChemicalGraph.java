@@ -141,6 +141,27 @@ public final class ChemicalGraph {
     }
 
     /**
+     * Access the vertices adjacent to 'u' in <b>sorted</b> order. This
+     * convenience method is provided to assist in configuring atom-based
+     * stereo using the {@link #configurationOf(int)} method. For general
+     * purpose access to the neighbors of a vertex the {@link #edges(int)}
+     * is preferred.
+     *
+     * @param u a vertex
+     * @return fixed-size array of vertices
+     * @see #configurationOf(int)
+     */
+    public int[] neighbors(int u) {
+        List<Edge> es  = edges[checkRange(u)];
+        int[]      vs  = new int[es.size()];
+        int        deg = es.size();
+        for (int i = 0; i < deg; i++)
+            vs[i] = es.get(i).other(u);
+        Arrays.sort(vs);
+        return vs;
+    }
+
+    /**
      * Determine if the vertices 'u' and 'v' are adjacent and there is an edge
      * which connects them.
      *

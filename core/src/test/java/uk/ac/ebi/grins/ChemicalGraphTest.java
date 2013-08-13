@@ -416,4 +416,16 @@ public class ChemicalGraphTest {
         Assert.assertThat(g.configurationOf(10), is(Configuration.TH2));
     }
 
+    @Test public void myoInositol_neighbors() throws Exception {
+        ChemicalGraph g = ChemicalGraph
+                .fromSmiles("O[C@@H]1[C@H](O)[C@H](O)[C@H](O)[C@H](O)[C@@H]1O");
+
+        Assert.assertThat(g.neighbors(1), is(new int[]{0, 2, 10}));
+        Assert.assertThat(g.neighbors(2), is(new int[]{1, 3, 4}));
+        Assert.assertThat(g.neighbors(4), is(new int[]{2, 5, 6}));
+        Assert.assertThat(g.neighbors(6), is(new int[]{4, 7, 8}));
+        Assert.assertThat(g.neighbors(8), is(new int[]{6, 9, 10}));
+        Assert.assertThat(g.neighbors(10), is(new int[]{1, 8, 11}));
+    }
+
 }
