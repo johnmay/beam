@@ -535,15 +535,15 @@ public class OpenSMILESSpecificationTest {
     }
 
     @Test(expected = InvalidSmilesException.class)
-    public void write_atom_properties_in_order_1() {
-        roundTrip("[C-H3]",   // this is accepted by daylight but doesn't match OpenSMILES grammar
-                  "[CH3-]");
+    public void write_atom_properties_in_order_1() throws
+                                                   InvalidSmilesException {
+        ChemicalGraph.fromSmiles("[C-H3]");   // this is accepted by daylight but doesn't match OpenSMILES grammar
     }
 
     @Test(expected = InvalidSmilesException.class)
-    public void write_atom_properties_in_order_2() {
-        roundTrip("C[CH@](Br)Cl",   // this is accepted by daylight but doesn't match OpenSMILES grammar
-                  "C[C@H](Br)Cl");
+    public void write_atom_properties_in_order_2() throws
+                                                   InvalidSmilesException {
+        ChemicalGraph.fromSmiles("C[CH@](Br)Cl");  // this is accepted by daylight but doesn't match OpenSMILES grammar
     }
 
     @Test public void methanide_wrong() {
