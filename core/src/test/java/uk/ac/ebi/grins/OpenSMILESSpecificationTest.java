@@ -479,19 +479,19 @@ public class OpenSMILESSpecificationTest {
 
     // Parsing termination
     @Test public void terminate_on_space() {
-        roundTrip("CCO ethanol");
+        roundTrip("CCO ethanol", "CCO");
     }
 
     @Test public void terminate_on_tab() {
-        roundTrip("CCO\tethanol");
+        roundTrip("CCO\tethanol", "CCO");
     }
 
     @Test public void terminate_on_newline() {
-        roundTrip("CCO\nethanol");
+        roundTrip("CCO\nethanol", "CCO");
     }
 
     @Test public void terminate_on_carriage_return() {
-        roundTrip("CCO\r\nethanol");
+        roundTrip("CCO\r\nethanol", "CCO");
     }
 
     // Normalisation - part of the functions but we can test we can read/write them
