@@ -258,4 +258,12 @@ final class AtomImpl {
 
     static Atom EXPLICIT_HYDROGEN = new BracketAtom(Element.Hydrogen, 0, 0);
 
+    static Atom DEUTERIUM         = AtomBuilder.aliphatic(Element.Hydrogen)
+                                               .isotope(2)
+                                               .build();
+
+    static Atom TRITIUM           = AtomBuilder.aliphatic(Element.Hydrogen)
+                                               .isotope(3)
+                                               .build();
+
 }

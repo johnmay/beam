@@ -286,6 +286,14 @@ final class Parser {
                     addAtom(AtomImpl.AromaticSubset.Sulfur);
                     break;
 
+
+                // D/T for hydrogen isotopes - non-standard but OpenSMILES spec
+                // says it's possible
+                case 'D':
+                    addAtom(AtomImpl.DEUTERIUM);
+                case 'T':
+                    addAtom(AtomImpl.TRITIUM);
+
                 // bracket atom
                 case '[':
                     addAtom(readBracketAtom(buffer));
