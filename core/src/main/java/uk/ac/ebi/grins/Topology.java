@@ -71,6 +71,16 @@ abstract class Topology {
     abstract Configuration configuration();
 
     /**
+     * What type of configuration is defined by this topology (e.g. Tetrahedral,
+     * DoubleBond etc).
+     *
+     * @return the type of the configuration
+     */
+    Configuration.Type type() {
+        return configuration().type();
+    }
+
+    /**
      * Arrange the topology relative to a given ranking of vertices.
      *
      * @param rank ordering of vertices
