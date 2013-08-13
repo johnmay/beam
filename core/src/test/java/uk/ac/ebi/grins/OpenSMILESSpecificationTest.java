@@ -671,8 +671,8 @@ public class OpenSMILESSpecificationTest {
     }
 
     @Test(expected = InvalidSmilesException.class)
-    public void extra_paratheses_2() {
-        roundTrip("(N1CCCC1)", "N1CCCC1");
+    public void extra_paratheses_2() throws InvalidSmilesException {
+        ChemicalGraph.fromSmiles("(N1CCCC1)");
     }
 
     @Test public void misplaced_dots_1() {
