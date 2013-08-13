@@ -171,7 +171,8 @@ final class ToTrigonalTopology extends AbstractFunction<ChemicalGraph,ChemicalGr
             }
         }
 
-
+        if (vs[1] == vs[2])
+            return Topology.unknown();
 
         Configuration c = es.get(offset).other(u) < u ? Configuration.DB1
                                                       : Configuration.DB2;

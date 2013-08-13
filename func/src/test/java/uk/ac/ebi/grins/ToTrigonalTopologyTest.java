@@ -129,6 +129,11 @@ public class ToTrigonalTopologyTest {
                   "[C@H]1=[C@@H][C@H]=[C@H][C@@H]=[C@@H][C@H]=[C@H]1");
     }
 
+    @Test public void unspecified() throws InvalidSmilesException {
+        transform("FC=CF",
+                  "FC=CF");
+    }
+
 
     static void transform(String smi, String exp) throws
                                                   InvalidSmilesException {
