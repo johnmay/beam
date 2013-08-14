@@ -21,6 +21,12 @@ public final class Functions {
     // bond label conversion -> to explicit
     private static final ImplicitToExplicit ite = new ImplicitToExplicit();
 
+    // use organic subset
+    private static final ToSubsetAtoms tsa = new ToSubsetAtoms();
+
+    // expand organic subset
+    private static final FromSubsetAtoms fsa = new FromSubsetAtoms();
+
     /// non-instantiable
     private Functions() {
     }
@@ -64,11 +70,35 @@ public final class Functions {
      * bond-based specification (direction UP and DOWN bonds).
      *
      * @param g chemical graph graph
-     * @return a copy of the original graph but with bond-based stereo-chemistry
+     * @return a copy of the original graph but with bond-based
+     *         stereo-chemistry
      */
     public static ChemicalGraph bondBasedDBStereo(ChemicalGraph g) {
         return eti.apply(ftt.apply(ite.apply(g)));
     }
+
+    /**
+     * Expand a graph with organic subsets to one with specified atom
+     * properties.
+     *
+     * @param g a chemical graph
+     * @return the chemical graph expanded
+     */
+    public static ChemicalGraph expand(ChemicalGraph g) {
+        return ite.apply(fsa.apply(ite.apply(g)));
+    }
+
+    /**
+     * Collapse a graph with specified atom properties to one with organic
+     * subset atoms.
+     *
+     * @param g a chemical graph
+     * @return the chemical graph expanded
+     */
+    public static ChemicalGraph collapse(ChemicalGraph g) {
+        return ite.apply(fsa.apply(ite.apply(g)));
+    }
+
 
     private static int[] ident(int n) {
         int[] p = new int[n];
