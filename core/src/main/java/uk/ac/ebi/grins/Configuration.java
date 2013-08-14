@@ -48,9 +48,7 @@ import static uk.ac.ebi.grins.Configuration.Type.TrigonalBipyramidal;
  */
 public enum Configuration {
 
-    /**
-     * An atoms has unknown/no configuration.
-     */
+    /** An atoms has unknown/no configuration. */
     UNKNOWN(None, ""),
 
     /** Shorthand for TH1, AL1, DB1, TB1 or OH1 configurations. */
@@ -59,7 +57,10 @@ public enum Configuration {
     /** Shorthand for TH2, AL2, DB2, TB2 or OH2 configurations. */
     CLOCKWISE(Implicit, "@@"),
 
-    /** Tetrahedral, neighbors proceed anti-clockwise looking from the first atom. */
+    /**
+     * Tetrahedral, neighbors proceed anti-clockwise looking from the first
+     * atom.
+     */
     TH1(Tetrahedral, "@TH1", ANTI_CLOCKWISE),
 
     /** Tetrahedral, neighbors proceed clockwise looking from the first atom. */
@@ -67,7 +68,8 @@ public enum Configuration {
 
     /**
      * Atom-based double bond configuration, neighbors proceed anti-clockwise in
-     * a plane. <i>Note - this configuration is currently specific to grins.</i>
+     * a plane. <i>Note - this configuration is currently specific to
+     * grins.</i>
      */
     DB1(DoubleBond, "@DB1", ANTI_CLOCKWISE),
 
@@ -312,6 +314,13 @@ public enum Configuration {
         SquarePlanar,
         TrigonalBipyramidal,
         Octahedral
+    }
+
+    /** Configurations for double-bond bond-based specification. */
+    public enum DoubleBond {
+        UNSPECIFIED,
+        TOGETHER,
+        OPPOSITE
     }
 }
 
