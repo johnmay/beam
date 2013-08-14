@@ -85,7 +85,7 @@ public final class Functions {
      * @return the chemical graph expanded
      */
     public static ChemicalGraph expand(ChemicalGraph g) {
-        return ite.apply(fsa.apply(ite.apply(g)));
+        return eti.apply(fsa.apply(ite.apply(g)));
     }
 
     /**
@@ -96,7 +96,7 @@ public final class Functions {
      * @return the chemical graph expanded
      */
     public static ChemicalGraph collapse(ChemicalGraph g) {
-        return ite.apply(fsa.apply(ite.apply(g)));
+        return eti.apply(tsa.apply(ite.apply(g)));
     }
 
 
