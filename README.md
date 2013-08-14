@@ -45,8 +45,22 @@ ChemicalGraph.fromSmiles("[CH]1=[CH]C=C[CH]=[CH]1").toSmiles();       // mix bra
 Although preserving the representation was one of the design goals for grins it is common practise to normalise.
 As such there are several utilities for standardising outputs.
 
+One can easily convert a molecule with implicit hydrogens `[CH3][CH2][OH]` to
+one with inferred hydrogens `CCO`.
+
 ```java
-// examples coming soon
+ChemicalGraph g = ChemicalGraph.fromSmiles("[CH3][CH2][OH]");
+ChemicalGraph h = Functions.collapse(g);
+h.toSmiles().equals("CCO");
+```
+
+Likewise, conversion of a molecule with inferred hydrogens `CCO` to
+one with implicit hydrogens `[CH3][CH2][OH]` is also easy.
+
+```java
+ChemicalGraph g = ChemicalGraph.fromSmiles("CCO");
+ChemicalGraph h = Functions.expand(g);
+h.toSmiles().equals("[CH3][CH2][OH]");
 ```
 
 Randomly generate different SMILES notations preserving stereo-configuration.
