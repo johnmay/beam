@@ -29,8 +29,11 @@
 
 package uk.ac.ebi.grins;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Given a molecule with implicit double bond configurations add UP/DOWN bond
@@ -39,7 +42,8 @@ import java.util.Map;
  *
  * @author John May
  */
-final class AddUpDownBonds extends AbstractFunction<ChemicalGraph,ChemicalGraph> {
+final class AddUpDownBonds
+        extends AbstractFunction<ChemicalGraph, ChemicalGraph> {
 
     /**
      * Transform all implicit up/down to their explicit type. The original graph
@@ -60,15 +64,26 @@ final class AddUpDownBonds extends AbstractFunction<ChemicalGraph,ChemicalGraph>
         }
 
         Map<Edge, Edge> replacements = new HashMap<Edge, Edge>();
+        Set<Edge> remaining = new HashSet<Edge>();
 
         // change edges (only changed added to replacement)
         for (int u = 0; u < g.order(); u++) {
             for (final Edge e : g.edges(u)) {
                 if (e.other(u) > u && e.bond() == Bond.DOUBLE) {
-                    replaceImplWithExpl(g, e, replacements);
+                    remaining.add(e);
                 }
             }
         }
+
+        boolean altered = false;
+        do {
+            for (Edge e : new ArrayList<Edge>(remaining)) {
+                if (!replaceImplWithExpl(g, e, replacements)) {
+                    remaining.remove(e);
+                    altered = true;
+                }
+            }
+        } while (altered && !remaining.isEmpty());
 
         // append the edges, replacing any which need to be changed
         for (int u = 0; u < g.order(); u++) {
@@ -94,17 +109,17 @@ final class AddUpDownBonds extends AbstractFunction<ChemicalGraph,ChemicalGraph>
      * @param acc accumulator for new edges
      * @throws InvalidSmilesException thrown if the edge could not be converted
      */
-    private void replaceImplWithExpl(ChemicalGraph g,
-                                     Edge e,
-                                     Map<Edge, Edge> acc)
+    private boolean replaceImplWithExpl(ChemicalGraph g,
+                                        Edge e,
+                                        Map<Edge, Edge> acc)
             throws InvalidSmilesException {
 
         int u = e.either(), v = e.other(u);
 
+        boolean uDone = replaceImplWithExpl(g, e, u, acc);
+        boolean vDone = replaceImplWithExpl(g, e, v, acc);
 
-        replaceImplWithExpl(g, e, u, acc);
-        replaceImplWithExpl(g, e, v, acc);
-
+        return uDone || vDone;
     }
 
     /**
@@ -115,44 +130,46 @@ final class AddUpDownBonds extends AbstractFunction<ChemicalGraph,ChemicalGraph>
      * @param e   a edge in the graph ('double bond type')
      * @param u   a endpoint of the edge 'e'
      * @param acc accumulator for new edges
+     * @return does the edge 'e' need to be reconsidered later
      * @throws InvalidSmilesException thrown if the edge could not be converted
      */
-    private void replaceImplWithExpl(ChemicalGraph g,
-                                     Edge e,
-                                     int u,
-                                     Map<Edge, Edge> acc)
+    private boolean replaceImplWithExpl(ChemicalGraph g,
+                                        Edge e,
+                                        int u,
+                                        Map<Edge, Edge> acc)
             throws InvalidSmilesException {
 
         Edge implicit = null;
         Edge explicit = null;
 
         for (Edge f : g.edges(u)) {
-            switch (f.bond()) {
+            Edge f2 = acc.containsKey(f) ? acc.get(f) : f;
+            switch (f2.bond(u)) {
                 case SINGLE:
                 case IMPLICIT:
                     if (implicit != null)
-                        return;
+                        return true;
                     implicit = f;
                     break;
                 case DOUBLE:
                     if (!f.equals(e))
-                        return;
+                        return false;
                     break;
                 case UP:
                 case DOWN:
                     if (explicit != null) {
-                        if (explicit.bond(u).inverse() != f.bond(u))
+                        if (explicit.bond(u).inverse() != f2.bond(u))
                             throw new InvalidSmilesException("invalid double bond configuration");
-                        return;
+                        return false;
                     }
-                    explicit = f;
+                    explicit = f2;
                     break;
             }
         }
 
         // no implicit or explicit bond? don't do anything
         if (implicit == null || explicit == null)
-            return;
+            return false;
 
 
         int v = implicit.other(u);
@@ -165,6 +182,7 @@ final class AddUpDownBonds extends AbstractFunction<ChemicalGraph,ChemicalGraph>
         if (existing != null && existing.bond(u) != explicit.bond(u).inverse())
             throw new InvalidSmilesException("unable to assign explict type for " + implicit);
 
+        return false;
     }
 
 }

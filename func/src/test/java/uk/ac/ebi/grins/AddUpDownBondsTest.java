@@ -183,7 +183,7 @@ public class AddUpDownBondsTest {
      */
     @Test public void partial1() throws InvalidSmilesException {
         transform("[H]\\C(C([H])=C(\\C)[H])=C(/C)[H]",
-                  "[H]\\C(\\C([H])=C(\\C)/[H])=C(/C)\\[H]");
+                  "[H]\\C(\\C(\\[H])=C(\\C)/[H])=C(/C)\\[H]");
     }
 
 
