@@ -27,6 +27,9 @@ public final class Functions {
     // expand organic subset
     private static final FromSubsetAtoms fsa = new FromSubsetAtoms();
 
+    // normalise directional labels
+    private static final NormaliseDirectionalLabels ndl = new NormaliseDirectionalLabels();
+
     /// non-instantiable
     private Functions() {
     }
@@ -99,6 +102,9 @@ public final class Functions {
         return eti.apply(tsa.apply(ite.apply(g)));
     }
 
+    public static ChemicalGraph normaliseDirectionalLabels(ChemicalGraph g) {
+        return ndl.apply(g);
+    }
 
     private static int[] ident(int n) {
         int[] p = new int[n];

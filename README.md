@@ -81,6 +81,28 @@ ChemicalGraph h   = Functions.atomBasedDBStereo(g);
 String        smi = h.toSmiles(); // F[C@H]=[C@@H]F
 ```
 
+Normalise directional labels. There are two possible ways to write each
+bond-based configuration. Grins allows you to normalise the labels such
+that the first symbol is always a forward slash (`/`). Some examples are
+shown below.
+
+```java
+ChemicalGraph g   = ChemicalGraph.fromSmiles("F\\C=C/F");
+ChemicalGraph h   = Functions.normaliseDirectionalLabels(g);
+String        smi = h.toSmiles();
+```
+
+<table>
+<tr><th>Original</th>               <th>Normalised</th>
+<tr><td>`F/C=C/F`</td>              <td>`F/C=C/F`</td>
+<tr><td>`F\C=C\F`</td>              <td>`F/C=C/F`</td>
+<tr><td>`F/C=C\F`</td>              <td>`F/C=C\F`</td>
+<tr><td>`F\C=C/F`</td>              <td>`F/=C\F`</td>
+<tr><td>`C(\F)(/C)=C\F`</td>        <td>`C(/F)(\C)=C/F`</td>
+<tr><td>`C(\\F)=C\\F`</td>          <td>`C(/F)=C(\F)`</td>
+<tr><td>`FC=C(F)C=C(F)\\C=C\\F`</td><td>`FC=C(F)C=C(F)/C=C/F`</td>
+</table>
+
 ## How to Grin
 
 Grins is still in development but you can obtain the latest build from the [EBI snapshots repository](http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots/). An example configuration for maven is shown below.
