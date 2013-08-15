@@ -296,7 +296,7 @@ public final class AtomBuilder {
      *
      * @return an explicit hydrogen to be used in assembly molecules
      */
-    public Atom explicitHydrogen() {
+    public static Atom explicitHydrogen() {
         return AtomImpl.EXPLICIT_HYDROGEN;
     }
 }
