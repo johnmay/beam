@@ -159,11 +159,158 @@ public final class GraphBuilder {
     }
 
     /**
+     * Start building a tetrahedral configuration.
+     *
+     * @param u the central atom
+     * @return a {@link TetrahedralBuilder} to create the stereo-configuration
+     *         from
+     */
+    public TetrahedralBuilder tetrahedral(int u) {
+        return new TetrahedralBuilder(this, u);
+    }
+
+    /**
+     * (internal) Add a topology to the chemical graph. The topologies should be
+     * created using one of the configuration builders (e.g. {@link
+     * TetrahedralBuilder}).
+     *
+     * @param t the topology to add
+     */
+    void topology(int u, Topology t) {
+        g.addTopology(t);
+    }
+
+    /**
      * Finalise and build the chemical graph.
      *
      * @return chemical graph instance
      */
     public ChemicalGraph build() {
         return g;
+    }
+
+    /** @author John May */
+    public static final class TetrahedralBuilder {
+
+        /**
+         * Reference to the graph builder we came from - allows us to add the
+         * topology once the configuration as been built.
+         */
+        final GraphBuilder gb;
+
+        /** Central vertex. */
+        final int u;
+
+        /** The vertex we are looking from. */
+        int v;
+
+        /** The other neighbors */
+        int[] vs;
+
+        /** The configuration of the other neighbors */
+        Configuration config;
+
+        /**
+         * (internal) - constructor for starting to configure a tetrahedral
+         * centre.
+         *
+         * @param gb the graph builder (where we came from)
+         * @param u  the vertex to
+         */
+        private TetrahedralBuilder(GraphBuilder gb,
+                                   int u) {
+            this.gb = gb;
+            this.u = u;
+        }
+
+        /**
+         * Indicate from which vertex the tetrahedral is being 'looked-at'.
+         *
+         * @param v the vertex from which we are looking from.
+         * @return tetrahedral builder for further configuration
+         */
+        public TetrahedralBuilder lookingFrom(int v) {
+            this.v = v;
+            return this;
+        }
+
+        /**
+         * Indicate the other neighbors of tetrahedral (excluding the vertex we
+         * are looking from). There should be exactly 3 neighbors.
+         *
+         * @param vs the neighbors
+         * @return tetrahedral builder for further configuration
+         * @throws IllegalArgumentException when there was not exactly 3
+         *                                  neighbors
+         */
+        public TetrahedralBuilder neighbors(int[] vs) {
+            if (vs.length != 3)
+                throw new IllegalArgumentException("3 vertex required for tetrahedral centre");
+            this.vs = vs;
+            return this;
+        }
+
+        /**
+         * Indicate the other neighbors of tetrahedral (excluding the vertex we
+         * are looking from).
+         *
+         * @param u a neighbor
+         * @param v another neighbor
+         * @param w another neighbor
+         * @return tetrahedral builder for further configuration
+         */
+        public TetrahedralBuilder neighbors(int u, int v, int w) {
+            return neighbors(new int[]{u, v, w});
+        }
+
+        /**
+         * Convenience method to specify the parity as odd (-1) for
+         * anti-clockwise or even (+1) for clockwise. The parity is translated
+         * in to 'TH1' and 'TH2' stereo specification.
+         *
+         * @param p parity value
+         * @return tetrahedral builder for further configuration
+         */
+        public TetrahedralBuilder parity(int p) {
+            if (p < 0)
+                return winding(Configuration.TH1);
+            if (p > 0)
+                return winding(Configuration.TH2);
+            throw new IllegalArgumentException("parity must be < 0 or > 0");
+        }
+
+        /**
+         * Specify the winding of the {@link #neighbors(int, int, int)}.
+         *
+         * @param c configuration {@link Configuration#TH1},{@link
+         *          Configuration#TH2}, {@link Configuration#ANTI_CLOCKWISE} or
+         *          {@link Configuration#CLOCKWISE}
+         * @return tetrahedral builder for further configuration
+         */
+        public TetrahedralBuilder winding(Configuration c) {
+            this.config = c;
+            return this;
+        }
+
+        /**
+         * Finish configuring the tetrahedral centre and add it to the graph.
+         *
+         * @return the graph-builder to add more atoms/bonds or stereo elements
+         * @throws IllegalArgumentException configuration was missing
+         */
+        public GraphBuilder build() {
+            if (config == null)
+                throw new IllegalArgumentException("no configuration defined");
+            if (vs == null)
+                throw new IllegalArgumentException("no neighbors defined");
+            Topology t = Topology.tetrahedral(u,
+                                              new int[]{
+                                                      v,
+                                                      vs[0], vs[1], vs[2]
+                                              },
+                                              config);
+            gb.topology(u, t);
+            return gb;
+        }
     }
 }
