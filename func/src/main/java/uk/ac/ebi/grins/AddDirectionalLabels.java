@@ -37,13 +37,21 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Given a molecule with implicit double bond configurations add UP/DOWN bond
- * types to the implicit bonds. For example the explicit form of {@code
- * NC(/C)=C\C} is {@code N/C(/C)=C\C}.
+ * Given a molecule with bond-based double bond configurations - add directional
+ * labels to edges which do not have it assigned. For example the molecule
+ * {@code NC(/C)=C\C} has no directional label between the nitrogen and the
+ * carbon. Applying this procedure will 'fill-in' missing directional
+ * information on the edge - {@code N/C(/C)=C\C}. <br/>
+ *
+ * If required the directional labels in conjugated systems may be adjusted to
+ * allow for full-specification. Attempting to assign a directional label to the
+ * central carbon of {@code F/C=C(/F)C(/F)=C/F} creates a conflict. This conflict
+ * will be resolved by flipping the labels on the second double-bond - {@code
+ * F/C=C(/F)\C(\F)=C\F}.
  *
  * @author John May
  */
-final class AddUpDownBonds
+final class AddDirectionalLabels
         extends AbstractFunction<ChemicalGraph, ChemicalGraph> {
 
     /**
@@ -173,7 +181,8 @@ final class AddUpDownBonds
                             acc.put(f, f2.inverse());
                             BitSet visited = new BitSet();
                             visited.set(u);
-                            invertExistingDirectionalLabels(g, visited, acc, f2.other(u));
+                            invertExistingDirectionalLabels(g, visited, acc, f2
+                                    .other(u));
                         }
                         return false;
                     }

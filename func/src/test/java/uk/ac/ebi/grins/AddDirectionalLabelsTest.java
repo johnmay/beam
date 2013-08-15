@@ -36,7 +36,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 
 /** @author John May */
-public class AddUpDownBondsTest {
+public class AddDirectionalLabelsTest {
 
     @Test public void e_butene_implH() throws Exception {
         transform("C\\C=C\\C",
@@ -172,8 +172,8 @@ public class AddUpDownBondsTest {
 
     @Test
     public void invalidConjugated() throws Exception {
-        transform("C/C=C(/C)C(/[H])=C/C",
-                  "C/C=C(/C)\\C(\\[H])=C\\C");
+        transform("F/C=C(/F)C(/F)=C/F",
+                  "F/C=C(/F)\\C(\\F)=C\\F");
     }
 
     /**
@@ -195,7 +195,7 @@ public class AddUpDownBondsTest {
 
     static void transform(String smi, String exp) throws
                                                   InvalidSmilesException {
-        Assert.assertThat(Generator.generate(new AddUpDownBonds()
+        Assert.assertThat(Generator.generate(new AddDirectionalLabels()
                                                      .apply(Parser.parse(smi))), CoreMatchers
                 .is(exp));
     }
