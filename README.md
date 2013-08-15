@@ -94,13 +94,13 @@ String        smi = h.toSmiles();
 
 <table>
 <tr><th>Original</th>               <th>Normalised</th>
-<tr><td>`F/C=C/F`</td>              <td>`F/C=C/F`</td>
-<tr><td>`F\C=C\F`</td>              <td>`F/C=C/F`</td>
-<tr><td>`F/C=C\F`</td>              <td>`F/C=C\F`</td>
-<tr><td>`F\C=C/F`</td>              <td>`F/=C\F`</td>
-<tr><td>`C(\F)(/C)=C\F`</td>        <td>`C(/F)(\C)=C/F`</td>
-<tr><td>`C(\\F)=C\\F`</td>          <td>`C(/F)=C(\F)`</td>
-<tr><td>`FC=C(F)C=C(F)\\C=C\\F`</td><td>`FC=C(F)C=C(F)/C=C/F`</td>
+<tr><td><code>/C=C/</code></td>              <td><code>/C=C/</code></td>
+<tr><td><code>\C=C\</code></td>              <td><code>/C=C/</code></td>
+<tr><td><code>/C=C\</code></td>              <td><code>/C=C\</code></td>
+<tr><td><code>\C=C/</code></td>              <td><code>/=C\</code></td>
+<tr><td><code>(\F)(/C)=C\</code></td>        <td><code>(/F)(\C)=C/</code></td>
+<tr><td><code>(\\F)=C\\</code></td>          <td><code>(/F)=C(\F)`</td>
+<tr><td><code>C=C(F)C=C(F)\\C=C\\</code></td><td><code>C=C(F)C=C(F)/C=C/</code></td>
 </table>
 
 ## How to Grin
