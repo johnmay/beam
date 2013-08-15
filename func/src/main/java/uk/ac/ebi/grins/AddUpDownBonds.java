@@ -30,6 +30,7 @@
 package uk.ac.ebi.grins;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -158,11 +159,25 @@ final class AddUpDownBonds
                 case UP:
                 case DOWN:
                     if (explicit != null) {
-                        if (explicit.bond(u).inverse() != f2.bond(u))
+
+                        if (acc.containsKey(explicit))
+                            explicit = acc.get(explicit);
+
+                        // original bonds are invalid
+                        if ((f.bond() == Bond.UP || f.bond() == Bond.DOWN) &&
+                                explicit.bond(u).inverse() != f.bond(u)) {
                             throw new InvalidSmilesException("invalid double bond configuration");
+                        }
+
+                        if (explicit.bond(u).inverse() != f2.bond(u)) {
+                            acc.put(f, f2.inverse());
+                            BitSet visited = new BitSet();
+                            visited.set(u);
+                            invertExistingDirectionalLabels(g, visited, acc, f2.other(u));
+                        }
                         return false;
                     }
-                    explicit = f2;
+                    explicit = f;
                     break;
             }
         }
@@ -171,6 +186,8 @@ final class AddUpDownBonds
         if (implicit == null || explicit == null)
             return false;
 
+        if (acc.containsKey(explicit))
+            explicit = acc.get(explicit);
 
         int v = implicit.other(u);
 
@@ -183,6 +200,29 @@ final class AddUpDownBonds
             throw new InvalidSmilesException("unable to assign explict type for " + implicit);
 
         return false;
+    }
+
+    private void invertExistingDirectionalLabels(ChemicalGraph g,
+                                                 BitSet visited,
+                                                 Map<Edge, Edge> replacement,
+                                                 int u) {
+        visited.set(u);
+        if (g.topologyOf(u) == null)
+            return;
+        for (Edge e : g.edges(u)) {
+            int v = e.other(u);
+            if (!visited.get(v)) {
+                Edge f = replacement.get(e);
+                if (f != null) {
+                    replacement.put(e,
+                                    f.inverse());
+                } else {
+                    replacement.put(e,
+                                    e.inverse());
+                }
+                invertExistingDirectionalLabels(g, visited, replacement, v);
+            }
+        }
     }
 
 }

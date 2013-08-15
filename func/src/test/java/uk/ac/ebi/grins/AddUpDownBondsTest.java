@@ -170,10 +170,10 @@ public class AddUpDownBondsTest {
                   "CC=C=C=CC");
     }
 
-    @Test(expected = InvalidSmilesException.class)
+    @Test
     public void invalidConjugated() throws Exception {
         transform("C/C=C(/C)C(/[H])=C/C",
-                  "n/a");
+                  "C/C=C(/C)\\C(\\[H])=C\\C");
     }
 
     /**
