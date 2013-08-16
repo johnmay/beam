@@ -82,4 +82,19 @@ public class GraphBuilderTest {
         Assert.assertThat(g.toSmiles(), is("[C@](N)(O)(C)[H]"));
     }
 
+    @Test
+    public void e_1_2_difluroethene() {
+        GraphBuilder gb = GraphBuilder.create(5);
+        ChemicalGraph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Fluorine)
+                            .add(0, 1)
+                            .doubleBond(1, 2)
+                            .add(2, 3)
+                            .geometric(1, 2).opposite(0, 3)
+                            .build();
+        System.out.println(g.toSmiles());
+    }
+
 }

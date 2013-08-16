@@ -29,6 +29,11 @@
 
 package uk.ac.ebi.grins;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static uk.ac.ebi.grins.Configuration.DoubleBond.TOGETHER;
+
 /**
  * Provides the ability to incrementally build up a chemical graph from atoms
  * and their connections.
@@ -52,6 +57,8 @@ public final class GraphBuilder {
 
     /** Current we just use the non-public methods of the actual graph object. */
     private final ChemicalGraph g;
+
+    private final List<GeometricBuilder> builders = new ArrayList<GeometricBuilder>(2);
 
     /**
      * Internal constructor.
@@ -169,6 +176,11 @@ public final class GraphBuilder {
         return new TetrahedralBuilder(this, u);
     }
 
+    /** Start building the geometric configuration of the double bond 'u' / 'v'. */
+    public GeometricBuilder geometric(int u, int v) {
+        return new GeometricBuilder(this, u, v);
+    }
+
     /**
      * (internal) Add a topology to the chemical graph. The topologies should be
      * created using one of the configuration builders (e.g. {@link
@@ -178,6 +190,64 @@ public final class GraphBuilder {
      */
     void topology(int u, Topology t) {
         g.addTopology(t);
+    }
+
+    private void assignDirectionalLabels() {
+        for (GeometricBuilder builder : builders) {
+            // unspecified only used for getting not setting configuration
+            if (builder.c == Configuration.DoubleBond.UNSPECIFIED)
+                continue;
+            checkGeometricBuilder(builder); // check required vertices are adjacent
+            Bond first  = firstDirectionalLabel(builder.u, builder.x);
+            Bond second = builder.c == TOGETHER ? first
+                                                : first.inverse();
+
+
+        }
+    }
+
+    private Bond firstDirectionalLabel(int u, int x) {
+        if (g.degree(u) == 2) {
+            Edge e = g.edge(u, x);
+            Bond b = e.bond(u);
+            if (b.directional())
+                return b;
+            else
+                return Bond.UP;
+        }
+        // consider existing labels
+        else {
+            Edge target = null, other = null;
+            for (Edge e : g.edges(u)) {
+                if (e.other(u) == x)
+                    target = e;
+                else if (e.bond() != Bond.DOUBLE)
+                    other = e;
+            }
+            if (other == null)
+                throw new IllegalArgumentException("invalid geometric configuration - > 1 double bond");
+            if (other.bond(u).directional()) {
+                return other.bond(u).inverse();
+            } else {
+                return Bond.UP;
+            }
+        }
+    }
+
+    // safety checks
+    private void checkGeometricBuilder(GeometricBuilder builder) {
+        if (!g.adjacent(builder.u, builder.x)
+                || !g.adjacent(builder.u, builder.v)
+                || !g.adjacent(builder.v, builder.y))
+            throw new IllegalArgumentException("cannot assign directional labels, vertices were not adjacent" +
+                                                       "where not adjacent - expected topology of" +
+                                                       " 'x-u=v-y' where x=" + builder.x
+                                                       + " u=" + builder.u
+                                                       + " v=" + builder.v
+                                                       + " y=" + builder.y);
+        Edge db = g.edge(builder.u, builder.v);
+        if (db.bond() != Bond.DOUBLE)
+            throw new IllegalArgumentException("cannot assign double bond configuration to non-double bond");
     }
 
     /**
@@ -310,6 +380,40 @@ public final class GraphBuilder {
                                               },
                                               config);
             gb.topology(u, t);
+            return gb;
+        }
+    }
+
+    /** Fluent assembly of a double-bond configuration. */
+    public static final class GeometricBuilder {
+        /**
+         * Reference to the graph builder we came from - allows us to add the
+         * double bond once the configuration as been built.
+         */
+        final GraphBuilder gb;
+        final int          u, v;
+        int x, y;
+        Configuration.DoubleBond c;
+
+        public GeometricBuilder(GraphBuilder gb, int u, int v) {
+            this.gb = gb;
+            this.u = u;
+            this.v = v;
+        }
+
+        public GraphBuilder together(int x, int y) {
+            return configure(x, y, TOGETHER);
+        }
+
+        public GraphBuilder opposite(int x, int y) {
+            return configure(x, y, Configuration.DoubleBond.OPPOSITE);
+        }
+
+        public GraphBuilder configure(int x, int y, Configuration.DoubleBond c) {
+            this.x = x;
+            this.y = y;
+            this.c = c;
+            gb.builders.add(this);
             return gb;
         }
     }
