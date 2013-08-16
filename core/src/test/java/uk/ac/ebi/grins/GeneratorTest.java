@@ -3,6 +3,7 @@ package uk.ac.ebi.grins;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -157,7 +158,7 @@ public class GeneratorTest {
         assertThat(Generator.generate(Parser.parse(smi)), is(exp));
     }
 
-    @Test public void reuseNumbering() throws InvalidSmilesException {
+    @Test public void reuseNumbering() throws IOException {
         Generator generator = new Generator(ChemicalGraph.fromSmiles("c1cc1c2ccc2"),
                                             new Generator.ReuseRingNumbering(1));
         assertThat(generator.string(), is("c1cc1c1ccc1"));
