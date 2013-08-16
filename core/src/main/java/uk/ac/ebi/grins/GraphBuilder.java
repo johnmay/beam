@@ -198,12 +198,29 @@ public final class GraphBuilder {
             if (builder.c == Configuration.DoubleBond.UNSPECIFIED)
                 continue;
             checkGeometricBuilder(builder); // check required vertices are adjacent
-            Bond first  = firstDirectionalLabel(builder.u, builder.x);
+
+            int u = builder.u, v = builder.v, x = builder.x, y = builder.y;
+
+            Bond first = firstDirectionalLabel(u, x);
             Bond second = builder.c == TOGETHER ? first
                                                 : first.inverse();
 
-
+            // check if the second label would cause a conflict
+            if (checkDirectionalAssignment(second, v, y)) {
+                // okay to assign the labels as they are
+                g.replace(g.edge(u, x), new Edge(u, x, first));
+                g.replace(g.edge(v, y), new Edge(v, y, second));
+            }
+            // there will be a conflict - check if we invert the first one...
+            else if(checkDirectionalAssignment(first.inverse(), u, v)) {
+                g.replace(g.edge(u, x), new Edge(u, x, first.inverse()));
+                g.replace(g.edge(v, y), new Edge(v, y, second.inverse()));
+            }
+            else {
+                throw new IllegalArgumentException("cannot assigned geometric configurations");
+            }
         }
+        builders.clear();
     }
 
     private Bond firstDirectionalLabel(int u, int x) {
@@ -213,25 +230,43 @@ public final class GraphBuilder {
             if (b.directional())
                 return b;
             else
-                return Bond.UP;
+                return Bond.DOWN;
         }
         // consider existing labels
         else {
-            Edge target = null, other = null;
+            Bond target = null, other = null;
             for (Edge e : g.edges(u)) {
                 if (e.other(u) == x)
-                    target = e;
+                    target = e.bond(u);
                 else if (e.bond() != Bond.DOUBLE)
-                    other = e;
+                    other = e.bond(u);
             }
             if (other == null)
                 throw new IllegalArgumentException("invalid geometric configuration - > 1 double bond");
-            if (other.bond(u).directional()) {
-                return other.bond(u).inverse();
+            if (other.directional()) {
+                return other.inverse();
             } else {
-                return Bond.UP;
+                return target.directional() ? target : Bond.DOWN;
             }
         }
+    }
+
+    private boolean checkDirectionalAssignment(Bond b, int u, int v) {
+        for (Edge e : g.edges(u)) {
+            Bond existing = e.bond(u);
+            if (existing.directional()) {
+                // if there is already a directional label on a different edge
+                // and they are equal this produces a conflict
+                if (e.other(u) != v) {
+                    if (existing == b)
+                        return false;
+                } else {
+                    if (existing != b)
+                        return false;
+                }
+            }
+        }
+        return true;
     }
 
     // safety checks
@@ -256,6 +291,7 @@ public final class GraphBuilder {
      * @return chemical graph instance
      */
     public ChemicalGraph build() {
+        assignDirectionalLabels();
         return g;
     }
 

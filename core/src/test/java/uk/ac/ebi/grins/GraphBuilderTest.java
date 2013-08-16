@@ -31,7 +31,6 @@ package uk.ac.ebi.grins;
 
 import org.junit.Assert;
 import org.junit.Test;
-import sun.security.pkcs11.wrapper.Functions;
 
 import static org.hamcrest.CoreMatchers.is;
 
@@ -52,9 +51,9 @@ public class GraphBuilderTest {
                             .add(0, 3)
                             .add(0, 4)
                             .tetrahedral(0).lookingFrom(1)
-                                           .neighbors(2, 3, 4)
-                                           .parity(1)
-                                           .build()
+                            .neighbors(2, 3, 4)
+                            .parity(1)
+                            .build()
                             .build();
 
         Assert.assertThat(g.toSmiles(), is("[C@@](N)(O)(C)[H]"));
@@ -74,9 +73,9 @@ public class GraphBuilderTest {
                             .add(0, 3)
                             .add(0, 4)
                             .tetrahedral(0).lookingFrom(1)
-                                           .neighbors(2, 3, 4)
-                                           .parity(-1)
-                                           .build()
+                            .neighbors(2, 3, 4)
+                            .parity(-1)
+                            .build()
                             .build();
 
         Assert.assertThat(g.toSmiles(), is("[C@](N)(O)(C)[H]"));
@@ -94,7 +93,66 @@ public class GraphBuilderTest {
                             .add(2, 3)
                             .geometric(1, 2).opposite(0, 3)
                             .build();
-        System.out.println(g.toSmiles());
+        Assert.assertThat(g.toSmiles(), is("F/C=C/F"));
+    }
+
+    @Test
+    public void z_1_2_difluroethene() {
+        GraphBuilder gb = GraphBuilder.create(5);
+        ChemicalGraph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Fluorine)
+                            .add(0, 1)
+                            .doubleBond(1, 2)
+                            .add(2, 3)
+                            .geometric(1, 2).together(0, 3)
+                            .build();
+        Assert.assertThat(g.toSmiles(), is("F/C=C\\F"));
+    }
+
+
+    @Test
+    public void conjugated_consider_existing() {
+        // the second configuration considers the existing configuration
+        GraphBuilder gb = GraphBuilder.create(5);
+        ChemicalGraph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Fluorine)
+                            .add(0, 1)
+                            .doubleBond(1, 2)
+                            .add(2, 3)
+                            .doubleBond(3, 4)
+                            .add(4, 5)
+                            .geometric(1, 2).together(0, 3)
+                            .geometric(3, 4).together(2, 5)
+                            .build();
+        Assert.assertThat(g.toSmiles(), is("F/C=C\\C=C/F"));
+    }
+
+    @Test
+    public void conjugated_resolve_conflict() {
+        // assigning the second one first means we have to consider this
+        // on the first one
+        GraphBuilder gb = GraphBuilder.create(5);
+        ChemicalGraph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Fluorine)
+                            .add(0, 1)
+                            .doubleBond(1, 2)
+                            .add(2, 3)
+                            .doubleBond(3, 4)
+                            .add(4, 5)
+                            .geometric(3, 4).together(2, 5)
+                            .geometric(1, 2).together(0, 3)
+                            .build();
+        Assert.assertThat(g.toSmiles(), is("F\\C=C/C=C\\F"));
     }
 
 }
