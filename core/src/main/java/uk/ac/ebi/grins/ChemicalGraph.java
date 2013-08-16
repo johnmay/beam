@@ -29,6 +29,7 @@
 
 package uk.ac.ebi.grins;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -308,7 +309,7 @@ public final class ChemicalGraph {
      *                                parsing the SMILES.
      */
     public static ChemicalGraph fromSmiles(String smi) throws
-                                                       InvalidSmilesException {
+                                                       IOException {
         if (smi == null)
             throw new NullPointerException("no SMILES provided");
         return Parser.parse(smi);
