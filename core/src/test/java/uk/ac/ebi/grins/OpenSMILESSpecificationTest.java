@@ -32,6 +32,8 @@ package uk.ac.ebi.grins;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -224,7 +226,7 @@ public class OpenSMILESSpecificationTest {
     }
 
     @Test(expected = InvalidSmilesException.class)
-    public void cyclohexene_invalid() throws InvalidSmilesException {
+    public void cyclohexene_invalid() throws IOException {
         ChemicalGraph.fromSmiles("C-1CCCCC=1");
     }
 
@@ -271,17 +273,17 @@ public class OpenSMILESSpecificationTest {
     }
 
     @Test(expected = InvalidSmilesException.class)
-    public void multi_edge_1() throws InvalidSmilesException {
+    public void multi_edge_1() throws IOException {
         ChemicalGraph.fromSmiles("C12CCCCC12");
     }
 
     @Test(expected = InvalidSmilesException.class)
-    public void multi_edge_2() throws InvalidSmilesException {
+    public void multi_edge_2() throws IOException {
         ChemicalGraph.fromSmiles("C12C2CCC1");
     }
 
     @Test(expected = InvalidSmilesException.class)
-    public void loop() throws InvalidSmilesException {
+    public void loop() throws IOException {
         ChemicalGraph.fromSmiles("C11");
     }
 
@@ -372,7 +374,7 @@ public class OpenSMILESSpecificationTest {
     }
 
     @Test(expected = InvalidSmilesException.class)
-    public void dot_ring_bond() throws InvalidSmilesException {
+    public void dot_ring_bond() throws IOException {
         ChemicalGraph.fromSmiles("C.1CCCCC.1");
     }
 
@@ -533,13 +535,13 @@ public class OpenSMILESSpecificationTest {
 
     @Test(expected = InvalidSmilesException.class)
     public void write_atom_properties_in_order_1() throws
-                                                   InvalidSmilesException {
+                                                   IOException {
         ChemicalGraph.fromSmiles("[C-H3]");   // this is accepted by daylight but doesn't match OpenSMILES grammar
     }
 
     @Test(expected = InvalidSmilesException.class)
     public void write_atom_properties_in_order_2() throws
-                                                   InvalidSmilesException {
+                                                   IOException {
         ChemicalGraph.fromSmiles("C[CH@](Br)Cl");  // this is accepted by daylight but doesn't match OpenSMILES grammar
     }
 
@@ -668,7 +670,7 @@ public class OpenSMILESSpecificationTest {
     }
 
     @Test(expected = InvalidSmilesException.class)
-    public void extra_paratheses_2() throws InvalidSmilesException {
+    public void extra_paratheses_2() throws IOException {
         ChemicalGraph.fromSmiles("(N1CCCC1)");
     }
 
