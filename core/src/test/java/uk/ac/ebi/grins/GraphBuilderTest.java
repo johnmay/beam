@@ -155,4 +155,85 @@ public class GraphBuilderTest {
         Assert.assertThat(g.toSmiles(), is("F\\C=C/C=C\\F"));
     }
 
+    @Test
+    public void conjugated_resolve_conflict2() {
+        // we assign the first, third then second - the second one cause
+        // a conflict and we must flip one of the others
+        GraphBuilder gb = GraphBuilder.create(5);
+        ChemicalGraph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Fluorine)
+                            .add(0, 1)
+                            .doubleBond(1, 2)
+                            .add(2, 3)
+                            .doubleBond(3, 4)
+                            .add(4, 5)
+                            .doubleBond(5, 6)
+                            .add(6, 7)
+                            .geometric(1, 2).opposite(0, 3)
+                            .geometric(5, 6).together(4, 7)
+                            .geometric(3, 4).together(2, 5)
+                            .build();
+        Assert.assertThat(g.toSmiles(), is("F/C=C/C=C\\C=C/F"));
+    }
+
+    @Test
+    public void all_trans_octatetraene() {
+        GraphBuilder gb = GraphBuilder.create(5);
+        ChemicalGraph g = gb.add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(0, 1)
+                            .doubleBond(1, 2)
+                            .add(2, 3)
+                            .doubleBond(3, 4)
+                            .add(4, 5)
+                            .doubleBond(5, 6)
+                            .add(6, 7)
+                            .doubleBond(7, 0)
+                            .geometric(1, 2).together(0, 3)
+                            .geometric(3, 4).together(2, 5)
+                            .geometric(5, 6).together(4, 7)
+                            .geometric(7, 0).together(6, 1)
+                            .build();
+        Assert.assertThat(g.toSmiles(), is("C=1/C=C\\C=C/C=C\\C1"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void impossible_octatetraene() {
+        GraphBuilder gb = GraphBuilder.create(5);
+        ChemicalGraph g = gb.add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(AtomImpl.AliphaticSubset.Carbon)
+                            .add(0, 1)
+                            .doubleBond(1, 2)
+                            .add(2, 3)
+                            .doubleBond(3, 4)
+                            .add(4, 5)
+                            .doubleBond(5, 6)
+                            .add(6, 7)
+                            .doubleBond(7, 0)
+                            .geometric(1, 2).together(0, 3)
+                            .geometric(3, 4).opposite(2, 5)
+                            .geometric(5, 6).together(4, 7)
+                            .geometric(7, 0).together(6, 1)
+                            .build();
+        Assert.assertThat(g.toSmiles(), is("C=1/C=C\\C=C/C=C\\C1"));
+    }
+
 }

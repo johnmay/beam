@@ -30,6 +30,7 @@
 package uk.ac.ebi.grins;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 import static uk.ac.ebi.grins.Configuration.DoubleBond.TOGETHER;
@@ -212,15 +213,32 @@ public final class GraphBuilder {
                 g.replace(g.edge(v, y), new Edge(v, y, second));
             }
             // there will be a conflict - check if we invert the first one...
-            else if(checkDirectionalAssignment(first.inverse(), u, v)) {
+            else if (checkDirectionalAssignment(first.inverse(), u, x)) {
                 g.replace(g.edge(u, x), new Edge(u, x, first.inverse()));
                 g.replace(g.edge(v, y), new Edge(v, y, second.inverse()));
-            }
-            else {
-                throw new IllegalArgumentException("cannot assigned geometric configurations");
+            } else {
+                invertExistingDirectionalLabels(new BitSet(), v, u);
+                if (!checkDirectionalAssignment(first, u, x) ||
+                        !checkDirectionalAssignment(second, v, y))
+                    throw new IllegalArgumentException("cannot assign geometric configuration");
+                g.replace(g.edge(u, x), new Edge(u, x, first));
+                g.replace(g.edge(v, y), new Edge(v, y, second));
             }
         }
         builders.clear();
+    }
+
+    private void invertExistingDirectionalLabels(BitSet visited,
+                                                 int u,
+                                                 int p) {
+        visited.set(u);
+        for (Edge e : g.edges(u)) {
+            int v = e.other(u);
+            if (!visited.get(v) && p != v) {
+                g.replace(e, e.inverse());
+                invertExistingDirectionalLabels(visited, v, u);
+            }
+        }
     }
 
     private Bond firstDirectionalLabel(int u, int x) {

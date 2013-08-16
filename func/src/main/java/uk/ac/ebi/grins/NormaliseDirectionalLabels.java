@@ -167,8 +167,6 @@ public class NormaliseDirectionalLabels
                                                      Map<Edge, Edge> replacement,
                                                      int u) {
             visited.set(u);
-            if (g.topologyOf(u) == null)
-                return;
             for (Edge e : g.edges(u)) {
                 int v = e.other(u);
                 if (!visited.get(v)) {
