@@ -87,6 +87,10 @@ public enum Bond {
         @Override public Bond inverse() {
             return DOWN;
         }
+
+        @Override boolean directional() {
+            return true;
+        }
     },
 
     /**
@@ -98,6 +102,10 @@ public enum Bond {
     DOWN("\\", 2) {
         @Override public Bond inverse() {
             return UP;
+        }
+
+        @Override boolean directional() {
+            return true;
         }
     };
 
@@ -161,6 +169,10 @@ public enum Bond {
      */
     public Edge edge(int u, int v) {
         return new Edge(u, v, this);
+    }
+
+    boolean directional() {
+        return false;
     }
 
     /** @inheritDoc */
