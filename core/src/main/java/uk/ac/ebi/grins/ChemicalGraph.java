@@ -193,6 +193,31 @@ public final class ChemicalGraph {
     }
 
     /**
+     * Replace an edge in the graph.
+     *
+     * @param org the original edge
+     * @param rep the replacement
+     */
+    void replace(Edge org, Edge rep) {
+
+        int u = org.either();
+        int v = org.other(u);
+
+        for (int i = 0; i < edges[u].size(); i++) {
+            if (edges[u].get(i) == org) {
+                edges[u].set(i, rep);
+            }
+        }
+
+        for (int i = 0; i < edges[v].size(); i++) {
+            if (edges[v].get(i) == org) {
+                edges[v].set(i, rep);
+            }
+        }
+
+    }
+
+    /**
      * Add a topology description to the graph. The topology describes the
      * configuration around a given atom.
      *
