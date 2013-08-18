@@ -254,7 +254,7 @@ public class OpenSMILESSpecificationTest {
     }
 
     @Test public void max_rnum_99() {
-        roundTrip("C%123CCCCC%12CCC35",
+        roundTrip("C%123CCCCC%12CCC3",
                   "C12CCCCC1CCC2");
     }
 
@@ -682,7 +682,8 @@ public class OpenSMILESSpecificationTest {
         roundTrip("CCO.", "CCO");
     }
 
-    @Test public void mismatch_ring() {
+    @Test(expected = IllegalArgumentException.class)
+    public void mismatch_ring() {
         roundTrip("C1CCC",
                   "CCCC");
     }
