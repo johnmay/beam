@@ -55,7 +55,7 @@ final class FromTrigonalTopology extends AbstractFunction<ChemicalGraph,Chemical
           nElectrons += e.bond().electrons();
         }
 
-        return ToSubsetAtoms.toSubset(g.atom(u), nElectrons / 2);
+        return ToSubsetAtoms.toSubset(g.atom(u), nElectrons);
     }
 
     private static final class Traversal {
