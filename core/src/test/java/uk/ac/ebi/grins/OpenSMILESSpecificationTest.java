@@ -683,9 +683,8 @@ public class OpenSMILESSpecificationTest {
     }
 
     @Test(expected = InvalidSmilesException.class)
-    public void mismatch_ring() {
-        roundTrip("C1CCC",
-                  "CCCC");
+    public void mismatch_ring() throws InvalidSmilesException {
+        Parser.parse("C1CCC");
     }
 
     // invalid cis/trans - semantics
