@@ -222,6 +222,8 @@ public enum Element {
      */
     private final int[] valence;
 
+    private final int[] electrons;
+
     /** Whether the element can be aromatic. */
     private final boolean aromatic;
 
@@ -251,6 +253,14 @@ public enum Element {
                     int... valence) {
         this.symbol = symbol;
         this.valence = valence;
+        if (valence != null) {
+            this.electrons = new int[valence.length];
+            for (int i = 0; i < valence.length; i++) {
+                electrons[i] = valence[i] * 2;
+            }
+        } else {
+            this.electrons = null;
+        }
         this.aromatic = aromatic;
     }
 
@@ -304,6 +314,19 @@ public enum Element {
             if (sum <= v) return v - sum;
 
         // bond order sum exceeds or equals maximum valance
+        return 0;
+    }
+
+    int electrons(int bondElectronSum) {
+        for (final int e : electrons)
+            if (bondElectronSum <= e)
+                return e - bondElectronSum;
+        return 0;
+    }
+
+    int delocalisedElectrons(int bondedElectrons) {
+        if (bondedElectrons <= electrons[0])
+            return electrons[0] - bondedElectrons;
         return 0;
     }
 
