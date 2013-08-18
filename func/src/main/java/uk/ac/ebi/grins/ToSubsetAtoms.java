@@ -1,10 +1,8 @@
 package uk.ac.ebi.grins;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static uk.ac.ebi.grins.Configuration.Type.None;
-import static uk.ac.ebi.grins.Configuration.UNKNOWN;
 
 /**
  * Given a chemical graph with 0 or more atoms. Convert that graph to one where
@@ -25,7 +23,7 @@ final class ToSubsetAtoms extends AbstractFunction<ChemicalGraph,ChemicalGraph> 
 
             if (t.type() == None) {
                 h.addAtom(toSubset(g.atom(u),
-                                   bondOrderSum(g.edges(u))));
+                                   electronSum(g.edges(u))));
             } else {
                 h.addAtom(g.atom(u));
                 h.addTopology(t);
@@ -39,7 +37,7 @@ final class ToSubsetAtoms extends AbstractFunction<ChemicalGraph,ChemicalGraph> 
         return h;
     }
 
-    static Atom toSubset(Atom a, int bondOrderSum) {
+    static Atom toSubset(Atom a, int nElectrons) {
 
         // atom is already a subset atom
         if (a.subset())
@@ -54,9 +52,12 @@ final class ToSubsetAtoms extends AbstractFunction<ChemicalGraph,ChemicalGraph> 
         if (a.charge() != 0 || a.atomClass() != 0 || a.isotope() >= 0)
            return a;
 
-        // does the implied hydrogens from the bond order sum match that
-        // which was stored
-        int impliedHCount = a.element().implicitHydrogens(bondOrderSum);
+        // does the implied electrons from the bond order sum match that
+        // which was stored - if aromatic we only check the lowest valence state
+        int impliedHCount = a.aromatic() ? a.element().delocalisedElectrons(nElectrons) / 2
+                                         : a.element().electrons(nElectrons) / 2;
+
+        // mismatch in number of hydrogens we must write this as a bracket atom
         if (impliedHCount != a.hydrogens())
             return a;
 
@@ -67,10 +68,10 @@ final class ToSubsetAtoms extends AbstractFunction<ChemicalGraph,ChemicalGraph> 
         }
     }
 
-    private int bondOrderSum(final List<Edge> es) {
+    private int electronSum(final List<Edge> es) {
         int nElectrons = 0;
         for (Edge e : es)
             nElectrons += e.bond().electrons();
-        return nElectrons / 2;
+        return nElectrons;
     }
 }
