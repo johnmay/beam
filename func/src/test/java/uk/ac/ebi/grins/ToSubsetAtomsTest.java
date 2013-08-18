@@ -111,8 +111,23 @@ public class ToSubsetAtomsTest {
                                                                   .sameInstance(a)));
     }
 
+    @Test public void tricyclazole() throws Exception {
+        transform("[CH3][c]1[cH][cH][cH][c]2[s][c]3[n][n][cH][n]3[c]12",
+                  "Cc1cccc2sc3nncn3c12");
+    }
+
+    @Test public void pyrole_kekule() throws Exception {
+        transform("[NH]1[CH]=[CH]N=[CH]1",
+                  "N1C=CN=C1");
+    }
+
+    @Test public void pyrole() throws Exception {
+        transform("[nH]1[cH][cH][n][cH]1",
+                  "[nH]1ccnc1");
+    }
+
     private Atom toSubset(Atom a, int bondOrderSum) {
-        return ToSubsetAtoms.toSubset(a, bondOrderSum);
+        return ToSubsetAtoms.toSubset(a, bondOrderSum * 2);
     }
 
     private void transform(String input, String expected) throws
