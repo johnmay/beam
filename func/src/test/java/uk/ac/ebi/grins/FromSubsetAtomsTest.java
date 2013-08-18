@@ -39,21 +39,21 @@ public class FromSubsetAtomsTest {
     @Test public void bracketAtom() {
         // should provide identity of bracket atom
         Atom input = new AtomImpl.BracketAtom(Element.Carbon, 1, 0);
-        Atom output = FromSubsetAtoms.fromSubset(input, 0);
+        Atom output = FromSubsetAtoms.fromSubset(input, 0, 0);
         Assert.assertThat(input, CoreMatchers.is(CoreMatchers
                                                          .sameInstance(output)));
     }
 
     @Test public void aliphatic_carbon() {
         Atom actual = FromSubsetAtoms
-                .fromSubset(AtomImpl.AliphaticSubset.Carbon, 6);
+                .fromSubset(AtomImpl.AliphaticSubset.Carbon, 6, 0);
         Atom expect = new AtomImpl.BracketAtom(Element.Carbon, 1, 0);
         Assert.assertThat(expect, CoreMatchers.is(actual));
     }
 
     @Test public void aromatic_carbon() {
         Atom actual = FromSubsetAtoms
-                .fromSubset(AtomImpl.AromaticSubset.Carbon, 6);
+                .fromSubset(AtomImpl.AromaticSubset.Carbon, 6, 0);
         Atom expect = new AtomImpl.BracketAtom(-1, Element.Carbon, 1, 0, 0, true);
         Assert.assertThat(expect, CoreMatchers.is(actual));
     }
@@ -111,10 +111,25 @@ public class FromSubsetAtomsTest {
                   "[CH3][C]1=[C]2[N]3[CH]=[N][N]=[C]3[S][C]2=[CH][CH]=[CH]1");
     }
 
+    @Test public void mixingAromaticAndKekule() throws Exception {
+        transform("c1=cc=cc=c1",
+                  "[cH]1=[cH][cH]=[cH][cH]=[cH]1");
+    }
+
+    @Test public void quinone() throws Exception {
+        transform("oc1ccc(o)cc1",
+                  "[o][c]1[cH][cH][c]([o])[cH][cH]1");
+    }
+
     /** 1-(1H-pyrrol-2-yl)pyrrole */
-    @Test public void pyrroles() throws Exception {
+    @Test public void pyroles() throws Exception {
         transform("c1ccn(c1)-c1ccc[nH]1",
                   "[cH]1[cH][cH][n]([cH]1)-[c]2[cH][cH][cH][nH]2");
+    }
+
+    @Test public void cdk_bug_956926() throws InvalidSmilesException {
+        transform("[c+]1ccccc1",
+                  "[c+]1[cH][cH][cH][cH][cH]1");
     }
 
     private void transform(String input, String expected) throws
