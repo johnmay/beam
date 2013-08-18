@@ -682,7 +682,7 @@ public class OpenSMILESSpecificationTest {
         roundTrip("CCO.", "CCO");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = InvalidSmilesException.class)
     public void mismatch_ring() {
         roundTrip("C1CCC",
                   "CCCC");
