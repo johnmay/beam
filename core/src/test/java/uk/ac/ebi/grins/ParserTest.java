@@ -89,4 +89,8 @@ public class ParserTest {
     public void unopenedBranch2() throws Exception {
         Parser.parse("CCCCCC))CCC");
     }
+
+    @Test public void tellurophene() throws InvalidSmilesException {
+        Parser.parse("c1cc[te]c1");
+    }
 }

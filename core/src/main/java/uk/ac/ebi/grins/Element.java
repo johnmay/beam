@@ -145,7 +145,7 @@ public enum Element {
     Indium("In"),
     Tin("Sn"),
     Antimony("Sb"),
-    Tellurium("Te"),
+    Tellurium("Te", true), // nb: non-aromatic per OpenSMILES spec
     Iodine("I", false, 1),
     Xenon("Xe"),
 
@@ -352,8 +352,7 @@ public enum Element {
         if (!buffer.hasRemaining())
             return null;
         char c = buffer.get();
-        if (buffer.hasRemaining() && buffer.next() >= 'a' && buffer
-                .next() <= 'z') {
+        if (buffer.hasRemaining() && buffer.next() >= 'a' && buffer.next() <= 'z') {
             return elementMap.get(new String(new char[]{c, buffer.get()}));
         }
         return elementMap.get(Character.toString(c));

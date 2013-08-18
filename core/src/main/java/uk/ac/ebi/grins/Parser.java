@@ -405,6 +405,9 @@ final class Parser {
         final boolean aromatic = buffer.next() >= 'a' && buffer.next() <= 'z';
         final Element element = Element.read(buffer);
 
+        if (element == null)
+            throw new InvalidSmilesException("Unrecognised element symbol: ", buffer);
+
         configuration = Configuration.read(buffer);
 
         int hCount = readHydrogens(buffer);
