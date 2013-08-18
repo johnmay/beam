@@ -83,6 +83,9 @@ final class Parser {
      */
     private Set<Integer> start = new TreeSet<Integer>();
 
+    /** Number of open rings - all rings should be closed. */
+    private int openRings = 0;
+
     /**
      * Create a new parser for the specified buffer.
      *
@@ -92,6 +95,10 @@ final class Parser {
     Parser(CharBuffer buffer) throws InvalidSmilesException {
         g = new ChemicalGraph(1 + (2 * (buffer.length() / 3)));
         readSmiles(buffer);
+        if (openRings > 0)
+            throw new InvalidSmilesException("Unclosed ring");
+        if (stack.size() > 1)
+            throw new InvalidSmilesException("Unclosed branch");
         start.add(0); // always include first vertex as start
         createTopologies();
     }
@@ -136,7 +143,8 @@ final class Parser {
      * @param c explicit configuration of that vertex
      * @see Topology#toExplicit(ChemicalGraph, int, Configuration)
      */
-    private void addTopology(int u, Configuration c) throws InvalidSmilesException {
+    private void addTopology(int u, Configuration c) throws
+                                                     InvalidSmilesException {
 
         // stereo on ring closure - use local arrangement
         if (arrangement.containsKey(u)) {
@@ -145,9 +153,9 @@ final class Parser {
             for (int v : vs)
                 es.add(g.edge(u, v));
 
-            if(c.type() == Configuration.Type.Tetrahedral)
+            if (c.type() == Configuration.Type.Tetrahedral)
                 vs = insertThImplicitRef(u, vs); // XXX: temp fix
-            else if(c.type() == Configuration.Type.DoubleBond)
+            else if (c.type() == Configuration.Type.DoubleBond)
                 vs = insertDbImplicitRef(u, vs); // XXX: temp fix
 
             g.addTopology(Topology.create(u, vs, es, c));
@@ -157,9 +165,9 @@ final class Parser {
             for (int i = 0; i < vs.length; i++)
                 vs[i] = es.get(i).other(u);
 
-            if(c.type() == Configuration.Type.Tetrahedral)
+            if (c.type() == Configuration.Type.Tetrahedral)
                 vs = insertThImplicitRef(u, vs); // XXX: temp fix
-            else if(c.type() == Configuration.Type.DoubleBond)
+            else if (c.type() == Configuration.Type.DoubleBond)
                 vs = insertDbImplicitRef(u, vs); // XXX: temp fix
 
             g.addTopology(Topology.create(u, vs, es, c));
@@ -167,7 +175,8 @@ final class Parser {
     }
 
     // XXX: temporary fix for correcting configurations
-    private int[] insertThImplicitRef(int u, int[] vs) throws InvalidSmilesException {
+    private int[] insertThImplicitRef(int u, int[] vs) throws
+                                                       InvalidSmilesException {
         if (vs.length == 4)
             return vs;
         if (vs.length != 3)
@@ -179,7 +188,8 @@ final class Parser {
     }
 
     // XXX: temporary fix for correcting configurations
-    private int[] insertDbImplicitRef(int u, int[] vs) throws InvalidSmilesException {
+    private int[] insertDbImplicitRef(int u, int[] vs) throws
+                                                       InvalidSmilesException {
         if (vs.length == 3)
             return vs;
         if (vs.length != 2)
@@ -350,11 +360,14 @@ final class Parser {
                 // branching
                 case '(':
                     if (stack.empty())
-                        throw new InvalidSmilesException("cannot open branch with no previous atom",
+                        throw new InvalidSmilesException("cannot open branch - no previous atom",
                                                          buffer);
                     stack.push(stack.peek());
                     break;
                 case ')':
+                    if (stack.size() < 2)
+                        throw new InvalidSmilesException("Closing of an unopened branch",
+                                                         buffer);
                     stack.pop();
                     break;
 
@@ -512,6 +525,7 @@ final class Parser {
 
         // keep track of arrangement (important for stereo configurations)
         createArrangement(u).add(-rnum);
+        openRings++;
 
         bond = Bond.IMPLICIT;
     }
@@ -557,6 +571,7 @@ final class Parser {
         bond = Bond.IMPLICIT;
         // adjust the arrangement replacing where this ring number was openned
         arrangement.get(rbond.u).replace(-rnum, stack.peek());
+        openRings--;
     }
 
     /**

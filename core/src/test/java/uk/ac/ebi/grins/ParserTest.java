@@ -60,5 +60,33 @@ public class ParserTest {
         Assert.assertThat(g.topologyOf(0), is(Topology.unknown()));
     }
 
+    @Test(expected = InvalidSmilesException.class)
+    public void unclosedRing1() throws Exception {
+        Parser.parse("C1CCCCC");
+    }
 
+    @Test(expected = InvalidSmilesException.class)
+    public void unclosedRing2() throws Exception {
+        Parser.parse("C1CCCCC1CCCC1CCCC");
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void unclosedBranch1() throws Exception {
+        Parser.parse("CCCC(CCCC");
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void unclosedBranch2() throws Exception {
+        Parser.parse("CCCC(CCC(CC)");
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void unopenedBranch1() throws Exception {
+        Parser.parse("CCCCCC)CCC");
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void unopenedBranch2() throws Exception {
+        Parser.parse("CCCCCC))CCC");
+    }
 }
