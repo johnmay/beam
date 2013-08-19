@@ -35,7 +35,8 @@ package uk.ac.ebi.grins;
  *
  * @author John May
  */
-final class ExplicitToImplicit extends AbstractFunction<ChemicalGraph,ChemicalGraph> {
+final class ExplicitToImplicit
+        extends AbstractFunction<ChemicalGraph, ChemicalGraph> {
 
     /**
      * Transform all explicit to implicit bonds. The original graph is
@@ -96,9 +97,9 @@ final class ExplicitToImplicit extends AbstractFunction<ChemicalGraph,ChemicalGr
      * @return the bond type
      */
     static Bond type(Atom u, Atom v, Bond b) {
-        if (u.aromatic() && v.aromatic() && b == Bond.SINGLE)
-            return b;
+        if (u.aromatic() && v.aromatic())
+            return b == Bond.AROMATIC ? Bond.IMPLICIT : b;
         else
-            return Bond.IMPLICIT;
+            return b == Bond.AROMATIC ? Bond.AROMATIC : Bond.IMPLICIT;
     }
 }
