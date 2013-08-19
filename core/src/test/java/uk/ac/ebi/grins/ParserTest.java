@@ -93,4 +93,11 @@ public class ParserTest {
     @Test public void tellurophene() throws InvalidSmilesException {
         Parser.parse("c1cc[te]c1");
     }
+
+    @Test public void mixingAromaticAndKekule() throws InvalidSmilesException {
+        ChemicalGraph g = Parser.parse("C:1:C:C:C:C:C1");
+        for (Edge e : g.edges()) {
+            assertThat(e.bond(), is(Bond.AROMATIC));
+        }
+    }
 }
