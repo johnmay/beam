@@ -1,5 +1,7 @@
 package uk.ac.ebi.grins;
 
+import java.util.List;
+
 /**
  * Given a chemical graph with 0 or more atoms. Convert that graph to one where
  * all atoms are fully specified bracket atoms.
@@ -14,13 +16,8 @@ final class FromSubsetAtoms
         ChemicalGraph h = new ChemicalGraph(g.order());
 
         for (int u = 0; u < g.order(); u++) {
-
-            int nElectrons = 0;
-            for (Edge e : g.edges(u))
-                nElectrons += e.bond().electrons();
-
             h.addAtom(fromSubset(g.atom(u),
-                                 nElectrons,
+                                 electronSum(g.edges(u), g),
                                  g.degree(u)));
             h.addTopology(g.topologyOf(u));
         }
@@ -30,6 +27,17 @@ final class FromSubsetAtoms
             h.addEdge(e);
 
         return h;
+    }
+
+    private int electronSum(final List<Edge> es,
+                            final ChemicalGraph g) {
+        int nElectrons = 0;
+        for (Edge e : es) {
+            int u = e.either();
+            int v = e.other(u);
+            nElectrons += e.bond().electrons(g.atom(u), g.atom(v));
+        }
+        return nElectrons;
     }
 
     static Atom fromSubset(Atom a, int bondElectronSum, int deg) {

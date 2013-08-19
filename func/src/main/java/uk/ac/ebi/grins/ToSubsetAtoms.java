@@ -23,7 +23,7 @@ final class ToSubsetAtoms extends AbstractFunction<ChemicalGraph,ChemicalGraph> 
 
             if (t.type() == None) {
                 h.addAtom(toSubset(g.atom(u),
-                                   electronSum(g.edges(u))));
+                                   electronSum(g.edges(u), g)));
             } else {
                 h.addAtom(g.atom(u));
                 h.addTopology(t);
@@ -68,10 +68,14 @@ final class ToSubsetAtoms extends AbstractFunction<ChemicalGraph,ChemicalGraph> 
         }
     }
 
-    private int electronSum(final List<Edge> es) {
+    private int electronSum(final List<Edge> es,
+                            final ChemicalGraph g) {
         int nElectrons = 0;
-        for (Edge e : es)
-            nElectrons += e.bond().electrons();
+        for (Edge e : es) {
+            int u = e.either();
+            int v = e.other(u);
+            nElectrons += e.bond().electrons(g.atom(u), g.atom(v));
+        }
         return nElectrons;
     }
 }

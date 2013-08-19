@@ -126,6 +126,11 @@ public class ToSubsetAtomsTest {
                   "[nH]1ccnc1");
     }
 
+    @Test public void zinc_1() throws Exception {
+        transform("c1cc(ccc1/C=c\\2/c(=O)o/c(=C\\Cl)/[nH]2)F",
+                  "c1cc(ccc1/C=c\\2/c(=O)o/c(=C\\Cl)/[nH]2)F");
+    }
+
     private Atom toSubset(Atom a, int bondOrderSum) {
         return ToSubsetAtoms.toSubset(a, bondOrderSum * 2);
     }

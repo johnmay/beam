@@ -132,6 +132,8 @@ public class FromSubsetAtomsTest {
                   "[c+]1[cH][cH][cH][cH][cH]1");
     }
 
+
+
     private void transform(String input, String expected) throws
                                                           InvalidSmilesException {
         ChemicalGraph g = Parser.parse(input);
