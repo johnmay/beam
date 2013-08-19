@@ -56,7 +56,7 @@ public enum Bond {
     DOT(".", 0),
 
     /** Atoms are bonded by either a single or aromatic bond. */
-    IMPLICIT("", 0) {
+    IMPLICIT("", 2) {
         @Override public int electrons() {
             throw new IllegalArgumentException("unknown number of electrons in implied bond");
         }
@@ -142,6 +142,10 @@ public enum Bond {
      */
     public int electrons() {
         return electrons;
+    }
+
+    public int electrons(Atom u, Atom v) {
+        return u.aromatic() && v.aromatic() ? 3 : electrons();
     }
 
     /**
