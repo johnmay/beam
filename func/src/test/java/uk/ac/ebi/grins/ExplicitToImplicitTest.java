@@ -33,8 +33,6 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-
 /** @author John May */
 public class ExplicitToImplicitTest {
 
@@ -57,6 +55,15 @@ public class ExplicitToImplicitTest {
                           CoreMatchers.is("c:1:c:c:c:c:c1"));
         Assert.assertThat(Generator.generate(f.apply(g)),
                           CoreMatchers.is("c1ccccc1"));
+    }
+
+    @Test
+    public void benzeneMixed() throws Exception {
+        ChemicalGraph g = Parser.parse("C:1:C:C:C:C:C1");
+        Assert.assertThat(Generator.generate(g),
+                          CoreMatchers.is("C:1:C:C:C:C:C1"));
+        Assert.assertThat(Generator.generate(f.apply(g)),
+                          CoreMatchers.is("C:1:C:C:C:C:C1"));
     }
 
 }
