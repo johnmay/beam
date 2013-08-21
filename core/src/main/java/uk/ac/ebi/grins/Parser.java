@@ -96,9 +96,9 @@ final class Parser {
         g = new ChemicalGraph(1 + (2 * (buffer.length() / 3)));
         readSmiles(buffer);
         if (openRings > 0)
-            throw new InvalidSmilesException("Unclosed ring");
+            throw new InvalidSmilesException("unclosed ring", buffer);
         if (stack.size() > 1)
-            throw new InvalidSmilesException("Unclosed branch");
+            throw new InvalidSmilesException("unclosed branch", buffer);
         start.add(0); // always include first vertex as start
         createTopologies();
     }
