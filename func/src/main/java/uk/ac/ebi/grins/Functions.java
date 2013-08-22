@@ -1,5 +1,7 @@
 package uk.ac.ebi.grins;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Random;
 
 /**
@@ -111,6 +113,43 @@ public final class Functions {
         for (int i = 0; i < n; i++)
             p[i] = i;
         return p;
+    }
+
+    /**
+     * Apply the labeling {@code labels[]} to the graph {@code g}. The labels
+     * are converted to a permutation which is then applied to the Graph and
+     * rearrange it's vertex order.
+     *
+     * @param g      the graph to permute
+     * @param labels the vertex labels - for example from a cannibalisation
+     *               algorithm
+     * @return a cpy of the original graph with it's vertices permuted by the
+     *         labelling
+     */
+    public static Graph canonicalize(final Graph g,
+                                     final long[] labels) {
+
+        Integer[] is = new Integer[g.order()];
+
+        for (int i = 0; i < is.length; i++)
+            is[i] = i;
+
+        // TODO: replace with radix sort (i.e. using a custom comparator)
+        Arrays.sort(is, new Comparator<Integer>() {
+            @Override public int compare(Integer i, Integer j) {
+                if (labels[i] < labels[j])
+                    return +1;
+                else if (labels[i] > labels[j])
+                    return -1;
+                return 0;
+            }
+        });
+
+        int[] p = new int[g.order()];
+        for (int i = 0; i < is.length; i++)
+            p[i] = is[i];
+
+        return g.permute(p);
     }
 
     private static int[] random(int n) {

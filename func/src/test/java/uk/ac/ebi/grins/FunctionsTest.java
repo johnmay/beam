@@ -2,6 +2,8 @@ package uk.ac.ebi.grins;
 
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -30,5 +32,13 @@ public class FunctionsTest {
         Graph g = Graph.fromSmiles("F[C@H]=[C@@H]F");
         assertThat(Functions.bondBasedDBStereo(g).toSmiles(),
                    is("F/C=C/F"));
+    }
+
+    @Test public void canoncalise() throws IOException {
+        Graph g = Graph.fromSmiles("CCOCC");
+        Graph h = Functions.canonicalize(g,
+                                         new long[]{56, 67, 3, 67, 56});
+        assertThat(h.toSmiles(),
+                   is("O(CC)CC"));
     }
 }
