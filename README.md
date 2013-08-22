@@ -16,10 +16,10 @@ A free and open source Java toolkit dedicated to parsing and generating [Simplif
 
 _grins is still in a development and some APIs will likely change until a release is made._
 
-The main 'molecule' class in _grins_ is the 'ChemicalGraph' it provides convenience methods for reading SMILES directly.
+The main 'molecule' class in _grins_ is the 'Graph' it provides convenience methods for reading SMILES directly.
 
 ```java
-ChemicalGraph g = ChemicalGraph.fromSmiles("CCO");
+Graph g = Graph.fromSmiles("CCO");
 ```
 
 and for writing it back to SMILES notation.
@@ -32,14 +32,14 @@ Grins provides excellent round tripping, preserving exactly how the input was sp
 
 ```java
 // bond labels
-ChemicalGraph.fromSmiles("C1=CC=CC=C1").toSmiles();    // kekule      (implicit single bonds)
-ChemicalGraph.fromSmiles("C-1=C-C=C-C=C1").toSmiles(); // kekule      (explicit single bonds)
-ChemicalGraph.fromSmiles("c1ccccc1").toSmiles();       // delocalised (implicit aromatic bonds)
-ChemicalGraph.fromSmiles("c:1:c:c:c:c:c1").toSmiles(); // delocalised (explicit aromatic bonds)
+Graph.fromSmiles("C1=CC=CC=C1").toSmiles();    // kekule      (implicit single bonds)
+Graph.fromSmiles("C-1=C-C=C-C=C1").toSmiles(); // kekule      (explicit single bonds)
+Graph.fromSmiles("c1ccccc1").toSmiles();       // delocalised (implicit aromatic bonds)
+Graph.fromSmiles("c:1:c:c:c:c:c1").toSmiles(); // delocalised (explicit aromatic bonds)
 
 // bracket atoms stay as bracket atoms
-ChemicalGraph.fromSmiles("[CH]1=[CH][CH]=[CH][CH]=[CH]1").toSmiles();
-ChemicalGraph.fromSmiles("[CH]1=[CH]C=C[CH]=[CH]1").toSmiles();       // mix bracket and subset atoms
+Graph.fromSmiles("[CH]1=[CH][CH]=[CH][CH]=[CH]1").toSmiles();
+Graph.fromSmiles("[CH]1=[CH]C=C[CH]=[CH]1").toSmiles();       // mix bracket and subset atoms
 ```
 
 Although preserving the representation was one of the design goals for grins it is common practise to normalise.
@@ -49,8 +49,8 @@ One can easily convert a molecule with implicit hydrogens `[CH3][CH2][OH]` to
 one with inferred hydrogens `CCO`.
 
 ```java
-ChemicalGraph g = ChemicalGraph.fromSmiles("[CH3][CH2][OH]");
-ChemicalGraph h = Functions.collapse(g);
+Graph g = Graph.fromSmiles("[CH3][CH2][OH]");
+Graph h = Functions.collapse(g);
 h.toSmiles().equals("CCO");
 ```
 
@@ -58,15 +58,15 @@ Likewise, conversion of a molecule with inferred hydrogens `CCO` to
 one with implicit hydrogens `[CH3][CH2][OH]` is also easy.
 
 ```java
-ChemicalGraph g = ChemicalGraph.fromSmiles("CCO");
-ChemicalGraph h = Functions.expand(g);
+Graph g = Graph.fromSmiles("CCO");
+Graph h = Functions.expand(g);
 h.toSmiles().equals("[CH3][CH2][OH]");
 ```
 
 Randomly generate different SMILES notations preserving stereo-configuration.
 
 ```java
-ChemicalGraph g  = ChemicalGraph.fromSmiles("CCC[C@@](C)(O)[C@H](C)N");
+Graph g  = Graph.fromSmiles("CCC[C@@](C)(O)[C@H](C)N");
 StringBuilder sb = new StringBuilder(g.toSmiles());
 for (int i = 0; i < 25; i++)
     sb.append('.').append(Functions.randomise(g).toSmiles());
@@ -76,8 +76,8 @@ System.out.println(sb);
 Using atom-based double-bond configuration.
 
 ```java
-ChemicalGraph g   = ChemicalGraph.fromSmiles("F/C=C/F");
-ChemicalGraph h   = Functions.atomBasedDBStereo(g);
+Graph g   = Graph.fromSmiles("F/C=C/F");
+Graph h   = Functions.atomBasedDBStereo(g);
 String        smi = h.toSmiles(); // F[C@H]=[C@@H]F
 ```
 
@@ -87,8 +87,8 @@ that the first symbol is always a forward slash (`/`). Some examples are
 shown below.
 
 ```java
-ChemicalGraph g   = ChemicalGraph.fromSmiles("F\\C=C/F");
-ChemicalGraph h   = Functions.normaliseDirectionalLabels(g);
+Graph g   = Graph.fromSmiles("F\\C=C/F");
+Graph h   = Functions.normaliseDirectionalLabels(g);
 String        smi = h.toSmiles();
 ```
 

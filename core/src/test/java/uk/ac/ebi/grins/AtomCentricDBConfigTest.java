@@ -40,7 +40,7 @@ public class AtomCentricDBConfigTest {
     @Test public void difluoroethene_implConfig() throws
                                                   InvalidSmilesException {
         String input = "F[C@H]=[C@H]F";
-        ChemicalGraph g = Parser.parse(input);
+        Graph g = Parser.parse(input);
         Assert.assertThat(g.topologyOf(1)
                            .configuration(), is(Configuration.DB1));
         Assert.assertThat(g.topologyOf(2)
@@ -50,7 +50,7 @@ public class AtomCentricDBConfigTest {
     @Test public void difluoroethene_implConfig2() throws
                                                    InvalidSmilesException {
         String input = "F[C@@H]=[C@@H]F";
-        ChemicalGraph g = Parser.parse(input);
+        Graph g = Parser.parse(input);
         Assert.assertThat(g.topologyOf(1)
                            .configuration(), is(Configuration.DB2));
         Assert.assertThat(g.topologyOf(2)
@@ -59,7 +59,7 @@ public class AtomCentricDBConfigTest {
 
     @Test public void difluoroethene_expConfig() throws InvalidSmilesException {
         String input = "F[C@DB1H]=[C@DB1H]F";
-        ChemicalGraph g = Parser.parse(input);
+        Graph g = Parser.parse(input);
         Assert.assertThat(g.topologyOf(1)
                            .configuration(), is(Configuration.DB1));
         Assert.assertThat(g.topologyOf(2)
@@ -69,7 +69,7 @@ public class AtomCentricDBConfigTest {
     @Test public void difluoroethene_expConfig2() throws
                                                   InvalidSmilesException {
         String input = "F[C@DB2H]=[C@DB2H]F";
-        ChemicalGraph g = Parser.parse(input);
+        Graph g = Parser.parse(input);
         Assert.assertThat(g.topologyOf(1)
                            .configuration(), is(Configuration.DB2));
         Assert.assertThat(g.topologyOf(2)

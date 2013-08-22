@@ -41,7 +41,7 @@ public class ExplicitToImplicitTest {
 
     @Test
     public void phenylbenzene() throws Exception {
-        ChemicalGraph g = Parser.parse("c:1:c:c:c(c:c1)-c:2:c:c:c:c:c2");
+        Graph g = Parser.parse("c:1:c:c:c(c:c1)-c:2:c:c:c:c:c2");
         Assert.assertThat(Generator.generate(g),
                           CoreMatchers.is("c:1:c:c:c(c:c1)-c:2:c:c:c:c:c2"));
         Assert.assertThat(Generator.generate(f.apply(g)),
@@ -50,7 +50,7 @@ public class ExplicitToImplicitTest {
 
     @Test
     public void benzene() throws Exception {
-        ChemicalGraph g = Parser.parse("c:1:c:c:c:c:c1");
+        Graph g = Parser.parse("c:1:c:c:c:c:c1");
         Assert.assertThat(Generator.generate(g),
                           CoreMatchers.is("c:1:c:c:c:c:c1"));
         Assert.assertThat(Generator.generate(f.apply(g)),
@@ -59,7 +59,7 @@ public class ExplicitToImplicitTest {
 
     @Test
     public void benzeneMixed() throws Exception {
-        ChemicalGraph g = Parser.parse("C:1:C:C:C:C:C1");
+        Graph g = Parser.parse("C:1:C:C:C:C:C1");
         Assert.assertThat(Generator.generate(g),
                           CoreMatchers.is("C:1:C:C:C:C:C1"));
         Assert.assertThat(Generator.generate(f.apply(g)),

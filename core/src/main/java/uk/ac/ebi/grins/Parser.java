@@ -41,12 +41,12 @@ import static java.util.Map.Entry;
 
 
 /**
- * Parse a SMILES string and create a {@link ChemicalGraph}. A new parser should
+ * Parse a SMILES string and create a {@link Graph}. A new parser should
  * be created for each invocation, for convenience {@link #parse(String)} is
  * provided.
  *
  * <blockquote><pre>
- * ChemicalGraph g = Parser.parse("CCO");
+ * Graph g = Parser.parse("CCO");
  * </pre></blockquote>
  *
  * @author John May
@@ -57,7 +57,7 @@ final class Parser {
     private final IntStack stack = new IntStack(10);
 
     /** Molecule being loaded. */
-    private final ChemicalGraph g;
+    private final Graph g;
 
     /** Keep track of ring information. */
     private RingBond[] rings = new RingBond[10];
@@ -93,7 +93,7 @@ final class Parser {
      * @throws InvalidSmilesException thrown if the SMILES could not be parsed
      */
     Parser(CharBuffer buffer) throws InvalidSmilesException {
-        g = new ChemicalGraph(1 + (2 * (buffer.length() / 3)));
+        g = new Graph(1 + (2 * (buffer.length() / 3)));
         readSmiles(buffer);
         if (openRings > 0)
             throw new InvalidSmilesException("unclosed ring", buffer);
@@ -118,7 +118,7 @@ final class Parser {
      *
      * @return the chemical graph for the parsed smiles string
      */
-    ChemicalGraph molecule() {
+    Graph molecule() {
         return g;
     }
 
@@ -141,7 +141,7 @@ final class Parser {
      *
      * @param u a vertex
      * @param c explicit configuration of that vertex
-     * @see Topology#toExplicit(ChemicalGraph, int, Configuration)
+     * @see Topology#toExplicit(Graph, int, Configuration)
      */
     private void addTopology(int u, Configuration c) throws
                                                      InvalidSmilesException {
@@ -613,7 +613,7 @@ final class Parser {
      * @throws InvalidSmilesException thrown if the SMILES could not be
      *                                interpreted
      */
-    static ChemicalGraph parse(String str) throws InvalidSmilesException {
+    static Graph parse(String str) throws InvalidSmilesException {
         return new Parser(str).molecule();
     }
 

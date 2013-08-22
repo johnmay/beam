@@ -112,7 +112,7 @@ public class TopologyTest {
     @Test public void implicitToExplicit_tetrahedral() {
 
         // N[C@]([H])(C)C(=O)O
-        ChemicalGraph g = new ChemicalGraph(7);
+        Graph g = new Graph(7);
         g.addAtom(AtomImpl.AliphaticSubset.Nitrogen);
         g.addAtom(new AtomImpl.BracketAtom(Element.Carbon, 0, 0));
         g.addAtom(AtomImpl.EXPLICIT_HYDROGEN);
@@ -135,7 +135,7 @@ public class TopologyTest {
     @Test public void implicitToExplicit_tetrahedralImplicitH() {
 
         // N[C@]([H])(C)C(=O)O
-        ChemicalGraph g = new ChemicalGraph(7);
+        Graph g = new Graph(7);
         g.addAtom(AtomImpl.AliphaticSubset.Nitrogen);
         g.addAtom(new AtomImpl.BracketAtom(Element.Carbon, 1, 0));
         g.addAtom(AtomImpl.AliphaticSubset.Carbon);
@@ -155,7 +155,7 @@ public class TopologyTest {
 
     @Test public void implicitToExplicit_sulfoxide() {
         // C[S@](CC)=O
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         g.addAtom(AtomImpl.AliphaticSubset.Carbon);
         g.addAtom(new AtomImpl.BracketAtom(Element.Sulfur, 0, 0));
         g.addAtom(AtomImpl.AliphaticSubset.Carbon);
@@ -174,7 +174,7 @@ public class TopologyTest {
     @Test public void implicitToExplicit_allene() {
 
         // OC(Cl)=[C@]=C(C)F
-        ChemicalGraph g = new ChemicalGraph(7);
+        Graph g = new Graph(7);
         g.addAtom(AtomImpl.AliphaticSubset.Oxygen);
         g.addAtom(AtomImpl.AliphaticSubset.Carbon);
         g.addAtom(AtomImpl.AliphaticSubset.Chlorine);
@@ -196,7 +196,7 @@ public class TopologyTest {
 
     @Test public void implicitToExplicit_trigonalBipyramidal() {
         // O=C[As@](F)(Cl)(Br)S
-        ChemicalGraph g = new ChemicalGraph(7);
+        Graph g = new Graph(7);
         g.addAtom(AtomImpl.AliphaticSubset.Oxygen);
         g.addAtom(AtomImpl.AliphaticSubset.Carbon);
         g.addAtom(new AtomImpl.BracketAtom(Element.Arsenic, 0, 0));
@@ -220,7 +220,7 @@ public class TopologyTest {
 
     @Test public void implicitToExplicit_octahedral() {
         // S[Co@@](F)(Cl)(Br)(I)C=O
-        ChemicalGraph g = new ChemicalGraph(8);
+        Graph g = new Graph(8);
         g.addAtom(AtomImpl.AliphaticSubset.Sulfur);
         g.addAtom(new AtomImpl.BracketAtom(Element.Cobalt, 0, 0));
         g.addAtom(AtomImpl.AliphaticSubset.Fluorine);
@@ -245,28 +245,28 @@ public class TopologyTest {
     }
 
     @Test public void implicitToExplicit_unknown() {
-        assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, Configuration.UNKNOWN),
+        assertThat(Topology.toExplicit(new Graph(0), 0, Configuration.UNKNOWN),
                    is(Configuration.UNKNOWN));
     }
 
     @Test public void implicitToExplicit_th1_th2() {
-        assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, Configuration.TH1),
+        assertThat(Topology.toExplicit(new Graph(0), 0, Configuration.TH1),
                    is(Configuration.TH1));
-        assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, Configuration.TH2),
+        assertThat(Topology.toExplicit(new Graph(0), 0, Configuration.TH2),
                    is(Configuration.TH2));
     }
 
     @Test public void implicitToExplicit_al1_al2() {
-        assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, Configuration.AL1),
+        assertThat(Topology.toExplicit(new Graph(0), 0, Configuration.AL1),
                    is(Configuration.AL1));
-        assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, Configuration.AL2),
+        assertThat(Topology.toExplicit(new Graph(0), 0, Configuration.AL2),
                    is(Configuration.AL2));
     }
 
     @Test public void implicitToExplicit_tbs() {
         for (Configuration c : Configuration.values()) {
             if (c.type() == Configuration.Type.TrigonalBipyramidal)
-                assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, c),
+                assertThat(Topology.toExplicit(new Graph(0), 0, c),
                            is(c));
         }
     }
@@ -274,7 +274,7 @@ public class TopologyTest {
     @Test public void implicitToExplicit_ohs() {
         for (Configuration c : Configuration.values()) {
             if (c.type() == Configuration.Type.Octahedral)
-                assertThat(Topology.toExplicit(new ChemicalGraph(0), 0, c),
+                assertThat(Topology.toExplicit(new Graph(0), 0, c),
                            is(c));
         }
     }

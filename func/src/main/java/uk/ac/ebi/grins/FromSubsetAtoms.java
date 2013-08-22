@@ -9,11 +9,11 @@ import java.util.List;
  * @author John May
  */
 final class FromSubsetAtoms
-        extends AbstractFunction<ChemicalGraph, ChemicalGraph> {
+        extends AbstractFunction<Graph, Graph> {
 
-    public ChemicalGraph apply(ChemicalGraph g) {
+    public Graph apply(Graph g) {
 
-        ChemicalGraph h = new ChemicalGraph(g.order());
+        Graph h = new Graph(g.order());
 
         for (int u = 0; u < g.order(); u++) {
             h.addAtom(fromSubset(g.atom(u),
@@ -30,7 +30,7 @@ final class FromSubsetAtoms
     }
 
     private int electronSum(final List<Edge> es,
-                            final ChemicalGraph g) {
+                            final Graph g) {
         int nElectrons = 0;
         for (Edge e : es) {
             int u = e.either();

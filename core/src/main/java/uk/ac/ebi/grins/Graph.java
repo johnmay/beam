@@ -44,7 +44,7 @@ import java.util.Map;
  *
  * @author John May
  */
-public final class ChemicalGraph {
+public final class Graph {
 
     /** The vertex labels, atoms. */
     private Atom[] atoms;
@@ -63,7 +63,7 @@ public final class ChemicalGraph {
      *
      * @param expSize expected size
      */
-    @SuppressWarnings("unchecked") ChemicalGraph(int expSize) {
+    @SuppressWarnings("unchecked") Graph(int expSize) {
         this.order = 0;
         this.size = 0;
         this.edges = new List[expSize];
@@ -308,7 +308,7 @@ public final class ChemicalGraph {
      * @throws InvalidSmilesException thrown if there was a syntax error while
      *                                parsing the SMILES.
      */
-    public static ChemicalGraph fromSmiles(String smi) throws
+    public static Graph fromSmiles(String smi) throws
                                                        IOException {
         if (smi == null)
             throw new NullPointerException("no SMILES provided");
@@ -338,12 +338,12 @@ public final class ChemicalGraph {
      * @return a new chemical graph with the vertices permuted by the given
      *         ordering
      */
-    ChemicalGraph permute(int[] p) {
+    Graph permute(int[] p) {
 
         if (p.length != order)
             throw new IllegalArgumentException("permuation size should equal |V| (order)");
 
-        ChemicalGraph g = new ChemicalGraph(order);
+        Graph g = new Graph(order);
         g.order = order;
         g.size = size;
 
@@ -405,7 +405,7 @@ public final class ChemicalGraph {
      * @param <T> output type of the function
      * @return the output of the function
      */
-    <T> T apply(Function<ChemicalGraph, T> f) throws Exception {
+    <T> T apply(Function<Graph, T> f) throws Exception {
         return f.apply(this);
     }
 
@@ -423,7 +423,7 @@ public final class ChemicalGraph {
      * @return self-reference for fluent invocation
      * @see #permute(int[])
      */
-    ChemicalGraph sort() {
+    Graph sort() {
         for (int u = 0; u < order; u++) {
             Collections.sort(edges[u], EdgeComparator.forVertex(u));
         }

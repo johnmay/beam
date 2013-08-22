@@ -14,10 +14,10 @@ import static uk.ac.ebi.grins.Configuration.Type.DoubleBond;
  *
  * @author John May
  */
-final class FromTrigonalTopology extends AbstractFunction<ChemicalGraph,ChemicalGraph> {
+final class FromTrigonalTopology extends AbstractFunction<Graph,Graph> {
 
-    public ChemicalGraph apply(ChemicalGraph g) {
-        ChemicalGraph h = new ChemicalGraph(g.order());
+    public Graph apply(Graph g) {
+        Graph h = new Graph(g.order());
 
         // copy atom/topology information this is unchanged
         for (int u = 0; u < g.order(); u++) {
@@ -47,7 +47,7 @@ final class FromTrigonalTopology extends AbstractFunction<ChemicalGraph,Chemical
         return h;
     }
 
-    private Atom reducedAtom(ChemicalGraph g, int u) {
+    private Atom reducedAtom(Graph g, int u) {
         Atom a = g.atom(u);
 
         int nElectrons = 0;
@@ -60,15 +60,15 @@ final class FromTrigonalTopology extends AbstractFunction<ChemicalGraph,Chemical
 
     private static final class Traversal {
 
-        private final ChemicalGraph g;
-        private final boolean[]     visited;
-        private final int[]         ordering;
-        private       int           i;
+        private final Graph     g;
+        private final boolean[] visited;
+        private final int[]     ordering;
+        private       int       i;
         private Map<Edge, Edge> replacement = new HashMap<Edge, Edge>();
 
         private static final Bond[] labels = new Bond[]{Bond.DOWN, Bond.UP};
 
-        private Traversal(ChemicalGraph g) {
+        private Traversal(Graph g) {
             this.g = g;
             this.visited = new boolean[g.order()];
             this.ordering = new int[g.order()];

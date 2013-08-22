@@ -46,12 +46,12 @@ import java.util.TreeSet;
  *
  * @author John May
  */
-final class RemoveUpDownBonds extends AbstractFunction<ChemicalGraph,ChemicalGraph> {
+final class RemoveUpDownBonds extends AbstractFunction<Graph,Graph> {
 
-    public ChemicalGraph apply(final ChemicalGraph g)
+    public Graph apply(final Graph g)
             throws InvalidSmilesException {
 
-        ChemicalGraph h = new ChemicalGraph(g.order());
+        Graph h = new Graph(g.order());
 
         // copy atom/topology information this is unchanged
         for (int u = 0; u < g.order(); u++) {
@@ -108,7 +108,7 @@ final class RemoveUpDownBonds extends AbstractFunction<ChemicalGraph,ChemicalGra
      * @throws uk.ac.ebi.grins.InvalidSmilesException
      *          thrown if the edge could not be converted
      */
-    private void removeRedundant(ChemicalGraph g,
+    private void removeRedundant(Graph g,
                                  Edge e,
                                  int[] ordering,
                                  Map<Edge, Edge> acc)
@@ -131,7 +131,7 @@ final class RemoveUpDownBonds extends AbstractFunction<ChemicalGraph,ChemicalGra
      * @throws uk.ac.ebi.grins.InvalidSmilesException
      *          thrown if the edge could not be converted
      */
-    private void replaceImplWithExpl(final ChemicalGraph g,
+    private void replaceImplWithExpl(final Graph g,
                                      final Edge e,
                                      final int u,
                                      final int[] ordering,
@@ -181,11 +181,11 @@ final class RemoveUpDownBonds extends AbstractFunction<ChemicalGraph,ChemicalGra
     }
 
     private static final class DepthFirstOrder {
-        private final ChemicalGraph g;
-        private final int[]         visited;
-        private       int           i;
+        private final Graph g;
+        private final int[] visited;
+        private       int   i;
 
-        private DepthFirstOrder(ChemicalGraph g) {
+        private DepthFirstOrder(Graph g) {
             this.g = g;
             this.visited = new int[g.order()];
             Arrays.fill(visited, -1);

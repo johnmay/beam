@@ -48,10 +48,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /** @author John May */
-public class ChemicalGraphTest {
+public class GraphTest {
 
     @Test public void addAtoms() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         assertThat(g.addAtom(mock(Atom.class)), is(0));
         assertThat(g.addAtom(mock(Atom.class)), is(1));
         assertThat(g.addAtom(mock(Atom.class)), is(2));
@@ -60,7 +60,7 @@ public class ChemicalGraphTest {
     }
 
     @Test public void addAtomsResize() {
-        ChemicalGraph g = new ChemicalGraph(2);
+        Graph g = new Graph(2);
         assertThat(g.addAtom(mock(Atom.class)), is(0));
         assertThat(g.addAtom(mock(Atom.class)), is(1));
         assertThat(g.addAtom(mock(Atom.class)), is(2));
@@ -75,7 +75,7 @@ public class ChemicalGraphTest {
                 mock(Atom.class),
                 mock(Atom.class)
         };
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         for (Atom a : atoms)
             g.addAtom(a);
         assertThat(g.atom(0), is(atoms[0]));
@@ -85,7 +85,7 @@ public class ChemicalGraphTest {
     }
 
     @Test public void testOrder() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         assertThat(g.order(), is(0));
         g.addAtom(mock(Atom.class));
         assertThat(g.order(), is(1));
@@ -100,7 +100,7 @@ public class ChemicalGraphTest {
     }
 
     @Test public void testSize() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -116,7 +116,7 @@ public class ChemicalGraphTest {
     }
 
     @Test public void testEdges() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -130,7 +130,7 @@ public class ChemicalGraphTest {
     }
 
     @Test public void testEdgesResize() {
-        ChemicalGraph g = new ChemicalGraph(2);
+        Graph g = new Graph(2);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -144,7 +144,7 @@ public class ChemicalGraphTest {
     }
 
     @Test public void testEdgesIterable() {
-        ChemicalGraph g = new ChemicalGraph(2);
+        Graph g = new Graph(2);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -162,7 +162,7 @@ public class ChemicalGraphTest {
 
 
     @Test public void testDegree() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -173,7 +173,7 @@ public class ChemicalGraphTest {
     }
 
     @Test public void adjacent() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -186,7 +186,7 @@ public class ChemicalGraphTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void adjacentInvalid() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -197,7 +197,7 @@ public class ChemicalGraphTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void adjacentInvalid2() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -208,7 +208,7 @@ public class ChemicalGraphTest {
 
     @Test
     public void edge() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -220,7 +220,7 @@ public class ChemicalGraphTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void edgeNone() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -231,61 +231,61 @@ public class ChemicalGraphTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidEdges() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         g.edges(4);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidDegree() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         g.degree(4);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void addingEdgeNonVertex1() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         g.addAtom(mock(Atom.class));
         g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void addingEdgeNonVertex2() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         g.addAtom(mock(Atom.class));
         g.addEdge(new Edge(1, 0, Bond.IMPLICIT));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void invalidAtom() {
-        new ChemicalGraph(5).atom(-1);
+        new Graph(5).atom(-1);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void invalidAtom2() {
-        new ChemicalGraph(5).atom(2);
+        new Graph(5).atom(2);
     }
 
     @Test public void addTopology() {
         Topology t = mock(Topology.class);
         when(t.atom()).thenReturn(5);
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         g.addTopology(t);
         assertThat(g.topologyOf(5), is(t));
     }
 
     @Test public void addUnknownTopology() {
         Topology t = Topology.unknown();
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         assertFalse(g.addTopology(t));
     }
 
     @Test public void defaultTopology() {
-        ChemicalGraph g = new ChemicalGraph(5);
+        Graph g = new Graph(5);
         assertThat(g.topologyOf(5), is(Topology.unknown()));
     }
 
     @Test public void clear() {
-        ChemicalGraph g = new ChemicalGraph(2);
+        Graph g = new Graph(2);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -304,7 +304,7 @@ public class ChemicalGraphTest {
     }
 
     @Test public void permute() {
-        ChemicalGraph g = new ChemicalGraph(2);
+        Graph g = new Graph(2);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -318,7 +318,7 @@ public class ChemicalGraphTest {
         assertThat(g.degree(2), is(2));
         assertThat(g.degree(3), is(1));
 
-        ChemicalGraph h = g.permute(new int[]{1, 0, 3, 2});
+        Graph h = g.permute(new int[]{1, 0, 3, 2});
         assertThat(h.degree(0), is(2));
         assertThat(h.degree(1), is(1));
         assertThat(h.degree(2), is(1));
@@ -331,7 +331,7 @@ public class ChemicalGraphTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void invalidPermutation() {
-        ChemicalGraph g = new ChemicalGraph(2);
+        Graph g = new Graph(2);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -343,7 +343,7 @@ public class ChemicalGraphTest {
     }
 
     @Test public void sort() {
-        ChemicalGraph g = new ChemicalGraph(2);
+        Graph g = new Graph(2);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -380,7 +380,7 @@ public class ChemicalGraphTest {
     }
 
     @Test public void atoms() {
-        ChemicalGraph g = new ChemicalGraph(20);
+        Graph g = new Graph(20);
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
         g.addAtom(mock(Atom.class));
@@ -399,14 +399,15 @@ public class ChemicalGraphTest {
     }
 
     @Test public void configurationOf() throws Exception {
-        ChemicalGraph g = ChemicalGraph.fromSmiles("O[C@]12CCCC[C@@]1(O)CCCC2");
+        Graph g = Graph.fromSmiles("O[C@]12CCCC[C@@]1(O)CCCC2");
 
         Assert.assertThat(g.configurationOf(1), is(Configuration.TH1));
         Assert.assertThat(g.configurationOf(6), is(Configuration.TH1));
     }
 
     @Test public void configurationOf_myoInositol() throws Exception {
-        ChemicalGraph g = ChemicalGraph.fromSmiles("O[C@@H]1[C@H](O)[C@H](O)[C@H](O)[C@H](O)[C@@H]1O");
+        Graph g = Graph
+                .fromSmiles("O[C@@H]1[C@H](O)[C@H](O)[C@H](O)[C@H](O)[C@@H]1O");
 
         Assert.assertThat(g.configurationOf(1), is(Configuration.TH1));
         Assert.assertThat(g.configurationOf(2), is(Configuration.TH1));
@@ -417,7 +418,7 @@ public class ChemicalGraphTest {
     }
 
     @Test public void myoInositol_neighbors() throws Exception {
-        ChemicalGraph g = ChemicalGraph
+        Graph g = Graph
                 .fromSmiles("O[C@@H]1[C@H](O)[C@H](O)[C@H](O)[C@H](O)[C@@H]1O");
 
         Assert.assertThat(g.neighbors(1), is(new int[]{0, 2, 10}));

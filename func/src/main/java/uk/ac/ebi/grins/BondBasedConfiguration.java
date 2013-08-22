@@ -3,7 +3,7 @@ package uk.ac.ebi.grins;
 /** @author John May */
 final class BondBasedConfiguration {
 
-    static Configuration.DoubleBond configurationOf(ChemicalGraph g,
+    static Configuration.DoubleBond configurationOf(Graph g,
                                                     int x, int u, int v, int y) {
 
         Edge e = g.edge(u, v);

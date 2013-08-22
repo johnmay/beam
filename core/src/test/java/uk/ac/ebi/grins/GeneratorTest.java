@@ -14,19 +14,19 @@ public class GeneratorTest {
 
     @Test public void permuteTH_3_nonRing() throws Exception {
         String input = "C[C@H](N)O";
-        ChemicalGraph g = Parser.parse(input);
+        Graph g = Parser.parse(input);
         assertThat(Generator.generate(g), is(input));
     }
 
     @Test public void permuteTH_4_nonRing() throws Exception {
         String input = "C[C@]([H])(N)O";
-        ChemicalGraph g = Parser.parse(input);
+        Graph g = Parser.parse(input);
         assertThat(Generator.generate(g), is(input));
     }
 
     @Test public void permuteTH_4_ring() throws Exception {
         String input = "C[C@]12CCCC[C@@]1(C)OCCC2";
-        ChemicalGraph g = Parser.parse(input);
+        Graph g = Parser.parse(input);
         assertThat(Generator.generate(g), is(input));
     }
 
@@ -159,7 +159,7 @@ public class GeneratorTest {
     }
 
     @Test public void reuseNumbering() throws IOException {
-        Generator generator = new Generator(ChemicalGraph.fromSmiles("c1cc1c2ccc2"),
+        Generator generator = new Generator(Graph.fromSmiles("c1cc1c2ccc2"),
                                             new Generator.ReuseRingNumbering(1));
         assertThat(generator.string(), is("c1cc1c1ccc1"));
     }
@@ -256,7 +256,7 @@ public class GeneratorTest {
      */
     private static String randomPermutations(String input, int n) throws
                                                                   InvalidSmilesException {
-        ChemicalGraph g = Parser.parse(input);
+        Graph g = Parser.parse(input);
         StringBuilder sb = new StringBuilder();
         sb.append(Generator.generate(g));
         for (int i = 0; i < n; i++) {

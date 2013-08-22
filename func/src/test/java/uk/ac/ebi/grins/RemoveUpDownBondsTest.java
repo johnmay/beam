@@ -88,7 +88,7 @@ public class RemoveUpDownBondsTest {
     @Test public void e_e_hexadiene_permute() throws Exception {
         String input = "C\\C(=C(\\C(=C(/[H])\\C)\\[H])/[H])\\[H]";
         int[] p = new int[]{7, 2, 4, 1, 3, 6, 8, 9, 0, 5};
-        ChemicalGraph g = Parser.parse(input);
+        Graph g = Parser.parse(input);
         Assert.assertThat(Generator.generate(g.permute(p)),
                           CoreMatchers
                                   .is("[H]\\C(\\C(=C(/[H])\\C)\\[H])=C(\\[H])/C"));

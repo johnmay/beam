@@ -40,7 +40,7 @@ import static uk.ac.ebi.grins.Configuration.DoubleBond.TOGETHER;
  * and their connections.
  *
  * <blockquote><pre>
- * ChemicalGraph g = GraphBuilder.create(3)
+ * Graph g = GraphBuilder.create(3)
  *                               .add(Carbon, 3)
  *                               .add(AtomBuilder.aliphatic(Carbon)
  *                                               .hydrogens(2)
@@ -57,7 +57,7 @@ import static uk.ac.ebi.grins.Configuration.DoubleBond.TOGETHER;
 public final class GraphBuilder {
 
     /** Current we just use the non-public methods of the actual graph object. */
-    private final ChemicalGraph g;
+    private final Graph g;
 
     private final List<GeometricBuilder> builders = new ArrayList<GeometricBuilder>(2);
 
@@ -67,7 +67,7 @@ public final class GraphBuilder {
      * @param nAtoms expected number of atoms
      */
     private GraphBuilder(int nAtoms) {
-        this.g = new ChemicalGraph(nAtoms);
+        this.g = new Graph(nAtoms);
     }
 
     public static GraphBuilder create(int n) {
@@ -308,7 +308,7 @@ public final class GraphBuilder {
      *
      * @return chemical graph instance
      */
-    public ChemicalGraph build() {
+    public Graph build() {
         assignDirectionalLabels();
         return g;
     }

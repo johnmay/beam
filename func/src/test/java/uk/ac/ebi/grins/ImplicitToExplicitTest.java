@@ -48,7 +48,7 @@ import static uk.ac.ebi.grins.Bond.SINGLE;
 public class ImplicitToExplicitTest {
 
     @Test public void cycloHexane() throws Exception {
-        ChemicalGraph g = new ChemicalGraph(6);
+        Graph g = new Graph(6);
         g.addAtom(AtomImpl.AliphaticSubset.Carbon);
         g.addAtom(AtomImpl.AliphaticSubset.Carbon);
         g.addAtom(AtomImpl.AliphaticSubset.Carbon);
@@ -62,7 +62,7 @@ public class ImplicitToExplicitTest {
         g.addEdge(new Edge(4, 5, IMPLICIT));
         g.addEdge(new Edge(5, 0, IMPLICIT));
 
-        ChemicalGraph h = new ImplicitToExplicit().apply(g);
+        Graph h = new ImplicitToExplicit().apply(g);
 
         Assert.assertThat(g, CoreMatchers.is(CoreMatchers.not(CoreMatchers
                                                                       .sameInstance(h))));
@@ -75,7 +75,7 @@ public class ImplicitToExplicitTest {
     }
 
     @Test public void aromaticBenzene() throws Exception {
-        ChemicalGraph g = new ChemicalGraph(6);
+        Graph g = new Graph(6);
         g.addAtom(AtomImpl.AromaticSubset.Carbon);
         g.addAtom(AtomImpl.AromaticSubset.Carbon);
         g.addAtom(AtomImpl.AromaticSubset.Carbon);
@@ -89,7 +89,7 @@ public class ImplicitToExplicitTest {
         g.addEdge(new Edge(4, 5, IMPLICIT));
         g.addEdge(new Edge(5, 0, IMPLICIT));
 
-        ChemicalGraph h = new ImplicitToExplicit().apply(g);
+        Graph h = new ImplicitToExplicit().apply(g);
 
         Assert.assertThat(g, CoreMatchers.is(CoreMatchers.not(CoreMatchers
                                                                       .sameInstance(h))));
@@ -102,7 +102,7 @@ public class ImplicitToExplicitTest {
     }
 
     @Test public void kekuleBenzene() throws Exception {
-        ChemicalGraph g = new ChemicalGraph(6);
+        Graph g = new Graph(6);
         g.addAtom(AtomImpl.AliphaticSubset.Carbon);
         g.addAtom(AtomImpl.AliphaticSubset.Carbon);
         g.addAtom(AtomImpl.AliphaticSubset.Carbon);
@@ -116,7 +116,7 @@ public class ImplicitToExplicitTest {
         g.addEdge(new Edge(4, 5, IMPLICIT));
         g.addEdge(new Edge(5, 0, DOUBLE));
 
-        ChemicalGraph h = new ImplicitToExplicit().apply(g);
+        Graph h = new ImplicitToExplicit().apply(g);
 
         Assert.assertThat(g, CoreMatchers.is(CoreMatchers.not(CoreMatchers
                                                                       .sameInstance(h))));
@@ -172,7 +172,7 @@ public class ImplicitToExplicitTest {
     }
 
     @Test public void toExplicitEdge_NonImplicitIdentity() {
-        ChemicalGraph g = new ChemicalGraph(0);
+        Graph g = new Graph(0);
         for (Bond b : Bond.values()) {
             if (b != IMPLICIT) {
                 Edge e = new Edge(0, 1, SINGLE);
@@ -184,7 +184,7 @@ public class ImplicitToExplicitTest {
     }
 
     @Test public void toExplicitEdge() {
-        ChemicalGraph g = new ChemicalGraph(2);
+        Graph g = new Graph(2);
 
         Atom u = Mockito.mock(Atom.class);
         Atom v = Mockito.mock(Atom.class);

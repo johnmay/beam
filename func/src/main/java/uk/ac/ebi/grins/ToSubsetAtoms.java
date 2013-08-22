@@ -10,11 +10,11 @@ import static uk.ac.ebi.grins.Configuration.Type.None;
  *
  * @author John May
  */
-final class ToSubsetAtoms extends AbstractFunction<ChemicalGraph,ChemicalGraph> {
+final class ToSubsetAtoms extends AbstractFunction<Graph,Graph> {
 
-    public ChemicalGraph apply(ChemicalGraph g) {
+    public Graph apply(Graph g) {
 
-        ChemicalGraph h = new ChemicalGraph(g.order());
+        Graph h = new Graph(g.order());
 
         for (int u = 0; u < g.order(); u++) {
 
@@ -69,7 +69,7 @@ final class ToSubsetAtoms extends AbstractFunction<ChemicalGraph,ChemicalGraph> 
     }
 
     private int electronSum(final List<Edge> es,
-                            final ChemicalGraph g) {
+                            final Graph g) {
         int nElectrons = 0;
         for (Edge e : es) {
             int u = e.either();

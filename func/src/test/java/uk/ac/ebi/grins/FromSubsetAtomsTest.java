@@ -136,7 +136,7 @@ public class FromSubsetAtomsTest {
 
     private void transform(String input, String expected) throws
                                                           InvalidSmilesException {
-        ChemicalGraph g = Parser.parse(input);
+        Graph g = Parser.parse(input);
         ImplicitToExplicit ite = new ImplicitToExplicit();
         FromSubsetAtoms fsa = new FromSubsetAtoms();
         ExplicitToImplicit eti = new ExplicitToImplicit();

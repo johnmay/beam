@@ -52,7 +52,7 @@ import java.util.Set;
  * @author John May
  */
 final class AddDirectionalLabels
-        extends AbstractFunction<ChemicalGraph, ChemicalGraph> {
+        extends AbstractFunction<Graph, Graph> {
 
     /**
      * Transform all implicit up/down to their explicit type. The original graph
@@ -61,10 +61,10 @@ final class AddDirectionalLabels
      * @param g a chemical graph
      * @return new chemical graph but with all explicit bonds
      */
-    public ChemicalGraph apply(final ChemicalGraph g)
+    public Graph apply(final Graph g)
             throws InvalidSmilesException {
 
-        ChemicalGraph h = new ChemicalGraph(g.order());
+        Graph h = new Graph(g.order());
 
         // copy atom/topology information this is unchanged
         for (int u = 0; u < g.order(); u++) {
@@ -118,7 +118,7 @@ final class AddDirectionalLabels
      * @param acc accumulator for new edges
      * @throws InvalidSmilesException thrown if the edge could not be converted
      */
-    private boolean replaceImplWithExpl(ChemicalGraph g,
+    private boolean replaceImplWithExpl(Graph g,
                                         Edge e,
                                         Map<Edge, Edge> acc)
             throws InvalidSmilesException {
@@ -142,7 +142,7 @@ final class AddDirectionalLabels
      * @return does the edge 'e' need to be reconsidered later
      * @throws InvalidSmilesException thrown if the edge could not be converted
      */
-    private boolean replaceImplWithExpl(ChemicalGraph g,
+    private boolean replaceImplWithExpl(Graph g,
                                         Edge e,
                                         int u,
                                         Map<Edge, Edge> acc)
@@ -211,7 +211,7 @@ final class AddDirectionalLabels
         return false;
     }
 
-    private void invertExistingDirectionalLabels(ChemicalGraph g,
+    private void invertExistingDirectionalLabels(Graph g,
                                                  BitSet visited,
                                                  Map<Edge, Edge> replacement,
                                                  int u) {

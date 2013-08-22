@@ -41,7 +41,7 @@ public class GraphBuilderTest {
     public void clockwise_parity() {
 
         GraphBuilder gb = GraphBuilder.create(5);
-        ChemicalGraph g = gb.add(AtomBuilder.aliphatic("C").build())
+        Graph g = gb.add(AtomBuilder.aliphatic("C").build())
                             .add(AtomImpl.AliphaticSubset.Nitrogen)
                             .add(AtomImpl.AliphaticSubset.Oxygen)
                             .add(AtomImpl.AliphaticSubset.Carbon)
@@ -63,7 +63,7 @@ public class GraphBuilderTest {
     public void anticlockwise_parity() {
 
         GraphBuilder gb = GraphBuilder.create(5);
-        ChemicalGraph g = gb.add(AtomBuilder.aliphatic("C").build())
+        Graph g = gb.add(AtomBuilder.aliphatic("C").build())
                             .add(AtomImpl.AliphaticSubset.Nitrogen)
                             .add(AtomImpl.AliphaticSubset.Oxygen)
                             .add(AtomImpl.AliphaticSubset.Carbon)
@@ -84,7 +84,7 @@ public class GraphBuilderTest {
     @Test
     public void e_1_2_difluroethene() {
         GraphBuilder gb = GraphBuilder.create(5);
-        ChemicalGraph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
+        Graph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
                             .add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Fluorine)
@@ -99,7 +99,7 @@ public class GraphBuilderTest {
     @Test
     public void z_1_2_difluroethene() {
         GraphBuilder gb = GraphBuilder.create(5);
-        ChemicalGraph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
+        Graph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
                             .add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Fluorine)
@@ -116,7 +116,7 @@ public class GraphBuilderTest {
     public void conjugated_consider_existing() {
         // the second configuration considers the existing configuration
         GraphBuilder gb = GraphBuilder.create(5);
-        ChemicalGraph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
+        Graph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
                             .add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
@@ -138,7 +138,7 @@ public class GraphBuilderTest {
         // assigning the second one first means we have to consider this
         // on the first one
         GraphBuilder gb = GraphBuilder.create(5);
-        ChemicalGraph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
+        Graph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
                             .add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
@@ -160,7 +160,7 @@ public class GraphBuilderTest {
         // we assign the first, third then second - the second one cause
         // a conflict and we must flip one of the others
         GraphBuilder gb = GraphBuilder.create(5);
-        ChemicalGraph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
+        Graph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
                             .add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
@@ -185,7 +185,7 @@ public class GraphBuilderTest {
     @Test
     public void all_trans_octatetraene() {
         GraphBuilder gb = GraphBuilder.create(5);
-        ChemicalGraph g = gb.add(AtomImpl.AliphaticSubset.Carbon)
+        Graph g = gb.add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
@@ -212,7 +212,7 @@ public class GraphBuilderTest {
     @Test(expected = IllegalArgumentException.class)
     public void impossible_octatetraene() {
         GraphBuilder gb = GraphBuilder.create(5);
-        ChemicalGraph g = gb.add(AtomImpl.AliphaticSubset.Carbon)
+        Graph g = gb.add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)

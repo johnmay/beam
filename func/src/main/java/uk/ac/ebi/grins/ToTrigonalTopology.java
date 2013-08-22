@@ -30,7 +30,6 @@
 package uk.ac.ebi.grins;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,11 +47,11 @@ import java.util.Map;
  *
  * @author John May
  */
-final class ToTrigonalTopology extends AbstractFunction<ChemicalGraph,ChemicalGraph> {
+final class ToTrigonalTopology extends AbstractFunction<Graph,Graph> {
 
-    public ChemicalGraph apply(ChemicalGraph g) {
+    public Graph apply(Graph g) {
 
-        ChemicalGraph h = new ChemicalGraph(g.order());
+        Graph h = new Graph(g.order());
 
         // original topology information this is unchanged
         for (int u = 0; u < g.order(); u++) {
@@ -109,7 +108,7 @@ final class ToTrigonalTopology extends AbstractFunction<ChemicalGraph,ChemicalGr
         return h;
     }
 
-    private Atom asBracketAtom(int u, ChemicalGraph g) {
+    private Atom asBracketAtom(int u, Graph g) {
         Atom a = g.atom(u);
         int nElectrons = 0;
         for (Edge e : g.edges(u)) {
@@ -124,7 +123,7 @@ final class ToTrigonalTopology extends AbstractFunction<ChemicalGraph,ChemicalGr
                                         a.aromatic());
     }
 
-    private Topology toTrigonal(ChemicalGraph g, Edge e, int u) {
+    private Topology toTrigonal(Graph g, Edge e, int u) {
 
         List<Edge> es = g.edges(u);
         int offset = es.indexOf(e);
@@ -189,7 +188,7 @@ final class ToTrigonalTopology extends AbstractFunction<ChemicalGraph,ChemicalGr
         return b == Bond.DOWN;
     }
 
-    private List<Edge> doubleBondLabelledEdges(ChemicalGraph g) {
+    private List<Edge> doubleBondLabelledEdges(Graph g) {
         List<Edge> es = new ArrayList<Edge>();
         for (int u = 0; u < g.order(); u++) {
             for (Edge e : g.edges(u)) {

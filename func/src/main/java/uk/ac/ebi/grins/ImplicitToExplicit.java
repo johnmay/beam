@@ -35,7 +35,7 @@ package uk.ac.ebi.grins;
  *
  * @author John May
  */
-final class ImplicitToExplicit extends AbstractFunction<ChemicalGraph,ChemicalGraph> {
+final class ImplicitToExplicit extends AbstractFunction<Graph,Graph> {
 
     /**
      * Transform all implicit to explicit bonds. The original graph is
@@ -44,9 +44,9 @@ final class ImplicitToExplicit extends AbstractFunction<ChemicalGraph,ChemicalGr
      * @param g a chemical graph
      * @return new chemical graph but with all explicit bonds
      */
-    public ChemicalGraph apply(final ChemicalGraph g) {
+    public Graph apply(final Graph g) {
 
-        ChemicalGraph h = new ChemicalGraph(g.order());
+        Graph h = new Graph(g.order());
 
         // copy atom/topology information
         for (int u = 0; u < g.order(); u++) {
@@ -74,7 +74,7 @@ final class ImplicitToExplicit extends AbstractFunction<ChemicalGraph,ChemicalGr
      * @param e an edge of g
      * @return the edge with specified explicit bond type
      */
-    static Edge toExplicitEdge(final ChemicalGraph g, final Edge e) {
+    static Edge toExplicitEdge(final Graph g, final Edge e) {
         final int u = e.either(), v = e.other(u);
         if (e.bond() == Bond.IMPLICIT) {
             return new Edge(u, v,

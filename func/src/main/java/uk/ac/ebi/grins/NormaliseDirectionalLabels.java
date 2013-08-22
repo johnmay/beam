@@ -14,11 +14,11 @@ import java.util.Set;
  * @author John May
  */
 public class NormaliseDirectionalLabels
-        extends AbstractFunction<ChemicalGraph, ChemicalGraph> {
+        extends AbstractFunction<Graph, Graph> {
 
-    @Override public ChemicalGraph apply(ChemicalGraph g) {
+    @Override public Graph apply(Graph g) {
         Traversal traversal = new Traversal(g);
-        ChemicalGraph h = new ChemicalGraph(g.order());
+        Graph h = new Graph(g.order());
 
         // copy atom/topology information this is unchanged
         for (int u = 0; u < g.order(); u++) {
@@ -45,16 +45,16 @@ public class NormaliseDirectionalLabels
 
     private static final class Traversal {
 
-        private final ChemicalGraph g;
-        private final boolean[]     visited;
-        private final int[]         ordering;
-        private       int           i;
+        private final Graph     g;
+        private final boolean[] visited;
+        private final int[]     ordering;
+        private       int       i;
         private Map<Edge, Edge> acc = new HashMap<Edge, Edge>();
 
         private Set<Edge>    doubleBonds = new HashSet<Edge>();
         private Set<Integer> adj         = new HashSet<Integer>();
 
-        private Traversal(ChemicalGraph g) {
+        private Traversal(Graph g) {
             this.g = g;
             this.visited = new boolean[g.order()];
             this.ordering = new int[g.order()];
@@ -95,7 +95,7 @@ public class NormaliseDirectionalLabels
             }
         }
 
-        private boolean hasAdjDirectionalLabels(ChemicalGraph g, Edge e) {
+        private boolean hasAdjDirectionalLabels(Graph g, Edge e) {
             int u = e.either();
             int v = e.other(u);
 
@@ -109,7 +109,7 @@ public class NormaliseDirectionalLabels
             return false;
         }
 
-        private void flip(ChemicalGraph g, Edge e, Map<Edge, Edge> acc) {
+        private void flip(Graph g, Edge e, Map<Edge, Edge> acc) {
 
             int u = e.either();
             int v = e.other(u);
@@ -150,7 +150,7 @@ public class NormaliseDirectionalLabels
             }
         }
 
-        Edge firstDirectionalLabel(ChemicalGraph g, int u) {
+        Edge firstDirectionalLabel(Graph g, int u) {
             Edge first = null;
             for (Edge f : g.edges(u)) {
                 if (f.bond() == Bond.UP || f.bond() == Bond.DOWN) {
@@ -162,7 +162,7 @@ public class NormaliseDirectionalLabels
             return first;
         }
 
-        private void invertExistingDirectionalLabels(ChemicalGraph g,
+        private void invertExistingDirectionalLabels(Graph g,
                                                      BitSet visited,
                                                      Map<Edge, Edge> replacement,
                                                      int u) {

@@ -51,12 +51,12 @@ public class ParserTest {
     }
 
     @Test public void invalidTetrahedral() throws InvalidSmilesException {
-        ChemicalGraph g = Parser.parse("[C@-](N)(O)C");
+        Graph g = Parser.parse("[C@-](N)(O)C");
         Assert.assertThat(g.topologyOf(0), is(Topology.unknown()));
     }
 
     @Test public void invalidTetrahedral2() throws InvalidSmilesException {
-        ChemicalGraph g = Parser.parse("[C@](N)(O)C");
+        Graph g = Parser.parse("[C@](N)(O)C");
         Assert.assertThat(g.topologyOf(0), is(Topology.unknown()));
     }
 
@@ -95,7 +95,7 @@ public class ParserTest {
     }
 
     @Test public void mixingAromaticAndKekule() throws InvalidSmilesException {
-        ChemicalGraph g = Parser.parse("C:1:C:C:C:C:C1");
+        Graph g = Parser.parse("C:1:C:C:C:C:C1");
         for (Edge e : g.edges()) {
             assertThat(e.bond(), is(Bond.AROMATIC));
         }

@@ -225,7 +225,7 @@ abstract class Topology {
      * @ 5       @OH1     S[Co@@](F)(Cl)(Br)(I)C=O
      * @@ 5       @OH2     O=C[Co@](F)(Cl)(Br)(I)S </pre></blockquote>
      */
-    static Configuration toExplicit(ChemicalGraph g, int u, Configuration c) {
+    static Configuration toExplicit(Graph g, int u, Configuration c) {
 
         // already explicit
         if (c.type() != Implicit)

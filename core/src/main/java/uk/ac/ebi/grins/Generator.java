@@ -43,7 +43,7 @@ import java.util.Map;
  */
 final class Generator {
 
-    private final ChemicalGraph g;
+    private final Graph         g;
     private final StringBuilder sb;
 
     private final int[]                           visitedAt;
@@ -57,7 +57,7 @@ final class Generator {
      *
      * @param g chemical graph
      */
-    Generator(ChemicalGraph g, RingNumbering rnums) {
+    Generator(Graph g, RingNumbering rnums) {
         this.g = g;
         this.rnums = rnums;
         this.sb = new StringBuilder(g.order() * 2);
@@ -236,7 +236,7 @@ final class Generator {
      * @param g the graph to generate the SMILE for
      * @return SMILES gor the provided chemical graph
      */
-    static String generate(final ChemicalGraph g) {
+    static String generate(final Graph g) {
         return new Generator(g, new IterativeRingNumbering(1)).string();
     }
 

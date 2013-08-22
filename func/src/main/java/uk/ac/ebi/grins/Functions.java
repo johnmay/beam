@@ -41,7 +41,7 @@ public final class Functions {
      * @return a copy of the original graph with the order of the atoms
      *         randomised
      */
-    public static ChemicalGraph randomise(ChemicalGraph g) {
+    public static Graph randomise(Graph g) {
         return g.permute(random(g.order()));
     }
 
@@ -52,7 +52,7 @@ public final class Functions {
      * @return a copy of the original graph with the order of the atoms
      *         reversed
      */
-    public static ChemicalGraph reverse(ChemicalGraph g) {
+    public static Graph reverse(Graph g) {
         return g.permute(reverse(g.order()));
     }
 
@@ -64,7 +64,7 @@ public final class Functions {
      * @return a copy of the original graph but with directional bonds removed
      *         and atom-based double-bond stereo configruation.
      */
-    public static ChemicalGraph atomBasedDBStereo(ChemicalGraph g) {
+    public static Graph atomBasedDBStereo(Graph g) {
         return eti.apply(ttt.apply(ite.apply(g)));
     }
 
@@ -76,7 +76,7 @@ public final class Functions {
      * @return a copy of the original graph but with bond-based
      *         stereo-chemistry
      */
-    public static ChemicalGraph bondBasedDBStereo(ChemicalGraph g) {
+    public static Graph bondBasedDBStereo(Graph g) {
         return eti.apply(ftt.apply(ite.apply(g)));
     }
 
@@ -87,7 +87,7 @@ public final class Functions {
      * @param g a chemical graph
      * @return the chemical graph expanded
      */
-    public static ChemicalGraph expand(ChemicalGraph g) {
+    public static Graph expand(Graph g) {
         return eti.apply(fsa.apply(ite.apply(g)));
     }
 
@@ -98,11 +98,11 @@ public final class Functions {
      * @param g a chemical graph
      * @return the chemical graph expanded
      */
-    public static ChemicalGraph collapse(ChemicalGraph g) {
+    public static Graph collapse(Graph g) {
         return eti.apply(tsa.apply(ite.apply(g)));
     }
 
-    public static ChemicalGraph normaliseDirectionalLabels(ChemicalGraph g) {
+    public static Graph normaliseDirectionalLabels(Graph g) {
         return ndl.apply(g);
     }
 
