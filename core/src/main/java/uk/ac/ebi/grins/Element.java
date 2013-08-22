@@ -105,7 +105,7 @@ public enum Element {
     Sodium("Na"),
     Magnesium("Mg"),
     Aluminum("Al"),
-    Silicon("Si"),
+    Silicon("Si", true, false),
     Phosphorus("P", true, 3, 5),
     Sulfur("S", true, 2, 4, 6),
     Chlorine("Cl", false, 1),
@@ -124,7 +124,7 @@ public enum Element {
     Copper("Cu"),
     Zinc("Zn"),
     Gallium("Ga"),
-    Germanium("Ge"),
+    Germanium("Ge", true, false),
     Arsenic("As", true),
     Selenium("Se", true),
     Bromine("Br", false, 1),
@@ -143,9 +143,9 @@ public enum Element {
     Silver("Ag"),
     Cadmium("Cd"),
     Indium("In"),
-    Tin("Sn"),
-    Antimony("Sb"),
-    Tellurium("Te", true), // nb: non-aromatic per OpenSMILES spec
+    Tin("Sn", true, false),
+    Antimony("Sb", true, false),
+    Tellurium("Te", true, false),
     Iodine("I", false, 1),
     Xenon("Xe"),
 
@@ -163,7 +163,7 @@ public enum Element {
     Mercury("Hg"),
     Thallium("Tl"),
     Lead("Pb"),
-    Bismuth("Bi"),
+    Bismuth("Bi", true, false),
     Polonium("Po"),
     Astatine("At"),
     Radon("Rn"),
@@ -224,8 +224,11 @@ public enum Element {
 
     private final int[] electrons;
 
-    /** Whether the element can be aromatic. */
-    private final boolean aromatic;
+    /**
+     * Whether the element can be aromatic.  and whether the element is aromatic
+     * by the OpenSMILES specification.
+     */
+    private final boolean aromatic, strictlyAromatic;
 
     /** Look up of elements by symbol */
     private static final Map<String, Element> elementMap
@@ -240,16 +243,29 @@ public enum Element {
     }
 
     private Element(String symbol) {
-        this(symbol, false, null);
+        this(symbol, false, false, null);
     }
 
     private Element(String symbol,
                     boolean aromatic) {
-        this(symbol, aromatic, null);
+        this(symbol, aromatic, true, null);
     }
 
     private Element(String symbol,
                     boolean aromatic,
+                    boolean strictlyAromatic) {
+        this(symbol, aromatic, strictlyAromatic, null);
+    }
+
+    private Element(String symbol,
+                    boolean aromatic,
+                    int... valence) {
+        this(symbol, aromatic, true, null);
+    }
+
+    private Element(String symbol,
+                    boolean aromatic,
+                    boolean strictlyAromatic,
                     int... valence) {
         this.symbol = symbol;
         this.valence = valence;
@@ -262,6 +278,7 @@ public enum Element {
             this.electrons = null;
         }
         this.aromatic = aromatic;
+        this.strictlyAromatic = strictlyAromatic;
     }
 
     /**
@@ -281,6 +298,20 @@ public enum Element {
      */
     boolean aromatic() {
         return aromatic;
+    }
+
+    /**
+     * Is the element strictly aromatic as per OpenSMILES specification? The
+     * OpenSMILES specification defines a strict set of symbols as aromatic. In
+     * practise others are encountered (e.g. '[te]1ccccc1') - these can be
+     * parsed but are not supported by the OpenSMILES specification. This method
+     * can allows one to check if an aromatic atom is aromatic in the
+     * specification.
+     *
+     * @return the element is aromatic
+     */
+    boolean strictlyAromatic() {
+        return strictlyAromatic;
     }
 
     /**
@@ -352,7 +383,8 @@ public enum Element {
         if (!buffer.hasRemaining())
             return null;
         char c = buffer.get();
-        if (buffer.hasRemaining() && buffer.next() >= 'a' && buffer.next() <= 'z') {
+        if (buffer.hasRemaining() && buffer.next() >= 'a' && buffer
+                .next() <= 'z') {
             return elementMap.get(new String(new char[]{c, buffer.get()}));
         }
         return elementMap.get(Character.toString(c));
