@@ -52,10 +52,10 @@ final class ToSubsetAtoms extends AbstractFunction<Graph,Graph> {
         if (a.charge() != 0 || a.atomClass() != 0 || a.isotope() >= 0)
            return a;
 
-        // does the implied electrons from the bond order sum match that
+        // does the implied availableElectrons from the bond order sum match that
         // which was stored - if aromatic we only check the lowest valence state
-        int impliedHCount = a.aromatic() ? a.element().delocalisedElectrons(nElectrons) / 2
-                                         : a.element().electrons(nElectrons) / 2;
+        int impliedHCount = a.aromatic() ? a.element().availableDelocalisedElectrons(nElectrons) / 2
+                                         : a.element().availableElectrons(nElectrons) / 2;
 
         // mismatch in number of hydrogens we must write this as a bracket atom
         if (impliedHCount != a.hydrogens())

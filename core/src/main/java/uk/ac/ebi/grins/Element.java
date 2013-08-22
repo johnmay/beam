@@ -336,8 +336,10 @@ public enum Element {
      * @throws IllegalArgumentException the element was not a member of the
      *                                  organic subset and did not have default
      *                                  valence information
+     * @deprecated use {@link #availableElectrons(int)} or {@link
+     *             #availableDelocalisedElectrons(int)}
      */
-    int implicitHydrogens(int sum) {
+    @Deprecated int implicitHydrogens(int sum) {
         if (!organic())
             throw new IllegalArgumentException("inorganic atom, no preset valence");
 
@@ -348,16 +350,68 @@ public enum Element {
         return 0;
     }
 
-    int electrons(int bondElectronSum) {
+    /**
+     * Determine the number of available electrons which could be bonding to
+     * implicit hydrogens. This include electrons donated from the hydrogen.
+     * <br/>
+     *
+     * The central carbon of {@code C-C=C} 6 bonded electrons - using SMILES
+     * default valence there must be 2 electrons involved in bonding an implicit
+     * hydrogen (i.e. there is a single bond to a hydrogen).
+     *
+     * @param bondElectronSum the sum of the bonded electrons
+     * @return number of electrons which could be involved with bonds to
+     *         hydrogen
+     */
+    int availableElectrons(int bondElectronSum) {
         for (final int e : electrons)
             if (bondElectronSum <= e)
                 return e - bondElectronSum;
         return 0;
     }
 
-    int delocalisedElectrons(int bondedElectrons) {
-        if (bondedElectrons <= electrons[0])
-            return electrons[0] - bondedElectrons;
+    /**
+     * Determine the number of available electrons which could be bonding to
+     * implicit hydrogens for an aromatic atom with delocalized bonds. This
+     * include electrons donated from the hydrogen. <br/>
+     *
+     * Instead of checking higher valence states only the lowest is checked. For
+     * example nitrogen has valence 3 and 5 but in a delocalized system only the
+     * lowest (3) is used. The electrons which would allow bonding of implicit
+     * hydrogens in the higher valence states are donated to the aromatic system
+     * and thus cannot be <i>reached</i>. Using a generalisation that an 
+     * aromatic bond as 3 electrons we reached the correct value for multi 
+     * valence aromatic elements. <br/>
+     * 
+     * <blockquote><pre>
+     *     c1c[nH]cn1    the aromatic subset nitrogen is bonded to two aromatic
+     *                   nitrogen bond order sum of 3 (6 electrons) there are
+     *                   no implicit hydrogens
+     *                   
+     *     c1cc2ccccn2c1 the nitrogen has three aromatic bond 4.5 bond order
+     *                   (9 electrons) - as we only check the lowest valence
+     *                   (3 - 4.5) < 0 so there are 0 implicit hydrogens
+     *                   
+     *     c1ccpcc1      the phosphorus has 2 aromatic bond (bond order sum 3)
+     *                   and the lowest valence is '3' - there are no implicit
+     *                   hydrogens
+     *                   
+     *     oc1ccscc1     the sulphur has two aromatic bonds (bond order sum 3)
+     *                   the lowest valence is '2' - 3 > 2 so there are no 
+     *                   implicit hydrogens
+     *                   
+     *     oc1ccscc1     the oxygen has a single aromatic bond, the default 
+     *                   valence of oxygen in the specification is '2' there
+     *                   are no hydrogens (2 - 1.5 = 0.5).
+     * </pre></blockquote>
+     *
+     * @param bondElectronSum the sum of the bonded electrons
+     * @return number of electrons which could be involved with bonds to
+     *         hydrogen
+     */
+    int availableDelocalisedElectrons(int bondElectronSum) {
+        if (bondElectronSum <= electrons[0])
+            return electrons[0] - bondElectronSum;
         return 0;
     }
 

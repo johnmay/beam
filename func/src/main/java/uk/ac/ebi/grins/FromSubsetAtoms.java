@@ -47,14 +47,14 @@ final class FromSubsetAtoms
             return a;
 
         Element e = a.element();
-        int electrons = a.aromatic() ? e.delocalisedElectrons(bondElectronSum)
-                                     : e.electrons(bondElectronSum);
+        int electrons = a.aromatic() ? e.availableDelocalisedElectrons(bondElectronSum)
+                                     : e.availableElectrons(bondElectronSum);
 
-        // XXX: if there was an odd number of electrons there was an odd number
+        // XXX: if there was an odd number of availableElectrons there was an odd number
         // or aromatic bonds (usually 1 or 3) - if there was one it was
         // only a single bond it's likely a spouting from a ring - otherwise
         // someones making our life difficult (e.g. c1=cc=cc=c1) in which we
-        // 'give' back 2 free electrons for use indeterminacy the hCount
+        // 'give' back 2 free availableElectrons for use indeterminacy the hCount
         int hCount = (electrons & 0x1) == 1 ? deg > 1 ? (electrons + 2) / 2
                                                       : electrons / 2
                                             : electrons / 2;
