@@ -5,15 +5,14 @@ Beam - _to express by means of a radiant smile_
 Beam is a free toolkit dedicated to parsing and generating [Simplified
 molecular-input line-entry system (SMILES)](http://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system)]
 line notations. The primary focus of the library is to elegantly handle the
-SMILES syntax. One goal is to provide an implementation of the [OpenSMILES](http://www.opensmiles.org)
-specification for the [Chemistry Development Kit (CDK)](http://sourceforge.net/projects/cdk/). 
+SMILES syntax.
 
 ## Beaming
 
 *Note: Beam is still in a development and some APIs will likely change until a release is made.*
 
-One of the primary class in Beam is the `Graph` it provides convenience methods
-for reading SMILES notation directly.
+One of the primary types in Beam is the `Graph` it provides convenience
+methods for reading SMILES notation directly.
 
 ```java
 Graph g = Graph.fromSmiles("CCO");
@@ -42,10 +41,9 @@ Graph.fromSmiles("[CH]1=[CH]C=C[CH]=[CH]1").toSmiles();       // mix bracket and
 ```
 
 Although preserving the representation was one of the design goals for beam it
-is common practise to normalise. There are several utilities for helping to 
-standardise output.
+is common to normalise output SMILES.
 
-_Collapse_ a graph with implicit hydrogens `[CH3][CH2][OH]` to one with inferred
+_Collapse_ a graph with labelled hydrogens `[CH3][CH2][OH]` to one with implicit
 hydrogens `CCO`.
 
 ```java
@@ -54,8 +52,8 @@ Graph h = Functions.collapse(g);
 h.toSmiles().equals("CCO");
 ```
 
-Expand a graph where the hydrogens are inferred `CCO` to one with implicit
-labelled hydrogens `[CH3][CH2][OH]`.
+_Expand_ a graph where the hydrogens are implicit `CCO` to one with labelled
+hydrogens `[CH3][CH2][OH]`.
 
 ```java
 Graph g = Graph.fromSmiles("CCO");
