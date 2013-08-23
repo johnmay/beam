@@ -1,24 +1,19 @@
-# beam
+# Beam
 
 Beam - _to express by means of a radiant smile_ 
 
-Beam is a free toolkit dedicated to parsing and generating [Simplified molecular-input line-entry system (SMILES)](http://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system) line notations. The primary focus of the library is to handle the SMILES syntax and to provide an implementation of the [OpenSMILES](http://www.opensmiles.org) specification for the [Chemistry Development Kit (CDK)](http://sourceforge.net/projects/cdk/). The code is separate to avoid cluttering the CDK API with data structures specific to beam.
+Beam is a free toolkit dedicated to parsing and generating [Simplified
+molecular-input line-entry system (SMILES)](http://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system)]
+line notations. The primary focus of the library is to elegantly handle the
+SMILES syntax. One goal is to provide an implementation of the [OpenSMILES](http://www.opensmiles.org)
+specification for the [Chemistry Development Kit (CDK)](http://sourceforge.net/projects/cdk/). 
 
-## Goals
- - Handle tetrahedral and double bond stereo chemistry and maintain configuration through different orderings
- - Canonization via a permutation of vertices in the chemical graph
- - Unification of double bond stereo using atom-based configuration - ['@' for Cis/Trans around Double Bonds
-](http://www.opensmiles.org/opensmiles.html#_tt_tt_for_cis_trans_around_double_bonds)
+## Beaming
 
-## Planned 
- - Generation of Universal SMILES ([O’Boyle, 2012](http://www.jcheminf.com/content/4/1/22))
- - Allene, Square Planar, Trigongal Bipyramidal and Octahedral topologies
+*Note: Beam is still in a development and some APIs will likely change until a release is made.*
 
-## Examples
-
-_beam is still in a development and some APIs will likely change until a release is made._
-
-The main 'molecule' class in _beam_ is the 'Graph' it provides convenience methods for reading SMILES directly.
+One of the primary class in Beam is the `Graph` it provides convenience methods
+for reading SMILES notation directly.
 
 ```java
 Graph g = Graph.fromSmiles("CCO");
@@ -30,7 +25,9 @@ and for writing it back to SMILES notation.
 String smi = g.toSmiles();
 ```
 
-beam provides excellent round tripping, preserving exactly how the input was specified. Disregarding inputs with redundant brackets and erroneous/repeated ring numbers - the actually input will generally be identical to the output.
+Beam provides excellent round tripping, preserving exactly how the input was
+specified. Disregarding inputs with redundant brackets and erroneous/repeated
+ring numbers - the actually input will generally be identical to the output.
 
 ```java
 // bond labels
@@ -44,11 +41,12 @@ Graph.fromSmiles("[CH]1=[CH][CH]=[CH][CH]=[CH]1").toSmiles();
 Graph.fromSmiles("[CH]1=[CH]C=C[CH]=[CH]1").toSmiles();       // mix bracket and subset atoms
 ```
 
-Although preserving the representation was one of the design goals for beam it is common practise to normalise.
-As such there are several utilities for standardising outputs.
+Although preserving the representation was one of the design goals for beam it
+is common practise to normalise. There are several utilities for helping to 
+standardise output.
 
-One can easily convert a molecule with implicit hydrogens `[CH3][CH2][OH]` to
-one with inferred hydrogens `CCO`.
+_Collapse_ a graph with implicit hydrogens `[CH3][CH2][OH]` to one with inferred
+hydrogens `CCO`.
 
 ```java
 Graph g = Graph.fromSmiles("[CH3][CH2][OH]");
@@ -56,8 +54,8 @@ Graph h = Functions.collapse(g);
 h.toSmiles().equals("CCO");
 ```
 
-Likewise, conversion of a molecule with inferred hydrogens `CCO` to
-one with implicit hydrogens `[CH3][CH2][OH]` is also easy.
+Expand a graph where the hydrogens are inferred `CCO` to one with implicit
+labelled hydrogens `[CH3][CH2][OH]`.
 
 ```java
 Graph g = Graph.fromSmiles("CCO");
@@ -65,7 +63,8 @@ Graph h = Functions.expand(g);
 h.toSmiles().equals("[CH3][CH2][OH]");
 ```
 
-Randomly generate arbitrary SMILES preserving stereo-configuration.
+Stereo specification is persevered through rearrangements. The example below 
+randomly generates arbitrary SMILES preserving correct stereo-configuration.
 
 ```java
 Graph g  = Graph.fromSmiles("CCC[C@@](C)(O)[C@H](C)N");
@@ -75,36 +74,49 @@ for (int i = 0; i < 25; i++)
 System.out.println(sb);
 ```
 
-Using atom-based double-bond configuration.
+Bond based double-bond configuration is normal is SMILES but can be problematic.
+The issue is that a single symbol may be specifying two adjacent configurations.
+A proposed extension was to use atom-based double-bond configuration.
+
+Beam will input, output and convert atom and bond-based double-bond stereo 
+specification. 
 
 ```java
 Graph  g   = Graph.fromSmiles("F/C=C/F");
 Graph  h   = Functions.atomBasedDBStereo(g);
-String smi = h.toSmiles(); // F[C@H]=[C@@H]F
+String smi = h.toSmiles();
+smi.equals("F[C@H]=[C@@H]F");
 ```
 
-Normalise directional labels. There are two possible ways to write each
-bond-based configuration. beam allows you to normalise the labels such
-that the first symbol is always a forward slash (`/`). Some examples are
-shown below.
+```java
+Graph  g   = Graph.fromSmiles("F[C@H]=[C@@H]F");
+Graph  h   = Functions.bondBasedDBStereo(g);
+String smi = h.toSmiles();
+smi.equals("F/C=C/F");
+```
+
+With bond-based double-bond stereo specification there are two possible ways to
+write each bond-based configuration. beam allows you to normalise the labels such
+that the first symbol is always a forward slash (`/`). Some examples are shown
+below.
 
 ```java
 Graph   g   = Graph.fromSmiles("F\\C=C/F");
 Graph   h   = Functions.normaliseDirectionalLabels(g);
 String  smi = h.toSmiles();
+smi.equals("F/C=C\\F");
 ```
 
-<table>
-<tr><th>Original</th>               <th>Normalised</th>
-<tr><td><code>F/C=C/C</code></td>              <td><code>F/C=C/C</code></td>
-<tr><td><code>F\C=C\C</code></td>              <td><code>F/C=C/C</code></td>
-<tr><td><code>F/C=C\C</code></td>              <td><code>F/C=C\C</code></td>
-<tr><td><code>F\C=C/C</code></td>              <td><code>F/=C\C</code></td>
-<tr><td><code>C(\F)(/C)=C\C</code></td>        <td><code>C(/F)(\C)=C/C</code></td>
-<tr><td><code>FC=C(F)C=C(F)\\C=C\\C</code></td><td><code>FC=C(F)C=C(F)/C=C/C</code></td>
-</table>
+```txt
+F/C=C/C              F/C=C/C
+F\C=C\C              F/C=C/C
+F/C=C\C              F/C=C\C
+F\C=C/C              F/=C\C
+C(\F)(/C)=C\C        C(/F)(\C)=C/C
+FC=C(F)C=C(F)\C=C\C  FC=C(F)C=C(F)/C=C/C
+```
 
-## How to Grin
+## Beam me up
 
 beam is still in development but you can obtain the latest build from the [EBI snapshots repository](http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots/). An example configuration for maven is shown below.
 
