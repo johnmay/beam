@@ -140,12 +140,13 @@ public enum Bond {
      *                                  aromatic) and as such the number of
      *                                  electrons is unknown.
      */
+    @Deprecated
     public int electrons() {
         return electrons;
     }
 
     public int electrons(Atom u, Atom v) {
-        return u.aromatic() && v.aromatic() ? 3 : electrons();
+        return u.aromatic() && v.aromatic() ? 3 : electrons;
     }
 
     /**
