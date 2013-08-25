@@ -30,7 +30,6 @@
 package uk.ac.ebi.beam;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -87,7 +86,7 @@ final class AtomImpl {
 
         @Override public int hydrogens() {
             throw new IllegalArgumentException("use bond order sum to determine implicit hydrogen count");
-        } 
+        }
 
         @Override public int atomClass() {
             return 0;
@@ -97,11 +96,16 @@ final class AtomImpl {
             return true;
         }
 
+        @Override public Atom toAromatic() {
+            return element.aromatic() ? AromaticSubset.ofElement(element) : this;
+        }
+
+
         @Override public int hydrogens(Graph g, int u) {
             int nElectrons = 0;
             for (final Edge e : g.edges(u)) {
                 nElectrons += e.bond().electrons(this, g.atom(e.other(u)));
-            }            
+            }
             return element.availableElectrons(nElectrons) / 2;
         }
 
@@ -173,6 +177,10 @@ final class AtomImpl {
             return true;
         }
 
+        @Override public Atom toAromatic() {
+            return this;
+        }
+
         @Override public int hydrogens(Graph g, int u) {
             int nElectrons = 0;
             for (final Edge e : g.edges(u)) {
@@ -180,6 +188,7 @@ final class AtomImpl {
             }
             return element.availableDelocalisedElectrons(nElectrons) / 2;
         }
+
 
         static Atom ofElement(Element e) {
             Atom a = atoms.get(e);
@@ -243,6 +252,16 @@ final class AtomImpl {
             return hydrogens();
         }
 
+        @Override public Atom toAromatic() {
+            return aromatic || !element.aromatic() ? this
+                                                   : new BracketAtom(isotope,
+                                                                     element,
+                                                                     hCount,
+                                                                     charge,
+                                                                     atomClass,
+                                                                     true);
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -279,12 +298,12 @@ final class AtomImpl {
 
     static Atom EXPLICIT_HYDROGEN = new BracketAtom(Element.Hydrogen, 0, 0);
 
-    static Atom DEUTERIUM         = AtomBuilder.aliphatic(Element.Hydrogen)
-                                               .isotope(2)
-                                               .build();
+    static Atom DEUTERIUM = AtomBuilder.aliphatic(Element.Hydrogen)
+                                       .isotope(2)
+                                       .build();
 
-    static Atom TRITIUM           = AtomBuilder.aliphatic(Element.Hydrogen)
-                                               .isotope(3)
-                                               .build();
+    static Atom TRITIUM = AtomBuilder.aliphatic(Element.Hydrogen)
+                                     .isotope(3)
+                                     .build();
 
 }

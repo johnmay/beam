@@ -99,9 +99,18 @@ public interface Atom {
     boolean subset();
 
     /**
+     * Access an aromatic form of this atom. If the element can not be aromatic
+     * then the same atom is returned.
+     *
+     * @return the aromatic form of this atom (or if it can't be aromatic just
+     *         this atom)
+     */
+    Atom toAromatic();
+
+    /**
      * (internal) the number of hydrogens this atom would have if it were vertex
-     * 'u' in the graph 'g'. If the atom is in the organic subset the value
-     * is computed - otherwise the labelled hydrogen count is returned.
+     * 'u' in the graph 'g'. If the atom is in the organic subset the value is
+     * computed - otherwise the labelled hydrogen count is returned.
      *
      * @see Graph#implHCount(int)
      */
