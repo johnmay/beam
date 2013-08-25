@@ -30,6 +30,7 @@
 package uk.ac.ebi.beam;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -86,7 +87,7 @@ final class AtomImpl {
 
         @Override public int hydrogens() {
             throw new IllegalArgumentException("use bond order sum to determine implicit hydrogen count");
-        }
+        } 
 
         @Override public int atomClass() {
             return 0;
@@ -94,6 +95,14 @@ final class AtomImpl {
 
         @Override public boolean subset() {
             return true;
+        }
+
+        @Override public int hydrogens(Graph g, int u) {
+            int nElectrons = 0;
+            for (final Edge e : g.edges(u)) {
+                nElectrons += e.bond().electrons(this, g.atom(e.other(u)));
+            }            
+            return element.availableElectrons(nElectrons) / 2;
         }
 
         @Override public Generator.AtomToken token() {
@@ -164,6 +173,14 @@ final class AtomImpl {
             return true;
         }
 
+        @Override public int hydrogens(Graph g, int u) {
+            int nElectrons = 0;
+            for (final Edge e : g.edges(u)) {
+                nElectrons += e.bond().electrons(this, g.atom(e.other(u)));
+            }
+            return element.availableDelocalisedElectrons(nElectrons) / 2;
+        }
+
         static Atom ofElement(Element e) {
             Atom a = atoms.get(e);
             if (a == null)
@@ -220,6 +237,10 @@ final class AtomImpl {
 
         @Override public boolean subset() {
             return false;
+        }
+
+        @Override public int hydrogens(Graph g, int u) {
+            return hydrogens();
         }
 
         @Override

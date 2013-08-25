@@ -99,6 +99,15 @@ public interface Atom {
     boolean subset();
 
     /**
+     * (internal) the number of hydrogens this atom would have if it were vertex
+     * 'u' in the graph 'g'. If the atom is in the organic subset the value
+     * is computed - otherwise the labelled hydrogen count is returned.
+     *
+     * @see Graph#implHCount(int)
+     */
+    int hydrogens(Graph g, int u);
+
+    /**
      * (internal) The token to write for the atom when generating a SMILES
      * string.
      *

@@ -143,19 +143,19 @@ public final class Graph {
 
     /**
      * Access the vertices adjacent to 'u' in <b>sorted</b> order. This
-     * convenience method is provided to assist in configuring atom-based
-     * stereo using the {@link #configurationOf(int)} method. For general
-     * purpose access to the neighbors of a vertex the {@link #edges(int)}
-     * is preferred.
+     * convenience method is provided to assist in configuring atom-based stereo
+     * using the {@link #configurationOf(int)} method. For general purpose
+     * access to the neighbors of a vertex the {@link #edges(int)} is
+     * preferred.
      *
      * @param u a vertex
      * @return fixed-size array of vertices
      * @see #configurationOf(int)
      */
     public int[] neighbors(int u) {
-        List<Edge> es  = edges[checkRange(u)];
-        int[]      vs  = new int[es.size()];
-        int        deg = es.size();
+        List<Edge> es = edges[checkRange(u)];
+        int[] vs = new int[es.size()];
+        int deg = es.size();
         for (int i = 0; i < deg; i++)
             vs[i] = es.get(i).other(u);
         Arrays.sort(vs);
@@ -178,6 +178,18 @@ public final class Graph {
         return false;
     }
 
+    /**
+     * The number of implied (or labelled) hydrogens for the vertex 'u'. Note
+     * the count does not include any bonded vertices which may also be
+     * hydrogen.
+     *
+     * @param u the vertex to access the implicit h count for.
+     * @return the number of implicit hydrogens
+     */
+    public int implHCount(int u) {
+        return atom(checkRange(u)).hydrogens(this, u);
+    }
+    
     /**
      * Access the edge connecting two adjacent vertices.
      *
@@ -248,21 +260,19 @@ public final class Graph {
      * configuration describes the relative-stereo as though the atoms were
      * arranged by atom number. <br/><br/>
      *
-     * <b>Further Explanation for Tetrahedral Centres</b>
-     * As an example the molecule {@code O[C@]12CCCC[C@@]1(O)CCCC2} has two
-     * tetrahedral centres. <br/>
-     * 1. The first one is on vertex '1' and looking from
-     * vertex '0' the other neighbors [6, 11, 2] proceed anti-clockwise ('@') -
-     * note ring bonds. It is easy to see that if we use the natural order of
-     * the molecule and order the neighbor [2, 6, 11] the winding is still
-     * anti-clockwise and '@TH1' is returned.
-     * 2. The second centre is on vertex '6' and looking from vertex '5' the
-     * ordering proceeds as [1, 7, 8] with clockwise winding. When we arrange
-     * the atoms by their natural order we will now be looking from vertex '1'
-     * as it is the lowest. The other neighbors then proceed in the order
-     * [5, 7, 8]. Drawing out the configuration it's clear that we look from
-     * vertex '1' instead of '5' the winding is now anti-clockwise and the
-     * configuration is also '@TH1'.
+     * <b>Further Explanation for Tetrahedral Centres</b> As an example the
+     * molecule {@code O[C@]12CCCC[C@@]1(O)CCCC2} has two tetrahedral centres.
+     * <br/> 1. The first one is on vertex '1' and looking from vertex '0' the
+     * other neighbors [6, 11, 2] proceed anti-clockwise ('@') - note ring
+     * bonds. It is easy to see that if we use the natural order of the molecule
+     * and order the neighbor [2, 6, 11] the winding is still anti-clockwise and
+     * '@TH1' is returned. 2. The second centre is on vertex '6' and looking
+     * from vertex '5' the ordering proceeds as [1, 7, 8] with clockwise
+     * winding. When we arrange the atoms by their natural order we will now be
+     * looking from vertex '1' as it is the lowest. The other neighbors then
+     * proceed in the order [5, 7, 8]. Drawing out the configuration it's clear
+     * that we look from vertex '1' instead of '5' the winding is now
+     * anti-clockwise and the configuration is also '@TH1'.
      *
      * @param u a vertex in the graph
      * @return The configuration around
@@ -309,7 +319,7 @@ public final class Graph {
      *                                parsing the SMILES.
      */
     public static Graph fromSmiles(String smi) throws
-                                                       IOException {
+                                               IOException {
         if (smi == null)
             throw new NullPointerException("no SMILES provided");
         return Parser.parse(smi);

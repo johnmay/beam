@@ -428,5 +428,24 @@ public class GraphTest {
         Assert.assertThat(g.neighbors(8), is(new int[]{6, 9, 10}));
         Assert.assertThat(g.neighbors(10), is(new int[]{1, 8, 11}));
     }
+    
+    @Test public void implHCount() throws Exception{
+        Graph g = Graph.fromSmiles("C1NC=C[C]=C1");
+        assertThat(g.implHCount(0), is(2));
+        assertThat(g.implHCount(1), is(1));
+        assertThat(g.implHCount(2), is(1));
+        assertThat(g.implHCount(3), is(1));
+        assertThat(g.implHCount(4), is(0));
+        assertThat(g.implHCount(5), is(1));
+    }
+    @Test public void implHCount_nonExpH() throws Exception{
+        Graph g = Graph.fromSmiles("C(H)(H)1NC=C[C]=C1");
+        assertThat(g.implHCount(0), is(0)); // 2 exp hs
+        assertThat(g.implHCount(1), is(1));
+        assertThat(g.implHCount(2), is(1));
+        assertThat(g.implHCount(3), is(1));
+        assertThat(g.implHCount(4), is(0));
+        assertThat(g.implHCount(5), is(1));
+    }
 
 }
