@@ -95,6 +95,8 @@ enum Hybridization {
      */
     static Hybridization hybridization(Graph g, int u) {
         Atom atom = g.atom(u);
+        if (!atom.element().aromatic())
+            return Hybridization.Unknown;
         int v = valence(atom.element());
         int x = monovalant(g.edges(u)) + atom.hydrogens();
         int c = atom.charge() > 0 ? atom.charge() : 0;
@@ -184,6 +186,10 @@ enum Hybridization {
 
         // bonded electron sum
         Atom atom = g.atom(u);
+        
+        if (!atom.element().aromatic())
+            return 0;
+        
         int bes = 2 * atom.hydrogens();
         List<Edge> es = g.edges(u);
         for (Edge e : es) {
