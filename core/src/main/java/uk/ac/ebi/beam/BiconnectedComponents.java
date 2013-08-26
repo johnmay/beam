@@ -64,7 +64,8 @@ final class BiconnectedComponents {
             component.add(stack.pop());
         }
         component.add(stack.pop());
-        components.add(Collections.unmodifiableList(component));
+        if (component.size() > 1)
+            components.add(Collections.unmodifiableList(component));
     }
     
     public List<List<Edge>> components() {

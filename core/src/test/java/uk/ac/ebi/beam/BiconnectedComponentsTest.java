@@ -35,5 +35,12 @@ public class BiconnectedComponentsTest {
         BiconnectedComponents bc = new BiconnectedComponents(g);
         assertThat(bc.components().size(), is(1));
         assertThat(bc.components().get(0).size(), is(8));
-    }    
+    }
+    
+    @Test public void exocyclic() throws Exception {
+        Graph g = Graph.fromSmiles("[AsH]=C1C=CC=CC=C1");
+        BiconnectedComponents bc = new BiconnectedComponents(g);
+        assertThat(bc.components().size(), is(1));
+        assertThat(bc.components().get(0).size(), is(7));
+    }
 }
