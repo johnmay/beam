@@ -98,7 +98,7 @@ enum Hybridization {
         if (!atom.element().aromatic())
             return Hybridization.Unknown;
         int v = valence(atom.element());
-        int x = monovalant(g.edges(u)) + atom.hydrogens();
+        int x = monovalant(g.edges(u)) + g.implHCount(u);
         int c = atom.charge() > 0 ? atom.charge() : 0;
         int a = atom.charge() < 0 ? -atom.charge() : 0;
         return hybridization(v, x, c, a);
@@ -156,6 +156,8 @@ enum Hybridization {
      */
     static int valence(Element e) {
         switch (e) {
+            case Boron:
+                return 3;
             case Carbon:
             case Silicon:    // nb. not 'strictly aromatic'
             case Germanium:  // nb. not 'strictly aromatic'  
@@ -190,7 +192,7 @@ enum Hybridization {
         if (!atom.element().aromatic())
             return 0;
         
-        int bes = 2 * atom.hydrogens();
+        int bes = 2 * g.implHCount(u);
         List<Edge> es = g.edges(u);
         for (Edge e : es) {
             bes += e.bond().electrons(g.atom(e.either()),
