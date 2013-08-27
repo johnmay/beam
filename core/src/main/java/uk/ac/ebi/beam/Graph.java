@@ -74,6 +74,16 @@ public final class Graph {
     }
 
     /**
+     * (internal) - set the atom label at position 'i'.
+     *
+     * @param i index
+     * @param a atom
+     */
+    void setAtom(int i, Atom a) {
+        atoms[i] = a;
+    }
+
+    /**
      * Add an atom to the graph and return the index to which the atom was
      * added.
      *
@@ -189,7 +199,7 @@ public final class Graph {
     public int implHCount(int u) {
         return atom(checkRange(u)).hydrogens(this, u);
     }
-    
+
     /**
      * Access the edge connecting two adjacent vertices.
      *
