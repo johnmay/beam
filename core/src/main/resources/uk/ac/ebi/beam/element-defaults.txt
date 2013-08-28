@@ -1,0 +1,68 @@
+- Defines default valence and charge (range) for several periodic elements. The
+- values allow checking for abnormal charge/valence on the defined element. A
+- value of 'n/a' means it is not checked. If a valence value is in bracket it
+- not adjusted by charge
+
+- period 1
+H     1       -1,1	
+
+He    0       0,0
+
+- period 2
+Li    1       0,1	
+Be    n/a     n/a  
+
+B     3       0,0
+C     4       -1,1 
+N     3,(5)   -3,1
+O     2       -2,1
+F     1       -1,0 
+Ne    0       0,0 
+
+- period 3
+Na    1       0,1
+Mg    2       0,2
+
+Al    n/a     n/a  
+Si    n/a     n/a  
+P     3,5     -3,1
+S     2,4,6   n/a       
+Cl    1,3,5,6 n/a  
+Ar    0       0,0
+
+- period 4 (excluding d-block)
+K     1       0,1
+Ca    2       0,2
+
+Ga    n/a     n/a  
+Ge    n/a     n/a  
+As    3,5     -3,1
+Se    2,4,6   n/a  
+Br    1,3,5,7 n/a  
+Kr    0       0,0 
+
+- period 5 (excluding d-block and f-block)
+Rb    n/a     n/a  
+Sr    2       0,2
+
+In    n/a     n/a  
+Sn    n/a     n/a  
+Sb    n/a     n/a  	
+Te    2,4,6   n/a  
+I     1,3,5,7 n/a  
+Xe    0       0,0 
+
+- period 6 (s-block only)
+Cs    n/a     n/a  
+Ba    2       0,2
+
+Tl    n/a     n/a
+Pb    n/a     n/a
+Bi    n/a     n/a
+Po    n/a     n/a
+At    1,3,5,7 n/a
+Rn    0       0,0
+
+- period 7
+Fr    n/a     n/a
+Ra    2       0,2
