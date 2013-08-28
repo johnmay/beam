@@ -29,6 +29,10 @@
 
 package uk.ac.ebi.beam;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -234,11 +238,20 @@ public enum Element {
     private static final Map<String, Element> elementMap
             = new HashMap<String, Element>();
 
+    /** Provide verification of valence/charge values. */
+    private ElementCheck defaults = ElementCheck.NO_CHECK;
+
     static {
         for (Element element : values()) {
             if (element.aromatic())
                 elementMap.put(element.symbol().toLowerCase(), element);
             elementMap.put(element.symbol(), element);
+        }
+
+        // load normal ranges from 'element-defaults.txt' and set for the
+        // elements
+        for (Map.Entry<String, ElementCheck> e : loadDefaults().entrySet()) {
+            elementMap.get(e.getKey()).defaults = e.getValue();
         }
     }
 
@@ -274,7 +287,8 @@ public enum Element {
             for (int i = 0; i < valence.length; i++) {
                 electrons[i] = valence[i] * 2;
             }
-        } else {
+        }
+        else {
             this.electrons = null;
         }
         this.aromatic = aromatic;
@@ -382,24 +396,24 @@ public enum Element {
      * and thus cannot be <i>reached</i>. Using a generalisation that an 
      * aromatic bond as 3 electrons we reached the correct value for multi 
      * valence aromatic elements. <br/>
-     * 
+     *
      * <blockquote><pre>
      *     c1c[nH]cn1    the aromatic subset nitrogen is bonded to two aromatic
      *                   nitrogen bond order sum of 3 (6 electrons) there are
      *                   no implicit hydrogens
-     *                   
+     *
      *     c1cc2ccccn2c1 the nitrogen has three aromatic bond 4.5 bond order
      *                   (9 electrons) - as we only check the lowest valence
      *                   (3 - 4.5) < 0 so there are 0 implicit hydrogens
-     *                   
+     *
      *     c1ccpcc1      the phosphorus has 2 aromatic bond (bond order sum 3)
      *                   and the lowest valence is '3' - there are no implicit
      *                   hydrogens
-     *                   
+     *
      *     oc1ccscc1     the sulphur has two aromatic bonds (bond order sum 3)
      *                   the lowest valence is '2' - 3 > 2 so there are no 
      *                   implicit hydrogens
-     *                   
+     *
      *     oc1ccscc1     the oxygen has a single aromatic bond, the default 
      *                   valence of oxygen in the specification is '2' there
      *                   are no hydrogens (2 - 1.5 = 0.5).
@@ -413,6 +427,19 @@ public enum Element {
         if (bondElectronSum <= electrons[0])
             return electrons[0] - bondElectronSum;
         return 0;
+    }
+
+    /**
+     * Verify whether the given valence and charge are 'normal' for
+     * the element.
+     * 
+     * @param v valence (bond order order sum)
+     * @param q charge 
+     * @return whether the valence and charge are valid
+     */
+    boolean verify(int v, int q) {
+        // table driven verification (see. element-defaults.txt)
+        return defaults.verify(v, q);
     }
 
     /**
@@ -443,4 +470,151 @@ public enum Element {
         }
         return elementMap.get(Character.toString(c));
     }
+
+    static Map<String,ElementCheck> loadDefaults() {
+        Map<String,ElementCheck> checks = new HashMap<String, ElementCheck>(200);
+        try {
+            InputStream in = Element.class.getResourceAsStream("element-defaults.txt");
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                if (line.length() == 0 || line.charAt(0) == '-') // empty line or comment
+                    continue;
+                Map.Entry<String,ElementCheck> entry = load(line);
+                checks.put(entry.getKey(), entry.getValue());
+            }
+            br.close();
+        } catch (Exception e) {
+            System.err.println("error whilst loading element-defaults.txt: " + e);
+        }
+        return checks;
+    }
+    
+    static Map.Entry<String,ElementCheck> load(String line) {
+        String[] data = line.split("\\s+");
+        String       symbol       = data[0];
+        ValenceCheck valenceCheck = ValenceCheck.parse(data[1]);
+        ChargeCheck  chargeCheck  = ChargeCheck.parse(data[2]);
+        return new AbstractMap.SimpleEntry<String, ElementCheck>(symbol,
+                                                                 new ElementCheck(valenceCheck, chargeCheck));
+    }
+    
+    private static final class ElementCheck {
+        private final ValenceCheck valenceCheck;
+        private final ChargeCheck chargeCheck;
+
+        private ElementCheck(ValenceCheck valenceCheck, ChargeCheck chargeCheck) {
+            this.valenceCheck = valenceCheck;
+            this.chargeCheck = chargeCheck;
+        }
+
+        boolean verify(int v, int q) {
+            return chargeCheck.verify(q) && valenceCheck.verify(v, q);
+        }
+        
+        private static final ElementCheck NO_CHECK = new ElementCheck(NoValenceCheck.INSTANCE,
+                                                                      ChargeCheck.NONE);
+        
+    }
+    
+    private static abstract class ValenceCheck {       
+        
+        abstract boolean verify(final int v, final int q);
+        
+        static ValenceCheck parse(String line) {
+            String[] vs = line.split(",");
+            if (vs.length == 1) {
+                if (vs[0].equals("n/a")) {
+                    return NoValenceCheck.INSTANCE;
+                }
+                else if (vs[0].charAt(0) == '(') {
+                    return new ChargeAdjustedValence(Integer.parseInt(vs[0].substring(1, vs[0].length() - 1)));
+                } else {
+                    return new ChargeAdjustedValence(Integer.parseInt(vs[0]));
+                }
+            }
+            ValenceCheck[] valences = new ValenceCheck[vs.length];
+            for (int i = 0; i < vs.length; i++) {
+                valences[i] = parse(vs[i]);    
+            }
+            
+            return new MultiValenceCheck(valences);
+        }        
+    }
+    
+    private static final class ChargeAdjustedValence extends ValenceCheck {
+        private final int valence;
+
+        private ChargeAdjustedValence(int valence) {
+            this.valence = valence;
+        }
+
+        @Override public boolean verify(int v, int q) {
+            return valence - q == v;
+        }
+    }
+
+    private static final class FixedValence extends ValenceCheck {
+        private final int valence;
+
+        private FixedValence(int valence) {
+            this.valence = valence;
+        }
+
+        @Override public boolean verify(int v, int q) {
+            return valence == v;
+        }
+    }
+    
+    private static final class MultiValenceCheck extends ValenceCheck {
+        
+        private final ValenceCheck[] valences;
+        
+        private MultiValenceCheck(ValenceCheck[] valences) {
+            this.valences = valences;
+        }
+
+        @Override public boolean verify(int v, int q) {
+            for (ValenceCheck vc : valences) {
+                if (vc.verify(v, q)) {
+                    return true;
+                }
+            }
+            return false;
+        }   
+    }
+    
+    private static final class NoValenceCheck extends ValenceCheck {
+        @Override boolean verify(int v, int q) {
+            return true;
+        }
+
+        private static final ValenceCheck INSTANCE = new NoValenceCheck();
+    }
+
+    private static final class ChargeCheck {
+
+        private final int lo, hi;
+
+        private ChargeCheck(int lo, int hi) {
+            this.lo = lo;
+            this.hi = hi;
+        }
+
+        boolean verify(final int q) {
+            return lo <= q && q <= hi;
+        }
+
+        static ChargeCheck parse(String range) {
+            if (range.equals("n/a"))
+                return NONE;
+            String[] data = range.split(",");
+            int lo = Integer.parseInt(data[0]);
+            int hi = Integer.parseInt(data[1]);
+            return new ChargeCheck(lo, hi);
+        }
+
+        private static final ChargeCheck NONE = new ChargeCheck(Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+
 }

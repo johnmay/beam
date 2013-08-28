@@ -34,7 +34,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Locale;
 
-import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertNull;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -200,6 +200,12 @@ public class ElementTest {
             assertThat(e.implicitHydrogens(0), is(1));
             assertThat(e.implicitHydrogens(1), is(0));
             assertThat(e.implicitHydrogens(2), is(0));
+        }
+    }
+    
+    @Test public void verify() {
+        for (Element e : Element.values()) {
+            boolean valid = e.verify(0, 0);
         }
     }
 
