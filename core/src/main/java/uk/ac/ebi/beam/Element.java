@@ -550,7 +550,7 @@ public enum Element {
         }
 
         @Override public boolean verify(int v, int q) {
-            return valence - q == v;
+            return valence + q == v;
         }
     }
 
