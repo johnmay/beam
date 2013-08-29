@@ -33,6 +33,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -494,7 +495,7 @@ public enum Element {
         String[] data = line.split("\\s+");
         String       symbol       = data[0];
         ValenceCheck valenceCheck = ValenceCheck.parse(data[1]);
-        ChargeCheck  chargeCheck  = ChargeCheck.parse(data[2]);
+        ChargeCheck  chargeCheck  = ChargeCheck.parse(data[2]);        
         return new AbstractMap.SimpleEntry<String, ElementCheck>(symbol,
                                                                  new ElementCheck(valenceCheck, chargeCheck));
     }
@@ -514,7 +515,10 @@ public enum Element {
         
         private static final ElementCheck NO_CHECK = new ElementCheck(NoValenceCheck.INSTANCE,
                                                                       ChargeCheck.NONE);
-        
+
+        @Override public String toString() {
+            return chargeCheck + ", " + valenceCheck;
+        }
     }
     
     private static abstract class ValenceCheck {       
@@ -528,7 +532,9 @@ public enum Element {
                     return NoValenceCheck.INSTANCE;
                 }
                 else if (vs[0].charAt(0) == '(') {
-                    return new ChargeAdjustedValence(Integer.parseInt(vs[0].substring(1, vs[0].length() - 1)));
+                    return new FixedValence(Integer.parseInt(vs[0].substring(1, vs[0].length() - 1)));
+                } else if (vs[0].charAt(0) == '[') {
+                    return new NeutralValence(Integer.parseInt(vs[0].substring(1, vs[0].length() - 1)));
                 } else {
                     return new ChargeAdjustedValence(Integer.parseInt(vs[0]));
                 }
@@ -552,6 +558,29 @@ public enum Element {
         @Override public boolean verify(int v, int q) {
             return valence + q == v;
         }
+
+        @Override public String toString() {
+            return "Charge(" + valence + ")";
+        }
+    }
+
+    /**
+     * A valence check which is only valid at netural charge
+     */
+    private static final class NeutralValence extends ValenceCheck {
+        private final int valence;
+
+        private NeutralValence(int valence) {
+            this.valence = valence;
+        }
+
+        @Override public boolean verify(int v, int q) {
+            return q == 0 && v == valence;
+        }
+
+        @Override public String toString() {
+            return "Neutral(" + valence + ")";
+        }
     }
 
     private static final class FixedValence extends ValenceCheck {
@@ -563,6 +592,10 @@ public enum Element {
 
         @Override public boolean verify(int v, int q) {
             return valence == v;
+        }
+
+        @Override public String toString() {
+            return "Fixed(" + valence + ")";
         }
     }
     
@@ -581,7 +614,11 @@ public enum Element {
                 }
             }
             return false;
-        }   
+        }
+
+        @Override public String toString() {
+            return Arrays.toString(valences);
+        }
     }
     
     private static final class NoValenceCheck extends ValenceCheck {
@@ -615,6 +652,10 @@ public enum Element {
         }
 
         private static final ChargeCheck NONE = new ChargeCheck(Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+        @Override public String toString() {
+            return lo + " < q < " + hi;
+        }
     }
 
 }
