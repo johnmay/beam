@@ -494,7 +494,8 @@ public enum Element {
     static Map.Entry<String,ElementCheck> load(String line) {
         String[] data = line.split("\\s+");
         String       symbol       = data[0];
-        ValenceCheck valenceCheck = ValenceCheck.parse(data[1]);
+        int          electrons    = Integer.parseInt(data[3]);        
+        ValenceCheck valenceCheck = ValenceCheck.parse(data[1], electrons);
         ChargeCheck  chargeCheck  = ChargeCheck.parse(data[2]);        
         return new AbstractMap.SimpleEntry<String, ElementCheck>(symbol,
                                                                  new ElementCheck(valenceCheck, chargeCheck));
@@ -525,7 +526,7 @@ public enum Element {
         
         abstract boolean verify(final int v, final int q);
         
-        static ValenceCheck parse(String line) {
+        static ValenceCheck parse(String line, int nElectrons) {
             String[] vs = line.split(",");
             if (vs.length == 1) {
                 if (vs[0].equals("n/a")) {
@@ -536,12 +537,12 @@ public enum Element {
                 } else if (vs[0].charAt(0) == '[') {
                     return new NeutralValence(Integer.parseInt(vs[0].substring(1, vs[0].length() - 1)));
                 } else {
-                    return new ChargeAdjustedValence(Integer.parseInt(vs[0]));
+                    return new ChargeAdjustedValence(Integer.parseInt(vs[0]), nElectrons);
                 }
             }
             ValenceCheck[] valences = new ValenceCheck[vs.length];
             for (int i = 0; i < vs.length; i++) {
-                valences[i] = parse(vs[i]);    
+                valences[i] = parse(vs[i], nElectrons);    
             }
             
             return new MultiValenceCheck(valences);
@@ -549,13 +550,16 @@ public enum Element {
     }
     
     private static final class ChargeAdjustedValence extends ValenceCheck {
-        private final int valence;
+        private final int valence, nElectrons;
 
-        private ChargeAdjustedValence(int valence) {
-            this.valence = valence;
+        private ChargeAdjustedValence(int valence, int nElectrons) {
+            this.valence    = valence;
+            this.nElectrons = nElectrons;
         }
 
         @Override public boolean verify(int v, int q) {
+            if (nElectrons == 2 && nElectrons - q <= 0)  // Group 2 exception
+                return v == nElectrons - q;
             return valence + q == v;
         }
 

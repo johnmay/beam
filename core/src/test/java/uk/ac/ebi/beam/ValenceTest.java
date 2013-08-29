@@ -1,7 +1,6 @@
 package uk.ac.ebi.beam;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -257,8 +256,7 @@ public class ValenceTest {
         abnormal("[Na+](C)(C)");
     }
 
-    @Ignore("needs adjustment")
-    public void magnesium() {
+    @Test public void magnesium() {
         normal("[Mg]");
         normal("[Mg+](C)");
         normal("[Mg++]");
@@ -467,13 +465,16 @@ public class ValenceTest {
         abnormal("[K+](C)");
     }
 
-    @Ignore("requires adjustment")
-    public void calcium() {
+    @Test public void calcium() {
         normal("[Ca]");
-        normal("[Ca+]");
+        normal("[Ca](C)(C)");
+        abnormal("[Ca+]");
+        normal("[Ca+](C)");
+        abnormal("[Ca+](C)(C)");
         normal("[Ca++]");
-        abnormal("[Ca-])");
-        abnormal("[K+](C)");
+        abnormal("[Ca++](C)");
+        abnormal("[Ca++](C)(C)");
+        
     }
 
     @Test public void arsenic_neutral() {
@@ -799,7 +800,7 @@ public class ValenceTest {
         normal("[Ra++]");
         normal("[Ra+](C)");
         normal("[Ra](C)(C)");
-        normal("[Ra++](C)(C)");
+        abnormal("[Ra++](C)(C)");
     }
 
     static void normal(String str) {
