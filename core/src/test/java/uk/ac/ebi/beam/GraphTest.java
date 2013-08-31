@@ -441,11 +441,13 @@ public class GraphTest {
     @Test public void implHCount_nonExpH() throws Exception{
         Graph g = Graph.fromSmiles("C([H])([H])1NC=C[C]=C1");
         assertThat(g.implHCount(0), is(0)); // 2 exp hs
-        assertThat(g.implHCount(1), is(0));
-        assertThat(g.implHCount(2), is(1));
-        assertThat(g.implHCount(3), is(1));
-        assertThat(g.implHCount(4), is(0));
+        assertThat(g.implHCount(1), is(0)); // [H]
+        assertThat(g.implHCount(2), is(0)); // [H]
+        assertThat(g.implHCount(3), is(1)); 
+        assertThat(g.implHCount(4), is(1)); 
         assertThat(g.implHCount(5), is(1));
+        assertThat(g.implHCount(6), is(0));
+        assertThat(g.implHCount(7), is(1));
     }
 
 }
