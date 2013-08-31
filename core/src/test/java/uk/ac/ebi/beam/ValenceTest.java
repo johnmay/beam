@@ -269,7 +269,7 @@ public class ValenceTest {
         abnormal("[Mg+](C)(C)(C)");
 
         abnormal("[Mg++](C)");
-        // abnormal("[Mg++](C)(C)");
+        abnormal("[Mg++](C)(C)");
         abnormal("[Mg++](C)(C)(C)");
     }
 

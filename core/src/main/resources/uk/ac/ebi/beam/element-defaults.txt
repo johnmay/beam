@@ -5,6 +5,11 @@
 - considered fixed and valid for all charge states, if a value is in square
 - brackets it is only valid for neutral atoms
 
+- It should be noted that the model used is only for checking abnormal valence
+- and not adding implied hydrogens. The model follows a simple pattern which
+- leads to incorrect results (e.g. 5 valent carbon cation ion - [C+H5]) but 
+- matches observed warnings from the Daylight Depict, daylight.com/daycgi/depict 
+
 - period 1
 H     (0),1       -1,1     1	
 

@@ -558,7 +558,7 @@ public enum Element {
         }
 
         @Override public boolean verify(int v, int q) {
-            if (nElectrons == 2 && nElectrons - q <= 0)  // Group 2 exception
+            if (nElectrons == 2 && valence + q > nElectrons - q)  // Group 2 exception
                 return v == nElectrons - q;
             return valence + q == v;
         }
