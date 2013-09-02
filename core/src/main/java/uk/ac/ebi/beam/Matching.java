@@ -5,13 +5,21 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Defines a matching on a graph.
+ * Defines a matching on a graph. A matching or independent edge set is a set of
+ * edges without common vertices. A matching is perfect if every vertex in the
+ * graph is matched. Another way of thinking about the matching is that each
+ * vertex is incident to exactly one matched edge. <p/>
+ *
+ * This class provides storage and manipulation of a matching. A new match is
+ * added with {@link #match(int, int)}, any existing match for the newly matched
+ * vertices is non-longer available. For convenience {@link #matches()} provides
+ * the current independent edge set.
  *
  * @author John May
  */
 final class Matching {
 
-    /** Indicate unmatched. */
+    /** Indicates an unmatched vertex. */
     private static final int UNMATCHED = -1;
 
     /** Storage of which each vertex is matched with. */
@@ -43,7 +51,7 @@ final class Matching {
      *
      * @param v a vertex
      * @return matched vertex
-     * @throws IllegalArgumentException the vertex is unmatched
+     * @throws IllegalArgumentException the vertex is currently unmatched
      */
     int other(int v) {
         if (unmatched(v))
@@ -52,18 +60,21 @@ final class Matching {
     }
 
     /**
-     * Match the vertex 'u' with vertex 'v'.
+     * Add the edge '{u,v}' to the matched edge set. Any existing matches for
+     * 'u' or 'v' are removed from the matched set.
      *
      * @param u a vertex
      * @param v another vertex
      */
     void match(int u, int v) {
+        // set the new match, don't need to update existing - we only provide
+        // access to bidirectional mappings
         match[u] = v;
         match[v] = u;
     }
 
     /**
-     * Access the current non-redundant matching of vertices.
+     * Access the current non-redundant set of edges.
      *
      * @return matched pairs
      */
@@ -82,7 +93,7 @@ final class Matching {
     }
 
     /**
-     * Allocate a matching enough for the given graph.
+     * Allocate a matching with enough capacity for the given graph.
      *
      * @param g a graph
      * @return matching
