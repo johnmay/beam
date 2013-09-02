@@ -2,7 +2,6 @@ package uk.ac.ebi.beam;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -29,6 +28,30 @@ final class Matching {
     }
 
     /**
+     * Is there a matching for the vertex 'v'.
+     *
+     * @param v a vertex
+     * @return the vertex has a matching
+     */
+    boolean contains(int v) {
+        int w = match[v];
+        return w >= 0 && match[w] == v;
+    }
+
+    /**
+     * Access the vertex matched with 'v'.
+     *
+     * @param v a vertex
+     * @return matched vertex
+     * @throws IllegalArgumentException the vertex is unmatched
+     */
+    int other(int v) {
+        if (contains(v))
+            return match[v];
+        throw new IllegalArgumentException(v + " is not matched");
+    }
+
+    /**
      * Match the vertex 'u' with vertex 'v'.
      *
      * @param u a vertex
@@ -41,7 +64,7 @@ final class Matching {
 
     /**
      * Access the current non-redundant matching of vertices.
-     * 
+     *
      * @return matched pairs
      */
     Iterable<Tuple> matches() {
@@ -49,7 +72,7 @@ final class Matching {
         List<Tuple> tuples = new ArrayList<Tuple>(match.length / 2);
 
         for (int v = 0; v < match.length; v++) {
-            int w = match[v];            
+            int w = match[v];
             if (w > v && match[w] == v) {
                 tuples.add(Tuple.of(v, w));
             }
