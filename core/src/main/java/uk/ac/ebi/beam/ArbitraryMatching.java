@@ -24,14 +24,14 @@ final class ArbitraryMatching {
         for (int v = 0; v < g.order(); v++) {
 
             // skip if not in the subset of vertices or already matched
-            if (!s[v] || m.contains(v))
+            if (!s[v] || !m.unmatched(v))
                 continue;
 
             // find a single edge which is not matched and match it
             for (Edge e : g.edges(v)) {
                 int w = e.other(v);
 
-                if (!s[w] || m.contains(w))
+                if (!s[w] || !m.unmatched(w))
                     continue;
 
                 m.match(v, w);

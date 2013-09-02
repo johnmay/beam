@@ -51,10 +51,10 @@ public class MatchingTest {
         matching.match(2, 3);
         matching.match(1, 2); // 0-1 and 2-3 should not be 
 
-        assertTrue(matching.contains(1));   
-        assertTrue(matching.contains(2));   
-        assertFalse(matching.contains(0));   
-        assertFalse(matching.contains(3));   
+        assertFalse(matching.unmatched(1));   
+        assertFalse(matching.unmatched(2));   
+        assertTrue(matching.unmatched(0));   
+        assertTrue(matching.unmatched(3));   
     }
 
     @Test public void adjusted_other() throws Exception {

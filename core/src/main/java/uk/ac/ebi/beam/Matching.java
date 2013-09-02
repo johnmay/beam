@@ -28,14 +28,14 @@ final class Matching {
     }
 
     /**
-     * Is there a matching for the vertex 'v'.
+     * Is the vertex v 'unmatched'.
      *
      * @param v a vertex
-     * @return the vertex has a matching
+     * @return the vertex has no matching
      */
-    boolean contains(int v) {
+    boolean unmatched(int v) {
         int w = match[v];
-        return w >= 0 && match[w] == v;
+        return w < 0 || match[w] != v;
     }
 
     /**
@@ -46,9 +46,9 @@ final class Matching {
      * @throws IllegalArgumentException the vertex is unmatched
      */
     int other(int v) {
-        if (contains(v))
-            return match[v];
-        throw new IllegalArgumentException(v + " is not matched");
+        if (unmatched(v))
+            throw new IllegalArgumentException(v + " is not matched");
+        return match[v];
     }
 
     /**
