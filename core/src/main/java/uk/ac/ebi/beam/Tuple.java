@@ -61,6 +61,33 @@ final class Tuple {
         return snd;
     }
 
+    /** @inheritDoc */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Tuple tuple = (Tuple) o;
+
+        if (fst != tuple.fst) return false;
+        if (snd != tuple.snd) return false;
+
+        return true;
+    }
+
+    /** @inheritDoc */
+    @Override
+    public int hashCode() {
+        int result = fst;
+        result = 31 * result + snd;
+        return result;
+    }
+
+    /** @inheritDoc */
+    @Override public String toString() {
+        return "{" + fst + ", " + snd + "}";
+    }
+
     /**
      * Create a new tuple for the provided values.
      *
