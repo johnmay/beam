@@ -115,4 +115,12 @@ final class UnionFind {
     boolean connected(int u, int v) {
         return find(u) == find(v);
     }
+
+    /**
+     * Clear any joint sets - all items are once disjoint and are singletons.
+     */
+    void clear() {
+        for (int i = 0; i < forest.length; i++)
+            forest[i] = -1;
+    }
 }
