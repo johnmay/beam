@@ -230,12 +230,6 @@ public enum Element {
 
     private final int[] electrons;
 
-    /**
-     * Whether the element can be aromatic.  and whether the element is aromatic
-     * by the OpenSMILES specification.
-     */
-    private final boolean aromatic;
-
     /** Look up of elements by symbol */
     private static final Map<String, Element> elementMap
             = new HashMap<String, Element>();
@@ -274,7 +268,6 @@ public enum Element {
         else {
             this.electrons = null;
         }
-        this.aromatic = AromaticSpecification.General.contains(this);
     }
 
     /**
@@ -295,7 +288,7 @@ public enum Element {
      * @return whether the element may be aromatic
      */
     boolean aromatic() {
-        return aromatic;
+        return aromatic(AromaticSpecification.General);
     }
 
     /**
