@@ -115,6 +115,11 @@ public class LocaliseTest {
              "[O-][S+]1(=O)[NH]C2=C(C=C(Cl)C3=CC=C(Cl)N=C23)C4=CC=CC=C14");
     }
     
+    @Test public void chembl_423544() throws Exception {
+        test("CCc1n[c]#[c]n1CC2CC(C(=O)O2)(c3ccccc3)c4ccccc4",
+             "CCC1=N[C]#[C]N1CC2CC(C(=O)O2)(C3=CC=CC=C3)C4=CC=CC=C4");
+    }
+    
     @Test public void tropylium() throws Exception {
         test("[cH+]1cccccc1", "[CH+]1C=CC=CC=C1");
     }

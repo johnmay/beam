@@ -92,6 +92,8 @@ public final class Localise {
                         && g.atom(e.other(v)).element() == Element.Oxygen)
                     return false;
                 return true;
+            } else if(e.bond() == Bond.TRIPLE) {
+                return true;
             }
         }
 
