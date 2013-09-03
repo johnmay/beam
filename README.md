@@ -93,6 +93,14 @@ String smi = h.toSmiles();
 smi.equals("F/C=C/F");
 ```
 
+Convert a graph with delocalised bonds to kekul&eacute; representation.
+
+```java
+Graph furan        = Graph.fromSmiles("o1cccc1");
+Graph furan_kekule = furan.kekule();
+furan_kekule.toSmiles().equals("O1C=CC=C1");
+```
+
 With bond-based double-bond stereo specification there are two possible ways to
 write each bond-based configuration. beam allows you to normalise the labels such
 that the first symbol is always a forward slash (`/`). Some examples are shown

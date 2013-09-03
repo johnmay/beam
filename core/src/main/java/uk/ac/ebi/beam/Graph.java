@@ -346,13 +346,33 @@ public final class Graph {
     }
 
     /**
-     * Localise delocalized (aromatic) bonds in this molecule.
+     * Localise delocalized (aromatic) bonds in this molecule producing the
+     * Kekulé form. The original graph is not modified. 
+     * 
+     * <blockquote><pre>
+     * Graph furan        = Graph.fromSmiles("o1cccc1");
+     * Graph furan_kekule = furan.kekule();
+     * </pre></blockquote>
+     * 
+     * If the graph could not be converted to a kekulé representation then
+     * a checked exception is thrown. Graphs cannot be converted if their
+     * structures are erroneous and there is no valid way to assign the
+     * delocalised electrons. <p/>
+     * 
+     * Some reasons are shown below. 
+     * 
+     * <blockquote><pre>
+     * n1cncc1             pyrole (incorrect) could be either C1C=NC=N1 or N1C=CN=C1
+     * n1c[nH]cc1          pyrole (correct)
+     * 
+     * [Hg+2][c-]1ccccc1   mercury(2+) ion benzenide (incorrect) 
+     * [Hg+2].[c-]1ccccc1  mercury(2+) ion benzenide (correct)
+     * </pre></blockquote>
      *
-     * @return kekule representation
-     * @throws InvalidSmilesException bond orders could not be assigned without
-     *                                invalidating the valence
+     * @return kekulé representation
+     * @throws InvalidSmilesException molecule exploded on contact with reality
      */
-    public Graph localise() throws InvalidSmilesException {
+    public Graph kekule() throws InvalidSmilesException {
         return Localise.localise(this);
     }
 
