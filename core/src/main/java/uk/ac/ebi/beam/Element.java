@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -93,27 +94,27 @@ import java.util.Map;
 public enum Element {
 
     /** Unspecified/Unknown element (*) */
-    Unknown("*", false, 0),
+    Unknown("*", 0),
 
     Hydrogen("H"),
     Helium("He"),
 
     Lithium("Li"),
     Beryllium("Be"),
-    Boron("B", true, 3),
-    Carbon("C", true, 4),
-    Nitrogen("N", true, 3, 5),
-    Oxygen("O", true, 2),
-    Fluorine("F", false, 1),
+    Boron("B", 3),
+    Carbon("C", 4),
+    Nitrogen("N", 3, 5),
+    Oxygen("O", 2),
+    Fluorine("F", 1),
     Neon("Ne"),
 
     Sodium("Na"),
     Magnesium("Mg"),
     Aluminum("Al"),
-    Silicon("Si", true, false),
-    Phosphorus("P", true, 3, 5),
-    Sulfur("S", true, 2, 4, 6),
-    Chlorine("Cl", false, 1),
+    Silicon("Si"),
+    Phosphorus("P", 3, 5),
+    Sulfur("S", 2, 4, 6),
+    Chlorine("Cl", 1),
     Argon("Ar"),
 
     Potassium("K"),
@@ -129,10 +130,10 @@ public enum Element {
     Copper("Cu"),
     Zinc("Zn"),
     Gallium("Ga"),
-    Germanium("Ge", true, false),
-    Arsenic("As", true),
-    Selenium("Se", true),
-    Bromine("Br", false, 1),
+    Germanium("Ge"),
+    Arsenic("As"),
+    Selenium("Se"),
+    Bromine("Br", 1),
     Krypton("Kr"),
 
     Rubidium("Rb"),
@@ -148,10 +149,10 @@ public enum Element {
     Silver("Ag"),
     Cadmium("Cd"),
     Indium("In"),
-    Tin("Sn", true, false),
-    Antimony("Sb", true, false),
-    Tellurium("Te", true, false),
-    Iodine("I", false, 1),
+    Tin("Sn"),
+    Antimony("Sb"),
+    Tellurium("Te"),
+    Iodine("I", 1),
     Xenon("Xe"),
 
     Cesium("Cs"),
@@ -168,7 +169,7 @@ public enum Element {
     Mercury("Hg"),
     Thallium("Tl"),
     Lead("Pb"),
-    Bismuth("Bi", true, false),
+    Bismuth("Bi"),
     Polonium("Po"),
     Astatine("At"),
     Radon("Rn"),
@@ -233,7 +234,7 @@ public enum Element {
      * Whether the element can be aromatic.  and whether the element is aromatic
      * by the OpenSMILES specification.
      */
-    private final boolean aromatic, strictlyAromatic;
+    private final boolean aromatic;
 
     /** Look up of elements by symbol */
     private static final Map<String, Element> elementMap
@@ -257,29 +258,10 @@ public enum Element {
     }
 
     private Element(String symbol) {
-        this(symbol, false, false, null);
+        this(symbol, null);
     }
 
     private Element(String symbol,
-                    boolean aromatic) {
-        this(symbol, aromatic, true, null);
-    }
-
-    private Element(String symbol,
-                    boolean aromatic,
-                    boolean strictlyAromatic) {
-        this(symbol, aromatic, strictlyAromatic, null);
-    }
-
-    private Element(String symbol,
-                    boolean aromatic,
-                    int... valence) {
-        this(symbol, aromatic, true, valence);
-    }
-
-    private Element(String symbol,
-                    boolean aromatic,
-                    boolean strictlyAromatic,
                     int... valence) {
         this.symbol = symbol;
         this.valence = valence;
@@ -292,8 +274,7 @@ public enum Element {
         else {
             this.electrons = null;
         }
-        this.aromatic = aromatic;
-        this.strictlyAromatic = strictlyAromatic;
+        this.aromatic = AromaticSpecification.General.contains(this);
     }
 
     /**
@@ -306,8 +287,10 @@ public enum Element {
     }
 
     /**
-     * Can the element be aromatic (as defined by the OpenSMILES
-     * specification).
+     * Can the element be aromatic. This definition is very loose and includes
+     * elements which are not part of the Daylight, OpenSMILES specification. To
+     * test if ane element is aromatic by the specification use {@link
+     * #aromatic(uk.ac.ebi.beam.Element.AromaticSpecification)}.
      *
      * @return whether the element may be aromatic
      */
@@ -316,17 +299,14 @@ public enum Element {
     }
 
     /**
-     * Is the element strictly aromatic as per OpenSMILES specification? The
-     * OpenSMILES specification defines a strict set of symbols as aromatic. In
-     * practise others are encountered (e.g. '[te]1ccccc1') - these can be
-     * parsed but are not supported by the OpenSMILES specification. This method
-     * can allows one to check if an aromatic atom is aromatic in the
-     * specification.
+     * Can the element be aromatic in accordance with a given specification.
      *
-     * @return the element is aromatic
+     * @param spec such {@link uk.ac.ebi.beam.Element.AromaticSpecification#Daylight},
+     *             {@link uk.ac.ebi.beam.Element.AromaticSpecification#OpenSmiles}
+     * @return the element is accepted as being aromatic by that scheme
      */
-    boolean strictlyAromatic() {
-        return strictlyAromatic;
+    boolean aromatic(AromaticSpecification spec) {
+        return spec.contains(this);
     }
 
     /**
@@ -394,8 +374,8 @@ public enum Element {
      * example nitrogen has valence 3 and 5 but in a delocalized system only the
      * lowest (3) is used. The electrons which would allow bonding of implicit
      * hydrogens in the higher valence states are donated to the aromatic system
-     * and thus cannot be <i>reached</i>. Using a generalisation that an 
-     * aromatic bond as 3 electrons we reached the correct value for multi 
+     * and thus cannot be <i>reached</i>. Using a generalisation that an
+     * aromatic bond as 3 electrons we reached the correct value for multi
      * valence aromatic elements. <br/>
      *
      * <blockquote><pre>
@@ -412,10 +392,10 @@ public enum Element {
      *                   hydrogens
      *
      *     oc1ccscc1     the sulphur has two aromatic bonds (bond order sum 3)
-     *                   the lowest valence is '2' - 3 > 2 so there are no 
+     *                   the lowest valence is '2' - 3 > 2 so there are no
      *                   implicit hydrogens
      *
-     *     oc1ccscc1     the oxygen has a single aromatic bond, the default 
+     *     oc1ccscc1     the oxygen has a single aromatic bond, the default
      *                   valence of oxygen in the specification is '2' there
      *                   are no hydrogens (2 - 1.5 = 0.5).
      * </pre></blockquote>
@@ -431,11 +411,11 @@ public enum Element {
     }
 
     /**
-     * Verify whether the given valence and charge are 'normal' for
-     * the element.
-     * 
+     * Verify whether the given valence and charge are 'normal' for the
+     * element.
+     *
      * @param v valence (bond order order sum)
-     * @param q charge 
+     * @param q charge
      * @return whether the valence and charge are valid
      */
     boolean verify(int v, int q) {
@@ -472,8 +452,8 @@ public enum Element {
         return elementMap.get(Character.toString(c));
     }
 
-    static Map<String,ElementCheck> loadDefaults() {
-        Map<String,ElementCheck> checks = new HashMap<String, ElementCheck>(200);
+    static Map<String, ElementCheck> loadDefaults() {
+        Map<String, ElementCheck> checks = new HashMap<String, ElementCheck>(200);
         try {
             InputStream in = Element.class.getResourceAsStream("element-defaults.txt");
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
@@ -481,7 +461,7 @@ public enum Element {
             while ((line = br.readLine()) != null) {
                 if (line.length() == 0 || line.charAt(0) == '-') // empty line or comment
                     continue;
-                Map.Entry<String,ElementCheck> entry = load(line);
+                Map.Entry<String, ElementCheck> entry = load(line);
                 checks.put(entry.getKey(), entry.getValue());
             }
             br.close();
@@ -490,20 +470,20 @@ public enum Element {
         }
         return checks;
     }
-    
-    static Map.Entry<String,ElementCheck> load(String line) {
+
+    static Map.Entry<String, ElementCheck> load(String line) {
         String[] data = line.split("\\s+");
-        String       symbol       = data[0];
-        int          electrons    = Integer.parseInt(data[3]);        
+        String symbol = data[0];
+        int electrons = Integer.parseInt(data[3]);
         ValenceCheck valenceCheck = ValenceCheck.parse(data[1], electrons);
-        ChargeCheck  chargeCheck  = ChargeCheck.parse(data[2]);        
+        ChargeCheck chargeCheck = ChargeCheck.parse(data[2]);
         return new AbstractMap.SimpleEntry<String, ElementCheck>(symbol,
                                                                  new ElementCheck(valenceCheck, chargeCheck));
     }
-    
+
     private static final class ElementCheck {
         private final ValenceCheck valenceCheck;
-        private final ChargeCheck chargeCheck;
+        private final ChargeCheck  chargeCheck;
 
         private ElementCheck(ValenceCheck valenceCheck, ChargeCheck chargeCheck) {
             this.valenceCheck = valenceCheck;
@@ -513,7 +493,7 @@ public enum Element {
         boolean verify(int v, int q) {
             return chargeCheck.verify(q) && valenceCheck.verify(v, q);
         }
-        
+
         private static final ElementCheck NO_CHECK = new ElementCheck(NoValenceCheck.INSTANCE,
                                                                       ChargeCheck.NONE);
 
@@ -521,11 +501,11 @@ public enum Element {
             return chargeCheck + ", " + valenceCheck;
         }
     }
-    
-    private static abstract class ValenceCheck {       
-        
+
+    private static abstract class ValenceCheck {
+
         abstract boolean verify(final int v, final int q);
-        
+
         static ValenceCheck parse(String line, int nElectrons) {
             String[] vs = line.split(",");
             if (vs.length == 1) {
@@ -534,26 +514,28 @@ public enum Element {
                 }
                 else if (vs[0].charAt(0) == '(') {
                     return new FixedValence(Integer.parseInt(vs[0].substring(1, vs[0].length() - 1)));
-                } else if (vs[0].charAt(0) == '[') {
+                }
+                else if (vs[0].charAt(0) == '[') {
                     return new NeutralValence(Integer.parseInt(vs[0].substring(1, vs[0].length() - 1)));
-                } else {
+                }
+                else {
                     return new ChargeAdjustedValence(Integer.parseInt(vs[0]), nElectrons);
                 }
             }
             ValenceCheck[] valences = new ValenceCheck[vs.length];
             for (int i = 0; i < vs.length; i++) {
-                valences[i] = parse(vs[i], nElectrons);    
+                valences[i] = parse(vs[i], nElectrons);
             }
-            
+
             return new MultiValenceCheck(valences);
-        }        
+        }
     }
-    
+
     private static final class ChargeAdjustedValence extends ValenceCheck {
         private final int valence, nElectrons;
 
         private ChargeAdjustedValence(int valence, int nElectrons) {
-            this.valence    = valence;
+            this.valence = valence;
             this.nElectrons = nElectrons;
         }
 
@@ -568,9 +550,7 @@ public enum Element {
         }
     }
 
-    /**
-     * A valence check which is only valid at netural charge
-     */
+    /** A valence check which is only valid at netural charge */
     private static final class NeutralValence extends ValenceCheck {
         private final int valence;
 
@@ -602,11 +582,11 @@ public enum Element {
             return "Fixed(" + valence + ")";
         }
     }
-    
+
     private static final class MultiValenceCheck extends ValenceCheck {
-        
+
         private final ValenceCheck[] valences;
-        
+
         private MultiValenceCheck(ValenceCheck[] valences) {
             this.valences = valences;
         }
@@ -624,7 +604,7 @@ public enum Element {
             return Arrays.toString(valences);
         }
     }
-    
+
     private static final class NoValenceCheck extends ValenceCheck {
         @Override boolean verify(int v, int q) {
             return true;
@@ -662,4 +642,55 @@ public enum Element {
         }
     }
 
+    /**
+     * Stores which elements the Daylight and OpenSMILES specification consider
+     * to be aromatic. The General scheme is what might be encountered 'in the
+     * wild'.
+     */
+    enum AromaticSpecification {
+
+        Daylight(Carbon,
+                 Nitrogen,
+                 Oxygen,
+                 Sulfur,
+                 Phosphorus,
+                 Arsenic,
+                 Selenium),
+
+        OpenSmiles(Boron,
+                   Carbon,
+                   Nitrogen,
+                   Oxygen,
+                   Sulfur,
+                   Phosphorus,
+                   Arsenic,
+                   Selenium),
+
+        General(Boron,
+                Carbon,
+                Nitrogen,
+                Oxygen,
+                Sulfur,
+                Phosphorus,
+                Arsenic,
+                Selenium,
+                Silicon,
+                Germanium,
+                Tin,
+                Antimony,
+                Tellurium,
+                Bismuth);
+
+        private EnumSet<Element> elements;
+
+        AromaticSpecification(Element... es) {
+            this.elements = EnumSet.noneOf(Element.class);
+            for (Element e : es)
+                elements.add(e);
+        }
+
+        boolean contains(Element e) {
+            return elements.contains(e);
+        }
+    }
 }
