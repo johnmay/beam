@@ -97,6 +97,11 @@ public class LocaliseTest {
         test("O=s1cccc1",
              "O=S1C=CC=C1");    
     }
+    
+    @Test public void tellurophene() throws Exception {
+        test("[Te]1cccc1", "[Te]1C=CC=C1");          
+        test("[te]1cccc1", "[Te]1C=CC=C1");          
+    }
 
     // Sulphur with two double bonds
     @Test public void chembl_1188068() throws Exception {        
