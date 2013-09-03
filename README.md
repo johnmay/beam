@@ -96,9 +96,10 @@ smi.equals("F/C=C/F");
 Convert a graph with delocalised bonds to kekul&eacute; representation.
 
 ```java
-Graph furan        = Graph.fromSmiles("o1cccc1");
-Graph furan_kekule = furan.kekule();
-furan_kekule.toSmiles().equals("O1C=CC=C1");
+Graph  furan        = Graph.fromSmiles("o1cccc1");
+Graph  furan_kekule = furan.kekule();
+String smi          = furan_kekule.toSmiles();
+smi.equals("O1C=CC=C1");
 ```
 
 With bond-based double-bond stereo specification there are two possible ways to
@@ -113,7 +114,7 @@ String  smi = h.toSmiles();
 smi.equals("F/C=C\\F");
 ```
 
-```txt
+```
 F/C=C/C              F/C=C/C
 F\C=C\C              F/C=C/C
 F/C=C\C              F/C=C\C
