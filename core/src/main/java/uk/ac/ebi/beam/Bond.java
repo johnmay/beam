@@ -66,13 +66,13 @@ public enum Bond {
     SINGLE("-", 1, 2),
 
     /** Atoms are bonded by two pairs of electrons. */
-    DOUBLE("=", 1, 4),
+    DOUBLE("=", 2, 4),
 
     /** Atoms are bonded by three pairs of electrons. */
-    TRIPLE("#", 1, 6),
+    TRIPLE("#", 3, 6),
 
     /** Atoms are bonded by four pairs of electrons. */
-    QUADRUPLE("$", 1, 8),
+    QUADRUPLE("$", 4, 8),
 
     /** Atoms are bonded by a delocalized bond of an aromatic system. */
     AROMATIC(":", 1, 3),
