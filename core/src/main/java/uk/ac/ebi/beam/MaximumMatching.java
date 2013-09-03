@@ -249,9 +249,15 @@ final class MaximumMatching {
      */
     private void blossom(int v, int w, int base) {
         base = uf.find(base);
-        blossomSupports(v, w, base);
-        blossomSupports(w, v, base);
-        even[uf.find(base)] = even[base];
+        int[] supports1 = blossomSupports(v, w, base);
+        int[] supports2 = blossomSupports(w, v, base);
+        
+        for (int i = 0; i < supports1.length; i++)
+            uf.union(supports1[i], supports1[0]);
+        for (int i = 0; i < supports2.length; i++)
+            uf.union(supports2[i], supports2[0]);
+        
+        even[uf.find(base)] = even[base];         
     }
 
     /**
@@ -265,7 +271,7 @@ final class MaximumMatching {
      * @param w    another endpoint of the blossom bridge
      * @param base the base of the blossom
      */
-    private void blossomSupports(int v, int w, int base) {
+    private int[] blossomSupports(int v, int w, int base) {
 
         int n = 0;
         path[n++] = uf.find(v);
@@ -280,8 +286,7 @@ final class MaximumMatching {
             path[n++] = uf.find(odd[u]);
         }
 
-        for (int i = 1; i < n; i++)
-            uf.union(path[i], path[0]);
+        return Arrays.copyOf(path, n);
     }
 
     /**
