@@ -73,6 +73,11 @@ public class LocaliseTest {
         test("n1p(O)(O)np(O)(O)np1(O)(O)", "N1=P(O)(O)N=P(O)(O)N=P1(O)O");
     }
     
+    @Test public void hexamethylidenecyclohexane() throws Exception {
+        test("cc1c(c)c(c)c(c)c(c)c1c", "C=C1C(=C)C(=C)C(=C)C(=C)C1=C");
+        test("C=c1c(=C)c(=C)c(=C)c(=C)c1=C", "C=C1C(=C)C(=C)C(=C)C(=C)C1=C");
+    }
+    
     @Test(expected = InvalidSmilesException.class)
     public void tryptophanyl_radical() throws Exception {
         test("NC(Cc1c[n]c2ccccc12)C(O)=O",
