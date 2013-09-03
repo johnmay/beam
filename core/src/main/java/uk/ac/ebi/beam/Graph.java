@@ -346,6 +346,17 @@ public final class Graph {
     }
 
     /**
+     * Localise delocalized (aromatic) bonds in this molecule.
+     *
+     * @return kekule representation
+     * @throws InvalidSmilesException bond orders could not be assigned without
+     *                                invalidating the valence
+     */
+    public Graph localise() throws InvalidSmilesException {
+        return Localise.localise(this);
+    }
+
+    /**
      * Permute the vertices of a graph using a given permutation.
      *
      * <blockquote><pre>
