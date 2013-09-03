@@ -135,6 +135,11 @@ public class LocaliseTest {
         test("c1nc2ccccc2n1", "n/a");
     }
     
+    @Test(expected = InvalidSmilesException.class)
+    public void invalid_benzene() throws Exception {
+        test("c1=cc=cc=c1", "n/a");
+    }
+    
     /* Examples from http://www.daylight.com/dayhtml_tutorials/languages/smiles/smiles_examples.html */
 
     @Test public void viagra() throws Exception {
