@@ -115,12 +115,12 @@ smi.equals("F/C=C\\F");
 ```
 
 ```
-F/C=C/C              F/C=C/C
-F\C=C\C              F/C=C/C
-F/C=C\C              F/C=C\C
-F\C=C/C              F/=C\C
-C(\F)(/C)=C\C        C(/F)(\C)=C/C
-FC=C(F)C=C(F)\C=C\C  FC=C(F)C=C(F)/C=C/C
+F/C=C/C              is normalised to F/C=C/C
+F\C=C\C              is normalised to F/C=C/C
+F/C=C\C              is normalised to F/C=C\C
+F\C=C/C              is normalised to F/=C\C
+C(\F)(/C)=C\C        is normalised to C(/F)(\C)=C/C
+FC=C(F)C=C(F)\C=C\C  is normalised to FC=C(F)C=C(F)/C=C/C
 ```
 
 ## Beam me up
