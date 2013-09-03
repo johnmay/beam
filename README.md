@@ -3,22 +3,22 @@
 Beam - _to express by means of a radiant smile_ 
 
 Beam is a free toolkit dedicated to parsing and generating [Simplified
-molecular-input line-entry system (SMILES)](http://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system)]
+molecular-input line-entry system (SMILES&trade;)(http://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system)
 line notations. The primary focus of the library is to elegantly handle the
-SMILES syntax.
+SMILES&trade; syntax.
 
 ## Beaming
 
 *Note: Beam is still in a development and some APIs will likely change until a release is made.*
 
 One of the primary types in Beam is the `Graph` it provides convenience
-methods for reading SMILES notation directly.
+methods for reading SMILES&trade; notation directly.
 
 ```java
 Graph g = Graph.fromSmiles("CCO");
 ```
 
-and for writing it back to SMILES notation.
+and for writing it back to SMILES&trade; notation.
 
 ```java
 String smi = g.toSmiles();
@@ -41,7 +41,7 @@ Graph.fromSmiles("[CH]1=[CH]C=C[CH]=[CH]1").toSmiles();       // mix bracket and
 ```
 
 Although preserving the representation was one of the design goals for beam it
-is common to normalise output SMILES.
+is common to normalise output SMILES&trade;.
 
 _Collapse_ a graph with labelled hydrogens `[CH3][CH2][OH]` to one with implicit
 hydrogens `CCO`.
@@ -62,7 +62,7 @@ h.toSmiles().equals("[CH3][CH2][OH]");
 ```
 
 Stereo specification is persevered through rearrangements. The example below 
-randomly generates arbitrary SMILES preserving correct stereo-configuration.
+randomly generates arbitrary SMILES&trade; preserving correct stereo-configuration.
 
 ```java
 Graph g  = Graph.fromSmiles("CCC[C@@](C)(O)[C@H](C)N");
@@ -170,3 +170,6 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 The views and conclusions contained in the software and documentation are those of the authors and should not be interpreted as representing official policies, either expressed or implied, of the FreeBSD Project.
+
+
+&trade;: SMILES is a trademark of [Daylight Chemical Information Systems](http://daylight.com/)
