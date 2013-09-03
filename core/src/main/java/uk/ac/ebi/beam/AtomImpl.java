@@ -100,6 +100,9 @@ final class AtomImpl {
             return element.aromatic() ? AromaticSubset.ofElement(element) : this;
         }
 
+        @Override public Atom toAliphatic() {
+            return this;
+        }
 
         @Override public int hydrogens(Graph g, int u) {
             int nElectrons = 0;
@@ -181,6 +184,10 @@ final class AtomImpl {
             return this;
         }
 
+        @Override public Atom toAliphatic() {
+            return AliphaticSubset.ofElement(element);
+        }
+
         @Override public int hydrogens(Graph g, int u) {
             int nElectrons = 0;
             for (final Edge e : g.edges(u)) {
@@ -260,6 +267,16 @@ final class AtomImpl {
                                                                      charge,
                                                                      atomClass,
                                                                      true);
+        }
+
+        @Override public Atom toAliphatic() {
+            return !aromatic ? this 
+                             : new BracketAtom(isotope,
+                                               element,
+                                               hCount,
+                                               charge,
+                                               atomClass,
+                                               false);
         }
 
         @Override

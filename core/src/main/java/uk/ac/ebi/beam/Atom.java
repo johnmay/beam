@@ -108,6 +108,13 @@ public interface Atom {
     Atom toAromatic();
 
     /**
+     * Access an aliphatic form of this atom. 
+     *
+     * @return the aliphatic form of this atom
+     */
+    Atom toAliphatic();
+
+    /**
      * (internal) the number of hydrogens this atom would have if it were vertex
      * 'u' in the graph 'g'. If the atom is in the organic subset the value is
      * computed - otherwise the labelled hydrogen count is returned.
