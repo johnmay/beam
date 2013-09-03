@@ -324,15 +324,24 @@ public enum Element {
      * @throws IllegalArgumentException the element was not a member of the
      *                                  organic subset and did not have default
      *                                  valence information
-     * @deprecated use {@link #availableElectrons(int)} or {@link
-     *             #availableDelocalisedElectrons(int)}
      */
-    @Deprecated int implicitHydrogens(int sum) {
+    int implicitHydrogens(int sum) {
         if (!organic())
             throw new IllegalArgumentException("inorganic atom, no preset valence: " + this);
 
         for (final int v : valence)
             if (sum <= v) return v - sum;
+
+        // bond order sum exceeds or equals maximum valance
+        return 0;
+    }
+
+    int aromaticImplicitHydrogens(int sum) {
+        if (!organic())
+            throw new IllegalArgumentException("inorganic atom, no preset valence: " + this);
+                
+        if (sum <= valence[0]) 
+            return valence[0] - sum;
 
         // bond order sum exceeds or equals maximum valance
         return 0;
