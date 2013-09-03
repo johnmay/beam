@@ -53,29 +53,29 @@ package uk.ac.ebi.beam;
 public enum Bond {
 
     /** Atoms are not bonded. */
-    DOT(".", 0),
+    DOT(".", 0, 0),
 
     /** Atoms are bonded by either a single or aromatic bond. */
-    IMPLICIT("", 2) {
+    IMPLICIT("", 1, 2) {
         @Override public int electrons() {
             throw new IllegalArgumentException("unknown number of electrons in implied bond");
         }
     },
 
     /** Atoms are bonded by a single pair of electrons. */
-    SINGLE("-", 2),
+    SINGLE("-", 1, 2),
 
     /** Atoms are bonded by two pairs of electrons. */
-    DOUBLE("=", 4),
+    DOUBLE("=", 1, 4),
 
     /** Atoms are bonded by three pairs of electrons. */
-    TRIPLE("#", 6),
+    TRIPLE("#", 1, 6),
 
     /** Atoms are bonded by four pairs of electrons. */
-    QUADRUPLE("$", 8),
+    QUADRUPLE("$", 1, 8),
 
     /** Atoms are bonded by a delocalized bond of an aromatic system. */
-    AROMATIC(":", 3),
+    AROMATIC(":", 1, 3),
 
     /**
      * Directional, single or aromatic bond (currently always single). The bond
@@ -83,7 +83,7 @@ public enum Bond {
      * <i>above</i> the first or the first end point is <i>below</i> the
      * second.
      */
-    UP("/", 2) {
+    UP("/", 1, 2) {
         @Override public Bond inverse() {
             return DOWN;
         }
@@ -99,7 +99,7 @@ public enum Bond {
      * <i>below</i> the first or the first end point is <i>above</i> the
      * second.
      */
-    DOWN("\\", 2) {
+    DOWN("\\", 1, 2) {
         @Override public Bond inverse() {
             return UP;
         }
@@ -113,10 +113,11 @@ public enum Bond {
     private final String token;
 
     /** The total number of electrons shared, i.e. not the number of pairs. */
-    private final int electrons;
+    private final int order, electrons;
 
-    private Bond(String token, int electrons) {
+    private Bond(String token, int order, int electrons) {
         this.token = token;
+        this.order = order;
         this.electrons = electrons;
     }
 
@@ -127,6 +128,15 @@ public enum Bond {
      */
     public final String token() {
         return token;
+    }
+
+    /**
+     * Order of the bond.
+     *
+     * @return bond order
+     */
+    public int order() {
+        return order;
     }
 
     /**
