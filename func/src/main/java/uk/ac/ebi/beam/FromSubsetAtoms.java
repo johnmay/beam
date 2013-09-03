@@ -17,7 +17,7 @@ final class FromSubsetAtoms
 
         for (int u = 0; u < g.order(); u++) {
             h.addAtom(fromSubset(g.atom(u),
-                                 electronSum(g.edges(u), g),
+                                 bondOrderSum(g.edges(u), g),
                                  g.degree(u)));
             h.addTopology(g.topologyOf(u));
         }
@@ -29,35 +29,35 @@ final class FromSubsetAtoms
         return h;
     }
 
-    private int electronSum(final List<Edge> es,
-                            final Graph g) {
-        int nElectrons = 0;
+    private int bondOrderSum(final List<Edge> es,
+                             final Graph g) {
+        int sum = 0;
         for (Edge e : es) {
-            int u = e.either();
-            int v = e.other(u);
-            nElectrons += e.bond().electrons(g.atom(u), g.atom(v));
+            sum += e.bond().order();
         }
-        return nElectrons;
+        return sum;
     }
 
-    static Atom fromSubset(Atom a, int bondElectronSum, int deg) {
+    static Atom fromSubset(Atom a, int sum, int deg) {
 
         // atom is already a non-subset atom
         if (!a.subset())
             return a;
 
         Element e = a.element();
-        int electrons = a.aromatic() ? e.availableDelocalisedElectrons(bondElectronSum)
-                                     : e.availableElectrons(bondElectronSum);
+        if (a.aromatic())
+            sum++;
+        int hCount = a.aromatic() ? e.aromaticImplicitHydrogens(sum)
+                                  : e.implicitHydrogens(sum);
 
         // XXX: if there was an odd number of availableElectrons there was an odd number
         // or aromatic bonds (usually 1 or 3) - if there was one it was
         // only a single bond it's likely a spouting from a ring - otherwise
         // someones making our life difficult (e.g. c1=cc=cc=c1) in which we
         // 'give' back 2 free availableElectrons for use indeterminacy the hCount
-        int hCount = (electrons & 0x1) == 1 ? deg > 1 ? (electrons + 2) / 2
-                                                      : electrons / 2
-                                            : electrons / 2;
+//        int hCount = (electrons & 0x1) == 1 ? deg > 1 ? (electrons + 2) / 2
+//                                                      : electrons / 2
+//                                            : electrons / 2;
 
 
         return new AtomImpl.BracketAtom(-1,

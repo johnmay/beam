@@ -21,8 +21,9 @@ public class LocaliseTest {
         test("O=c1ccc(=O)cc1", "O=C1C=CC(=O)C=C1");
     }
     
-    @Test public void methane() throws Exception {
-        test("c", "C"); // note daylight makes it 'CH3'
+    @Test(expected = InvalidSmilesException.class)
+    public void methane() throws Exception {
+        test("c", "C"); // note daylight makes it 'CH3' but we say - valence error
     }
 
     @Test public void ethene() throws Exception {

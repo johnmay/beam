@@ -23,7 +23,7 @@ final class ToSubsetAtoms extends AbstractFunction<Graph,Graph> {
 
             if (t.type() == None) {
                 h.addAtom(toSubset(g.atom(u),
-                                   electronSum(g.edges(u), g)));
+                                   bondOrderSum(g.edges(u), g)));
             } else {
                 h.addAtom(g.atom(u));
                 h.addTopology(t);
@@ -37,7 +37,7 @@ final class ToSubsetAtoms extends AbstractFunction<Graph,Graph> {
         return h;
     }
 
-    static Atom toSubset(Atom a, int nElectrons) {
+    static Atom toSubset(Atom a, int sum) {
 
         // atom is already a subset atom
         if (a.subset())
@@ -54,8 +54,8 @@ final class ToSubsetAtoms extends AbstractFunction<Graph,Graph> {
 
         // does the implied availableElectrons from the bond order sum match that
         // which was stored - if aromatic we only check the lowest valence state
-        int impliedHCount = a.aromatic() ? a.element().availableDelocalisedElectrons(nElectrons) / 2
-                                         : a.element().availableElectrons(nElectrons) / 2;
+        int impliedHCount = a.aromatic() ? a.element().aromaticImplicitHydrogens(sum + 1)
+                                         : a.element().implicitHydrogens(sum);
 
         // mismatch in number of hydrogens we must write this as a bracket atom
         if (impliedHCount != a.hydrogens())
@@ -68,14 +68,12 @@ final class ToSubsetAtoms extends AbstractFunction<Graph,Graph> {
         }
     }
 
-    private int electronSum(final List<Edge> es,
-                            final Graph g) {
-        int nElectrons = 0;
-        for (Edge e : es) {
-            int u = e.either();
-            int v = e.other(u);
-            nElectrons += e.bond().electrons(g.atom(u), g.atom(v));
+    private int bondOrderSum(final List<Edge> es,
+                             final Graph g) {
+        int sum = 0;
+        for (Edge e : es) {           
+            sum += e.bond().order();
         }
-        return nElectrons;
+        return sum;
     }
 }

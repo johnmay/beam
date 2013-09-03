@@ -105,11 +105,11 @@ final class AtomImpl {
         }
 
         @Override public int hydrogens(Graph g, int u) {
-            int nElectrons = 0;
+            int sum = 0;
             for (final Edge e : g.edges(u)) {
-                nElectrons += e.bond().electrons(this, g.atom(e.other(u)));
+                sum += e.bond().order();
             }
-            return element.availableElectrons(nElectrons) / 2;
+            return element.implicitHydrogens(sum);
         }
 
         @Override public Generator.AtomToken token() {
@@ -189,11 +189,12 @@ final class AtomImpl {
         }
 
         @Override public int hydrogens(Graph g, int u) {
-            int nElectrons = 0;
+            int sum = 1; // note start at 1
             for (final Edge e : g.edges(u)) {
-                nElectrons += e.bond().electrons(this, g.atom(e.other(u)));
+                sum += e.bond().order();
             }
-            return element.availableDelocalisedElectrons(nElectrons) / 2;
+            // only check first valence
+            return element.aromaticImplicitHydrogens(sum);
         }
 
 
