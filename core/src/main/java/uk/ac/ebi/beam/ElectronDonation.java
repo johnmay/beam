@@ -31,6 +31,8 @@ package uk.ac.ebi.beam;
 
 import java.util.BitSet;
 
+import static uk.ac.ebi.beam.Element.AromaticSpecification.Daylight;
+
 /**
  * Defines a model to determine the number of p electrons a particular element
  * in a certain environment donates. There is no universally accepted 'correct'
@@ -87,8 +89,7 @@ abstract class ElectronDonation {
 
             Atom atom = g.atom(u);
         
-            // for now
-            if (!atom.element().strictlyAromatic())
+            if (!atom.element().aromatic(Daylight))
                 return -1;
             
             // count cyclic and acyclic double bonds
