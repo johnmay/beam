@@ -50,12 +50,12 @@ final class FromTrigonalTopology extends AbstractFunction<Graph,Graph> {
     private Atom reducedAtom(Graph g, int u) {
         Atom a = g.atom(u);
 
-        int nElectrons = 0;
+        int sum = 0;
         for (Edge e : g.edges(u)) {
-          nElectrons += e.bond().electrons();
+          sum += e.bond().order();
         }
 
-        return ToSubsetAtoms.toSubset(g.atom(u), nElectrons);
+        return ToSubsetAtoms.toSubset(g.atom(u), sum);
     }
 
     private static final class Traversal {
