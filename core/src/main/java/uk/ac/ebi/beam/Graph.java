@@ -346,26 +346,41 @@ public final class Graph {
     }
 
     /**
-     * Localise delocalized (aromatic) bonds in this molecule producing the
-     * Kekulé form. The original graph is not modified. 
+     * Delocalise a kekulé graph representation to one with <i>aromatic</i>
+     * bonds. The original graph remains unchanged.
      * 
+     * TODO: more explanation
+     *
+     * @return aromatic representation
+     */
+    public Graph aromatic() {
+        // note Daylight use SSSR - should update and use that by default but
+        // provide the AllCycles method
+        return AllCycles.daylightModel(this).aromaticForm();
+    }
+  
+    /**
+     * Localise delocalized (aromatic) bonds in this molecule producing the
+     * Kekulé form. The original graph is not modified.
+     *
      * <blockquote><pre>
      * Graph furan        = Graph.fromSmiles("o1cccc1");
      * Graph furan_kekule = furan.kekule();
      * </pre></blockquote>
-     * 
-     * If the graph could not be converted to a kekulé representation then
-     * a checked exception is thrown. Graphs cannot be converted if their
+     *
+     * If the graph could not be converted to a kekulé representation then a
+     * checked exception is thrown. Graphs cannot be converted if their
      * structures are erroneous and there is no valid way to assign the
      * delocalised electrons. <p/>
-     * 
-     * Some reasons are shown below. 
-     * 
+     *
+     * Some reasons are shown below.
+     *
      * <blockquote><pre>
-     * n1cncc1             pyrole (incorrect) could be either C1C=NC=N1 or N1C=CN=C1
+     * n1cncc1             pyrole (incorrect) could be either C1C=NC=N1 or
+     * N1C=CN=C1
      * n1c[nH]cc1          pyrole (correct)
-     * 
-     * [Hg+2][c-]1ccccc1   mercury(2+) ion benzenide (incorrect) 
+     *
+     * [Hg+2][c-]1ccccc1   mercury(2+) ion benzenide (incorrect)
      * [Hg+2].[c-]1ccccc1  mercury(2+) ion benzenide (correct)
      * </pre></blockquote>
      *
