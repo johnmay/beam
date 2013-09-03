@@ -13,7 +13,7 @@ import java.util.Set;
  *
  * @author John May
  */
-public class NormaliseDirectionalLabels
+final class NormaliseDirectionalLabels
         extends AbstractFunction<Graph, Graph> {
 
     @Override public Graph apply(Graph g) {

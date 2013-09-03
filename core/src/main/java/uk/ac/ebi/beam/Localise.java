@@ -9,7 +9,7 @@ import java.util.Map;
  *
  * @author John May
  */
-public final class Localise {
+final class Localise {
 
     private final Graph delocalised, localised;
     private final IntSet subset;
