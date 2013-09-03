@@ -3,8 +3,6 @@ package uk.ac.ebi.beam;
 import org.hamcrest.collection.IsIterableWithSize;
 import org.junit.Test;
 
-import java.io.IOException;
-
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -16,7 +14,7 @@ public class ArbitraryMatchingTest {
     @Test public void furan() throws Exception {
         Graph g = Graph.fromSmiles("o1cccc1");
         Matching m = ArbitraryMatching.of(g,
-                                          new boolean[]{false, true, true, true, true});
+                                          IntSet.allOf(1, 2, 3, 4));
         // note this matching is maximum
         assertThat(m.matches(),
                    IsIterableWithSize.<Tuple>iterableWithSize(2));
@@ -29,7 +27,7 @@ public class ArbitraryMatchingTest {
     @Test public void furan_2() throws Exception {
         Graph g = Graph.fromSmiles("c1ccoc1");
         Matching m = ArbitraryMatching.of(g,
-                                          new boolean[]{true, true, true, false, true});
+                                          IntSet.allOf(0, 1, 2, 4));
         assertThat(m.matches(),
                    IsIterableWithSize.<Tuple>iterableWithSize(1));
         assertThat(m.matches(),
@@ -39,7 +37,7 @@ public class ArbitraryMatchingTest {
     @Test public void benzene() throws Exception {
         Graph g = Graph.fromSmiles("c1ccccc1");
         Matching m = ArbitraryMatching.of(g,
-                                          new boolean[]{true, true, true, true, true, true});
+                                          IntSet.universe());
         assertThat(m.matches(),
                    IsIterableWithSize.<Tuple>iterableWithSize(3));
         assertThat(m.matches(),
