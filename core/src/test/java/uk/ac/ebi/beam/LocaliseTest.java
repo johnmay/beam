@@ -56,14 +56,57 @@ public class LocaliseTest {
     @Test public void thiophene() throws Exception {
         test("s1cccc1", "S1C=CC=C1");
     }
+    
+    @Test public void imidazol_3_ium() throws Exception {
+        test("c1c[nH+]c[nH]1", "C1=C[NH+]=C[NH]1");
+    }
+    
+    @Test public void exocyclic_NO_bond() throws Exception {
+        test("Nc1c2nc[nH]c2ncn1=O", "NC1=C2N=C[NH]C2=NC=N1=O");
+    }
+    
+    @Test public void phospho_nitro_ring() throws Exception {
+        test("n1pnpnp1", "N1=PN=PN=P1");
+    }
+    
+    @Test public void phospho_nitro_ring_exocyclic_oxygen() throws Exception {
+        test("n1p(O)(O)np(O)(O)np1(O)(O)", "N1=P(O)(O)N=P(O)(O)N=P1(O)O");
+    }
+    
+    @Test(expected = InvalidSmilesException.class)
+    public void tryptophanyl_radical() throws Exception {
+        test("NC(Cc1c[n]c2ccccc12)C(O)=O",
+             "n/a");
+    }
+    
+    @Test public void thiophene_oxide() throws Exception {
+        test("O=s1cccc1",
+             "O=S1C=CC=C1");    
+    }
+
+    // Sulphur with two double bonds
+    @Test public void chembl_1188068() throws Exception {        
+        test("COc1cc2nc(ns(=O)(C)c2cc1OC)N3CCN(CC3)C(=O)c4oc(SC)nn4",
+             "COC1=CC2=NC(=NS(=O)(C)=C2C=C1OC)N3CCN(CC3)C(=O)C=4OC(SC)=NN4");
+    }
+
+    // Sulphur cation with exo cyclic double bond
+    @Test public void chembl_1434989() throws Exception {        
+        test("[O-][s+]1(=O)[nH]c2c(cc(Cl)c3ccc(Cl)nc23)c4ccccc14",
+             "[O-][S+]1(=O)[NH]C2=C(C=C(Cl)C3=CC=C(Cl)N=C23)C4=CC=CC=C14");
+    }
+    
+    @Test public void tropylium() throws Exception {
+        test("[cH+]1cccccc1", "[CH+]1C=CC=CC=C1");
+    }
 
     @Test(expected = InvalidSmilesException.class)
-    public void pyrole_bad() throws Exception {
+    public void pyrole_invalid() throws Exception {
         test("n1cncc1", "n/a");
     }
 
     @Test(expected = InvalidSmilesException.class)
-    public void imidazole_bad() throws Exception {
+    public void imidazole_invalid() throws Exception {
         test("c1nc2ccccc2n1", "n/a");
     }
     

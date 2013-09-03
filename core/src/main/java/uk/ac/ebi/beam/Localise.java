@@ -80,17 +80,26 @@ public final class Localise {
 
     boolean predetermined(Graph g, int v) {
 
+        Atom a = delocalised.atom(v);
+
+        int q   = a.charge();
+        int deg = delocalised.degree(v) + delocalised.implHCount(v);
+        
         for (Edge e : delocalised.edges(v)) {
-            if (e.bond() == Bond.DOUBLE)
+            if (e.bond() == Bond.DOUBLE) {
+                if (q == 0 
+                        && (a.element() == Element.Nitrogen || (a.element() == Element.Sulfur && deg > 3 )) 
+                        && g.atom(e.other(v)).element() == Element.Oxygen)
+                    return false;
                 return true;
+            }
         }
 
-        Atom a = delocalised.atom(v);
-        int q = a.charge();
-        int deg = delocalised.degree(v) + delocalised.implHCount(v);
+        
 
         switch (a.element()) {
             case Carbon:
+                if (q == 1 && deg == 3) return true;
             case Silicon:
             case Germanium:
                 return q < 0 ? true : false;
@@ -99,7 +108,9 @@ public final class Localise {
             case Arsenic:
             case Antimony:
                 if (q == 0)
-                    return deg == 2 ? false : true;
+                    return deg == 3 ? true : false;
+                else if (q == 1)
+                    return deg == 3 ? false : true;
                 else
                     return true;
             case Oxygen:
