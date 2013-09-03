@@ -536,7 +536,10 @@ public class DaylightDelocalisationTest {
         test("C/C(=C\\CO)/C=C/C=C(/C)\\C=C\\C1=C(C)CCCC1(C)C", "C/C(=C\\CO)/C=C/C=C(/C)\\C=C\\C1=C(C)CCCC1(C)C");
     }
    
-
+    @Test public void non_daylight_aromatic_element() throws Exception {
+        test("CC1=CC=C2[Bi](Cl)C3=CC=CC=C3S(=O)(=O)C2=C1",
+             "Cc1ccc2[Bi](Cl)c3ccccc3S(=O)(=O)c2c1");
+    }
 
     private static void test(String org, String exp) throws Exception {
         Graph g = Graph.fromSmiles(org);

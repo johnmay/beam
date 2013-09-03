@@ -86,7 +86,11 @@ abstract class ElectronDonation {
         @Override int contribution(int u, Graph g, Cycle cycle, BitSet cyclic) {
 
             Atom atom = g.atom(u);
-
+        
+            // for now
+            if (!atom.element().strictlyAromatic())
+                return -1;
+            
             // count cyclic and acyclic double bonds
             int nCyclic = 0, nAcyclic = 0;
             int deg = g.degree(u) + g.implHCount(u);
