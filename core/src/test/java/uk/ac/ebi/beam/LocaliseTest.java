@@ -20,9 +20,18 @@ public class LocaliseTest {
         test("oc1ccc(o)cc1", "O=C1C=CC(=O)C=C1");
         test("O=c1ccc(=O)cc1", "O=C1C=CC(=O)C=C1");
     }
+    
+    @Test public void methane() throws Exception {
+        test("c", "C"); // note daylight makes it 'CH3'
+    }
 
     @Test public void ethene() throws Exception {
         test("cc", "C=C");
+    }
+    
+    @Test(expected = InvalidSmilesException.class)
+    public void proene() throws Exception {
+        test("ccc", "n/a");
     }
 
     @Test public void butene() throws Exception {
