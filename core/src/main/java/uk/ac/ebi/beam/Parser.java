@@ -96,9 +96,9 @@ final class Parser {
         g = new Graph(1 + (2 * (buffer.length() / 3)));
         readSmiles(buffer);
         if (openRings > 0)
-            throw new InvalidSmilesException("unclosed ring", buffer);
+            throw new InvalidSmilesException("Unclosed ring detected:", buffer);
         if (stack.size() > 1)
-            throw new InvalidSmilesException("unclosed branch", buffer);
+            throw new InvalidSmilesException("Unclosed branch detected:", buffer);
         start.add(0); // always include first vertex as start
         createTopologies();
     }
@@ -180,7 +180,7 @@ final class Parser {
         if (vs.length == 4)
             return vs;
         if (vs.length != 3)
-            throw new InvalidSmilesException("invaid number of verticies for TH1/TH2");
+            throw new InvalidSmilesException("Invaid number of verticies for TH1/TH2 stereo chemistry");
         if (start.contains(u))
             return new int[]{u, vs[0], vs[1], vs[2]};
         else
@@ -193,7 +193,7 @@ final class Parser {
         if (vs.length == 3)
             return vs;
         if (vs.length != 2)
-            throw new InvalidSmilesException("invaid number of verticies for DB1/DB2");
+            throw new InvalidSmilesException("Invaid number of verticies for DB1/DB2 stereo chemistry");
         if (start.contains(u))
             return new int[]{u, vs[0], vs[1]};
         else
@@ -322,13 +322,13 @@ final class Parser {
                 case '7':
                 case '8':
                 case '9':
-                    ring(c - '0');
+                    ring(c - '0', buffer);
                     break;
                 case '%':
                     int num = buffer.getNumber(2);
                     if (num < 0)
-                        throw new InvalidSmilesException("number (<digit>+) must follow '%'", buffer);
-                    ring(num);
+                        throw new InvalidSmilesException("A number (<digit>+) must follow '%':", buffer);
+                    ring(num, buffer);
                     break;
 
                 // bond/dot
@@ -360,13 +360,13 @@ final class Parser {
                 // branching
                 case '(':
                     if (stack.empty())
-                        throw new InvalidSmilesException("cannot open branch - no previous atom",
+                        throw new InvalidSmilesException("Cannot open branch - there were no previous atoms:",
                                                          buffer);
                     stack.push(stack.peek());
                     break;
                 case ')':
                     if (stack.size() < 2)
-                        throw new InvalidSmilesException("Closing of an unopened branch",
+                        throw new InvalidSmilesException("Closing of an unopened branch:",
                                                          buffer);
                     stack.pop();
                     break;
@@ -379,7 +379,7 @@ final class Parser {
                     return;
 
                 default:
-                    throw new InvalidSmilesException("unexpected character:", buffer);
+                    throw new InvalidSmilesException("Unexpected character:", buffer);
             }
         }
     }
@@ -492,7 +492,7 @@ final class Parser {
         if (buffer.getIf(':')) {
             if (buffer.nextIsDigit())
                 return buffer.getNumber();
-            throw new InvalidSmilesException("invalid atom class, <digit>+ must follow ':'", buffer);
+            throw new InvalidSmilesException("Invalid atom class, <digit>+ must follow ':'", buffer);
         }
         return 0;
     }
@@ -503,13 +503,15 @@ final class Parser {
      * @param rnum ring number
      * @throws InvalidSmilesException bond types did not match on ring closure
      */
-    private void ring(int rnum) throws InvalidSmilesException {
+    private void ring(int rnum, CharBuffer buffer) throws InvalidSmilesException {
         if (bond == Bond.DOT)
-            throw new InvalidSmilesException("ring bond can not be a 'dot'");
+            throw new InvalidSmilesException("A ring bond can not be a 'dot':", 
+                                             buffer,
+                                             -1);
         if (rings.length <= rnum || rings[rnum] == null) {
             openRing(rnum);
         } else {
-            closeRing(rnum);
+            closeRing(rnum, buffer);
         }
     }
 
@@ -557,20 +559,22 @@ final class Parser {
      * @param rnum ring number
      * @throws InvalidSmilesException bond types did not match
      */
-    private void closeRing(int rnum) throws InvalidSmilesException {
+    private void closeRing(int rnum, CharBuffer buffer) throws InvalidSmilesException {
         RingBond rbond = rings[rnum];
         rings[rnum] = null;
         int u = rbond.u;
         int v = stack.peek();
 
         if (u == v)
-            throw new InvalidSmilesException("Endpoints of ringbond are the same - loops are not valid");
+            throw new InvalidSmilesException("Endpoints of ringbond are the same - loops are not allowed",
+                                             buffer);
 
         if (g.adjacent(u, v))
-            throw new InvalidSmilesException("Endpoints of ringbond are already connected - multi-edges are not valid");
+            throw new InvalidSmilesException("Endpoints of ringbond are already connected - multi-edges are not allowed",
+                                             buffer);
 
         g.addEdge(new Edge(u, v,
-                           decideBond(rbond.bond, bond.inverse())));
+                           decideBond(rbond.bond, bond.inverse(), buffer)));
         bond = Bond.IMPLICIT;
         // adjust the arrangement replacing where this ring number was openned
         arrangement.get(rbond.u).replace(-rnum, stack.peek());
@@ -594,7 +598,7 @@ final class Parser {
      * @return the bond to use for this edge
      * @throws InvalidSmilesException ring bonds did not match
      */
-    static Bond decideBond(final Bond a, final Bond b) throws
+    static Bond decideBond(final Bond a, final Bond b, CharBuffer buffer) throws
                                                        InvalidSmilesException {
         if (a == b)
             return a;
@@ -602,7 +606,10 @@ final class Parser {
             return b;
         else if (b == Bond.IMPLICIT)
             return a;
-        throw new InvalidSmilesException("ring bond mismatch, " + a + " and " + b);
+        throw new InvalidSmilesException("Ring closure bonds did not match. Ring was opened with '" + a + "' and closed with '" + b + "'." +
+                                         " Note - directional bonds ('/','\\') are relative.",
+                                         buffer,
+                                         -1);
     }
 
     /**

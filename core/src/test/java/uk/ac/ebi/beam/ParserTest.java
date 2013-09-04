@@ -40,14 +40,14 @@ public class ParserTest {
 
     @Test(expected = InvalidSmilesException.class)
     public void ringBondMismatch() throws InvalidSmilesException {
-        Parser.decideBond(Bond.SINGLE, Bond.DOUBLE);
+        Parser.decideBond(Bond.SINGLE, Bond.DOUBLE, CharBuffer.fromString(""));
     }
 
     @Test
     public void ringBondDecision() throws InvalidSmilesException {
-        assertThat(Parser.decideBond(Bond.DOUBLE, Bond.DOUBLE), is(Bond.DOUBLE));
-        assertThat(Parser.decideBond(Bond.DOUBLE, Bond.IMPLICIT), is(Bond.DOUBLE));
-        assertThat(Parser.decideBond(Bond.IMPLICIT, Bond.DOUBLE), is(Bond.DOUBLE));
+        assertThat(Parser.decideBond(Bond.DOUBLE, Bond.DOUBLE, CharBuffer.fromString("")), is(Bond.DOUBLE));
+        assertThat(Parser.decideBond(Bond.DOUBLE, Bond.IMPLICIT, CharBuffer.fromString("")), is(Bond.DOUBLE));
+        assertThat(Parser.decideBond(Bond.IMPLICIT, Bond.DOUBLE, CharBuffer.fromString("")), is(Bond.DOUBLE));
     }
 
     @Test public void invalidTetrahedral() throws InvalidSmilesException {
