@@ -15,11 +15,11 @@ final class Localise {
     private final IntSet subset;
     private final Map<Edge, Edge> edgeAssignments = new HashMap<Edge, Edge>();
 
-    private Localise(Graph delocalised) throws InvalidSmilesException {
+    private Localise(Graph delocalised, IntSet subset) throws InvalidSmilesException {
 
         this.delocalised = delocalised;
         this.localised = new Graph(delocalised.order());
-        this.subset = buildSet(delocalised);
+        this.subset = subset;
 
         // make initial matching - then improve it
         Matching m = MaximumMatching.maximise(delocalised,
@@ -61,43 +61,49 @@ final class Localise {
     }
 
 
-    IntSet buildSet(Graph g) {
+    static IntSet buildSet(Graph g) {
+
+        int count = 0;
 
         BitSet undecided = new BitSet(g.order());
+
         for (int v = 0; v < g.order(); v++) {
 
-            if (!g.atom(v).aromatic())
-                continue;
+            if (g.atom(v).aromatic()) {
+                count++;
 
-            // if the all aromatic bonds are single
-            if (!predetermined(g, v)) {
-                undecided.set(v);
+                // if the all aromatic bonds are single
+                if (!predetermined(g, v)) {
+                    undecided.set(v);
+                }
             }
         }
 
-        return IntSet.fromBitSet(undecided);
+        return count == 0 ? null
+                          : IntSet.fromBitSet(undecided);
     }
 
-    boolean predetermined(Graph g, int v) {
+    static boolean predetermined(Graph g, int v) {
 
-        Atom a = delocalised.atom(v);
+        Atom a = g.atom(v);
 
-        int q   = a.charge();
-        int deg = delocalised.degree(v) + delocalised.implHCount(v);
-        
-        for (Edge e : delocalised.edges(v)) {
+        int q = a.charge();
+        int deg = g.degree(v) + g.implHCount(v);
+
+        for (Edge e : g.edges(v)) {
             if (e.bond() == Bond.DOUBLE) {
-                if (q == 0 
-                        && (a.element() == Element.Nitrogen || (a.element() == Element.Sulfur && deg > 3 )) 
+                if (q == 0
+                        && (a.element() == Element.Nitrogen || (a.element() == Element.Sulfur && deg > 3))
                         && g.atom(e.other(v)).element() == Element.Oxygen)
                     return false;
                 return true;
-            } else if(e.bond() == Bond.TRIPLE) {
+            }
+            // triple or quadruple bond - we don't need to assign anymore p electrons
+            else if (e.bond().order() > 2) {
                 return true;
             }
         }
 
-        
 
         switch (a.element()) {
             case Carbon:
@@ -130,6 +136,9 @@ final class Localise {
 
 
     static Graph localise(Graph delocalised) throws InvalidSmilesException {
-        return new Localise(delocalised).localised;
+        IntSet subset = buildSet(delocalised);
+        if (subset == null)
+            return delocalised;
+        return new Localise(delocalised, subset).localised;
     }
 }
