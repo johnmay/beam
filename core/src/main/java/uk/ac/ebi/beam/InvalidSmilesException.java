@@ -39,7 +39,11 @@ import java.io.IOException;
 final class InvalidSmilesException extends IOException {
 
     InvalidSmilesException(String message, CharBuffer buffer) {
-        super(message + display(buffer));
+        this(message, buffer, 0);
+    }
+    
+    InvalidSmilesException(String message, CharBuffer buffer, int offset) {
+        super(message + display(buffer, offset));
     }
 
     InvalidSmilesException(String message) {
@@ -59,12 +63,12 @@ final class InvalidSmilesException extends IOException {
      * @param buffer a character buffer
      * @return a 3 line string showing the buffer and it's current position
      */
-    static String display(final CharBuffer buffer) {
+    static String display(final CharBuffer buffer, int offset) {
         StringBuilder sb = new StringBuilder();
         sb.append('\n');
         sb.append(buffer);
         sb.append('\n');
-        for (int i = 0; i < buffer.position(); i++)
+        for (int i = 1; i < (buffer.position() + offset); i++)
             sb.append(' ');
         sb.append('^');
         return sb.toString();
@@ -77,7 +81,7 @@ final class InvalidSmilesException extends IOException {
      * @return the invalid smiles exception with buffer information
      */
     static InvalidSmilesException invalidBracketAtom(CharBuffer buffer) {
-        return new InvalidSmilesException("invalid bracket atom, [ <isotope>? <symbol> <chiral>? <hcount>? <charge>? <class>? ]:",
+        return new InvalidSmilesException("Invalid bracket atom, [ <isotope>? <symbol> <chiral>? <hcount>? <charge>? <class>? ]:",
                                           buffer);
     }
 
