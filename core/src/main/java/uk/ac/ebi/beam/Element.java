@@ -94,130 +94,135 @@ import java.util.Map;
 public enum Element {
 
     /** Unspecified/Unknown element (*) */
-    Unknown("*", 0),
+    Unknown(0, "*", 0),
 
-    Hydrogen("H"),
-    Helium("He"),
+    Hydrogen(1, "H"),
+    Helium(2, "He"),
 
-    Lithium("Li"),
-    Beryllium("Be"),
-    Boron("B", 3),
-    Carbon("C", 4),
-    Nitrogen("N", 3, 5),
-    Oxygen("O", 2),
-    Fluorine("F", 1),
-    Neon("Ne"),
+    Lithium(3, "Li"),
+    Beryllium(4, "Be"),
+    Boron(5, "B", 3),
+    Carbon(6, "C", 4),
+    Nitrogen(7, "N", 3, 5),
+    Oxygen(8, "O", 2),
+    Fluorine(9, "F", 1),
+    Neon(10, "Ne"),
 
-    Sodium("Na"),
-    Magnesium("Mg"),
-    Aluminum("Al"),
-    Silicon("Si"),
-    Phosphorus("P", 3, 5),
-    Sulfur("S", 2, 4, 6),
-    Chlorine("Cl", 1),
-    Argon("Ar"),
+    Sodium(11, "Na"),
+    Magnesium(12, "Mg"),
+    Aluminum(13, "Al"),
+    Silicon(14, "Si"),
+    Phosphorus(15, "P", 3, 5),
+    Sulfur(16, "S", 2, 4, 6),
+    Chlorine(17, "Cl", 1),
+    Argon(18, "Ar"),
 
-    Potassium("K"),
-    Calcium("Ca"),
-    Scandium("Sc"),
-    Titanium("Ti"),
-    Vanadium("V"),
-    Chromium("Cr"),
-    Manganese("Mn"),
-    Iron("Fe"),
-    Cobalt("Co"),
-    Nickel("Ni"),
-    Copper("Cu"),
-    Zinc("Zn"),
-    Gallium("Ga"),
-    Germanium("Ge"),
-    Arsenic("As"),
-    Selenium("Se"),
-    Bromine("Br", 1),
-    Krypton("Kr"),
+    Potassium(19, "K"),
+    Calcium(20, "Ca"),
+    Scandium(21, "Sc"),
+    Titanium(22, "Ti"),
+    Vanadium(23, "V"),
+    Chromium(24, "Cr"),
+    Manganese(25, "Mn"),
+    Iron(26, "Fe"),
+    Cobalt(27, "Co"),
+    Nickel(28, "Ni"),
+    Copper(29, "Cu"),
+    Zinc(30, "Zn"),
+    Gallium(31, "Ga"),
+    Germanium(32, "Ge"),
+    Arsenic(33, "As"),
+    Selenium(34, "Se"),
+    Bromine(35, "Br", 1),
+    Krypton(36, "Kr"),
 
-    Rubidium("Rb"),
-    Strontium("Sr"),
-    Yttrium("Y"),
-    Zirconium("Zr"),
-    Niobium("Nb"),
-    Molybdenum("Mo"),
-    Technetium("Tc"),
-    Ruthenium("Ru"),
-    Rhodium("Rh"),
-    Palladium("Pd"),
-    Silver("Ag"),
-    Cadmium("Cd"),
-    Indium("In"),
-    Tin("Sn"),
-    Antimony("Sb"),
-    Tellurium("Te"),
-    Iodine("I", 1),
-    Xenon("Xe"),
+    Rubidium(37, "Rb"),
+    Strontium(38, "Sr"),
+    Yttrium(39, "Y"),
+    Zirconium(40, "Zr"),
+    Niobium(41, "Nb"),
+    Molybdenum(42, "Mo"),
+    Technetium(43, "Tc"),
+    Ruthenium(44, "Ru"),
+    Rhodium(45, "Rh"),
+    Palladium(46, "Pd"),
+    Silver(47, "Ag"),
+    Cadmium(48, "Cd"),
+    Indium(49, "In"),
+    Tin(50, "Sn"),
+    Antimony(51, "Sb"),
+    Tellurium(52, "Te"),
+    Iodine(53, "I", 1),
+    Xenon(54, "Xe"),
 
-    Cesium("Cs"),
-    Barium("Ba"),
-    Lutetium("Lu"),
-    Hafnium("Hf"),
-    Tantalum("Ta"),
-    Tungsten("W"),
-    Rhenium("Re"),
-    Osmium("Os"),
-    Iridium("Ir"),
-    Platinum("Pt"),
-    Gold("Au"),
-    Mercury("Hg"),
-    Thallium("Tl"),
-    Lead("Pb"),
-    Bismuth("Bi"),
-    Polonium("Po"),
-    Astatine("At"),
-    Radon("Rn"),
+    Cesium(55, "Cs"),
+    Barium(56, "Ba"),
+    // f-block (see below)
+    Lutetium(71, "Lu"),
+    Hafnium(72, "Hf"),
+    Tantalum(73, "Ta"),
+    Tungsten(74, "W"),
+    Rhenium(75, "Re"),
+    Osmium(76, "Os"),
+    Iridium(77, "Ir"),
+    Platinum(78, "Pt"),
+    Gold(79, "Au"),
+    Mercury(80, "Hg"),
+    Thallium(81, "Tl"),
+    Lead(82, "Pb"),
+    Bismuth(83, "Bi"),
+    Polonium(84, "Po"),
+    Astatine(85, "At"),
+    Radon(86, "Rn"),
 
-    Francium("Fr"),
-    Radium("Ra"),
-    Lawrencium("Lr"),
-    Rutherfordium("Rf"),
-    Dubnium("Db"),
-    Seaborgium("Sg"),
-    Bohrium("Bh"),
-    Hassium("Hs"),
-    Meitnerium("Mt"),
-    Darmstadtium("Ds"),
-    Roentgenium("Rg"),
-    Copernicium("Cn"),
-    Flerovium("Fl"),
-    Livermorium("Lv"),
+    Francium(87, "Fr"),
+    Radium(88, "Ra"),
+    // f-block (see below)
+    Lawrencium(103, "Lr"),
+    Rutherfordium(104, "Rf"),
+    Dubnium(105, "Db"),
+    Seaborgium(106, "Sg"),
+    Bohrium(107, "Bh"),
+    Hassium(108, "Hs"),
+    Meitnerium(109, "Mt"),
+    Darmstadtium(110, "Ds"),
+    Roentgenium(111, "Rg"),
+    Copernicium(112, "Cn"),
+    Flerovium(114, "Fl"),
+    Livermorium(116, "Lv"),
 
-    Lanthanum("La"),
-    Cerium("Ce"),
-    Praseodymium("Pr"),
-    Neodymium("Nd"),
-    Promethium("Pm"),
-    Samarium("Sm"),
-    Europium("Eu"),
-    Gadolinium("Gd"),
-    Terbium("Tb"),
-    Dysprosium("Dy"),
-    Holmium("Ho"),
-    Erbium("Er"),
-    Thulium("Tm"),
-    Ytterbium("Yb"),
+    Lanthanum(57, "La"),
+    Cerium(58, "Ce"),
+    Praseodymium(59, "Pr"),
+    Neodymium(60, "Nd"),
+    Promethium(61, "Pm"),
+    Samarium(62, "Sm"),
+    Europium(63, "Eu"),
+    Gadolinium(64, "Gd"),
+    Terbium(65, "Tb"),
+    Dysprosium(66, "Dy"),
+    Holmium(67, "Ho"),
+    Erbium(68, "Er"),
+    Thulium(69, "Tm"),
+    Ytterbium(70, "Yb"),
 
-    Actinium("Ac"),
-    Thorium("Th"),
-    Protactinium("Pa"),
-    Uranium("U"),
-    Neptunium("Np"),
-    Plutonium("Pu"),
-    Americium("Am"),
-    Curium("Cm"),
-    Berkelium("Bk"),
-    Californium("Cf"),
-    Einsteinium("Es"),
-    Fermium("Fm"),
-    Mendelevium("Md"),
-    Nobelium("No");
+    Actinium(89, "Ac"),
+    Thorium(90, "Th"),
+    Protactinium(91, "Pa"),
+    Uranium(92, "U"),
+    Neptunium(93, "Np"),
+    Plutonium(94, "Pu"),
+    Americium(95, "Am"),
+    Curium(96, "Cm"),
+    Berkelium(97, "Bk"),
+    Californium(98, "Cf"),
+    Einsteinium(99, "Es"),
+    Fermium(100, "Fm"),
+    Mendelevium(101, "Md"),
+    Nobelium(102, "No");
+
+    /** Atomic number of the elemnt. */
+    private final int atomicNumber;
 
     /** The symbol of the element. */
     private final String symbol;
@@ -251,12 +256,14 @@ public enum Element {
         }
     }
 
-    private Element(String symbol) {
-        this(symbol, null);
+    private Element(int atomicNumber, String symbol) {
+        this(atomicNumber, symbol, null);
     }
 
-    private Element(String symbol,
+    private Element(int atomicNumber,
+                    String symbol,
                     int... valence) {
+        this.atomicNumber = atomicNumber;
         this.symbol = symbol;
         this.valence = valence;
         if (valence != null) {
@@ -277,6 +284,16 @@ public enum Element {
      */
     public String symbol() {
         return symbol;
+    }
+
+    /**
+     * The atomic number of the element. If the element is unknown '0' is
+     * returned.
+     *
+     * @return atomic number
+     */
+    public int atomicNumber() {
+        return atomicNumber;
     }
 
     /**
@@ -339,8 +356,8 @@ public enum Element {
     int aromaticImplicitHydrogens(int sum) {
         if (!organic())
             throw new IllegalArgumentException("inorganic atom, no preset valence: " + this);
-                
-        if (sum <= valence[0]) 
+
+        if (sum <= valence[0])
             return valence[0] - sum;
 
         // bond order sum exceeds or equals maximum valance
