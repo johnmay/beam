@@ -96,9 +96,9 @@ abstract class ElectronDonation {
             int nCyclic = 0, nAcyclic = 0;
             int deg = g.degree(u) + g.implHCount(u);
             Edge acyclic = null;
-            int electrons = 0;
+            int sum = 0;
             for (final Edge e : g.edges(u)) {
-                electrons += e.bond().electrons(atom, g.atom(e.other(u)));
+                sum += e.bond().order();
                 if (e.bond() == Bond.DOUBLE) {
                     if (!cyclic.get(e.other(u))) {
                         nAcyclic++;
@@ -111,7 +111,7 @@ abstract class ElectronDonation {
             }
 
             int charge = atom.charge();
-            int valence = electrons / 2 + g.implHCount(u);
+            int valence = sum + g.implHCount(u);
 
             if (!atom.element().verify(valence, charge))
                 return -1;

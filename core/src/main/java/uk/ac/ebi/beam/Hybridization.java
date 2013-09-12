@@ -192,14 +192,13 @@ enum Hybridization {
         if (!atom.element().aromatic())
             return 0;
         
-        int bes = 2 * g.implHCount(u);
+        int sum = g.implHCount(u);
         List<Edge> es = g.edges(u);
         for (Edge e : es) {
-            bes += e.bond().electrons(g.atom(e.either()),
-                                      g.atom(e.other(e.either())));
+            sum += e.bond().order();
         }
         int v = valence(g.atom(u).element()) + -atom.charge();
-        return (v - (bes / 2)) / 2;
+        return (v - sum) / 2;
     }
 
     /** Lookup from the computed hybridization value to enumeration type. */

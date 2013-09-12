@@ -814,12 +814,12 @@ public class ValenceTest {
     static void normal(String str, int v) {
         try {
             Graph g = Graph.fromSmiles(str);
-            int electrons = 0;
+            int sum = 0;
             for (Edge e : g.edges(v)) {
-                electrons += e.bond().electrons(g.atom(v), g.atom(e.other(v)));
+                sum += e.bond().order();
             }
             assertTrue(str + " should be normal but was abnormal",
-                       g.atom(v).element().verify((electrons / 2) + g.implHCount(v),
+                       g.atom(v).element().verify(sum + g.implHCount(v),
                                                   g.atom(v).charge()));
         } catch (IOException e) {
             Assert.fail("parse error:" + e);
@@ -829,12 +829,12 @@ public class ValenceTest {
     static void abnormal(String str, int v) {
         try {
             Graph g = Graph.fromSmiles(str);
-            int electrons = 0;
+            int sum = 0;
             for (Edge e : g.edges(v)) {
-                electrons += e.bond().electrons(g.atom(v), g.atom(e.other(v)));
+                sum += e.bond().order();
             }
             assertFalse(str + " should be abnormal but was normal",
-                        g.atom(v).element().verify((electrons / 2) + g.implHCount(v),
+                        g.atom(v).element().verify(sum + g.implHCount(v),
                                                    g.atom(v).charge()));
         } catch (IOException e) {
             Assert.fail("parse error:" + e);

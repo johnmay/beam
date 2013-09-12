@@ -110,14 +110,14 @@ final class ToTrigonalTopology extends AbstractFunction<Graph,Graph> {
 
     private Atom asBracketAtom(int u, Graph g) {
         Atom a = g.atom(u);
-        int nElectrons = 0;
+        int sum = a.aromatic() ? 1 : 0;
         for (Edge e : g.edges(u)) {
-            nElectrons += e.bond().electrons();
+            sum += e.bond().order();
         }
         return new AtomImpl.BracketAtom(-1,
                                         a.element(),
-                                        a.element()
-                                        .implicitHydrogens(nElectrons / 2),
+                                        a.aromatic() ? a.element().aromaticImplicitHydrogens(sum) 
+                                                     : a.element().implicitHydrogens(sum),
                                         0,
                                         0,
                                         a.aromatic());

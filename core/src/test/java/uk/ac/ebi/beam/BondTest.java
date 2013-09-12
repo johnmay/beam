@@ -47,40 +47,35 @@ import static uk.ac.ebi.beam.Bond.UP;
 public class BondTest {
 
     @Test public void dotElectrons() throws Exception {
-        assertThat(DOT.electrons(), is(0));
+        assertThat(DOT.order(), is(0));
     }
 
     @Test public void singleElectrons() throws Exception {
-        assertThat(SINGLE.electrons(), is(2));
+        assertThat(SINGLE.order(), is(1));
     }
 
     @Test public void doubleElectrons() throws Exception {
-        assertThat(DOUBLE.electrons(), is(4));
+        assertThat(DOUBLE.order(), is(2));
     }
 
     @Test public void tripleElectrons() throws Exception {
-        assertThat(TRIPLE.electrons(), is(6));
+        assertThat(TRIPLE.order(), is(3));
     }
 
     @Test public void quadrupleElectrons() throws Exception {
-        assertThat(QUADRUPLE.electrons(), is(8));
+        assertThat(QUADRUPLE.order(), is(4));
     }
 
     @Test public void aromaticElectrons() throws Exception {
-        assertThat(AROMATIC.electrons(), is(3));
+        assertThat(AROMATIC.order(), is(1));
     }
 
     @Test public void upElectrons() throws Exception {
-        assertThat(UP.electrons(), is(2));
+        assertThat(UP.order(), is(1));
     }
 
     @Test public void downElectrons() throws Exception {
-        assertThat(DOWN.electrons(), is(2));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void implicitElectrons() throws Exception {
-        IMPLICIT.electrons();
+        assertThat(DOWN.order(), is(1));
     }
 
     @Test public void dotInverse() throws Exception {

@@ -53,29 +53,25 @@ package uk.ac.ebi.beam;
 public enum Bond {
 
     /** Atoms are not bonded. */
-    DOT(".", 0, 0),
+    DOT(".", 0),
 
     /** Atoms are bonded by either a single or aromatic bond. */
-    IMPLICIT("", 1, 2) {
-        @Override public int electrons() {
-            throw new IllegalArgumentException("unknown number of electrons in implied bond");
-        }
-    },
+    IMPLICIT("", 1),
 
     /** Atoms are bonded by a single pair of electrons. */
-    SINGLE("-", 1, 2),
+    SINGLE("-", 1),
 
     /** Atoms are bonded by two pairs of electrons. */
-    DOUBLE("=", 2, 4),
+    DOUBLE("=", 2),
 
     /** Atoms are bonded by three pairs of electrons. */
-    TRIPLE("#", 3, 6),
+    TRIPLE("#", 3),
 
     /** Atoms are bonded by four pairs of electrons. */
-    QUADRUPLE("$", 4, 8),
+    QUADRUPLE("$", 4),
 
     /** Atoms are bonded by a delocalized bond of an aromatic system. */
-    AROMATIC(":", 1, 3),
+    AROMATIC(":", 1),
 
     /**
      * Directional, single or aromatic bond (currently always single). The bond
@@ -83,7 +79,7 @@ public enum Bond {
      * <i>above</i> the first or the first end point is <i>below</i> the
      * second.
      */
-    UP("/", 1, 2) {
+    UP("/", 1) {
         @Override public Bond inverse() {
             return DOWN;
         }
@@ -99,7 +95,7 @@ public enum Bond {
      * <i>below</i> the first or the first end point is <i>above</i> the
      * second.
      */
-    DOWN("\\", 1, 2) {
+    DOWN("\\", 1) {
         @Override public Bond inverse() {
             return UP;
         }
@@ -111,14 +107,12 @@ public enum Bond {
 
     /** The token for the bond in the SMILES grammar. */
     private final String token;
+    
+    private final int order;
 
-    /** The total number of electrons shared, i.e. not the number of pairs. */
-    private final int order, electrons;
-
-    private Bond(String token, int order, int electrons) {
+    private Bond(String token, int order) {
         this.token = token;
-        this.order = order;
-        this.electrons = electrons;
+        this.order = order;        
     }
 
     /**
@@ -131,32 +125,12 @@ public enum Bond {
     }
 
     /**
-     * Order of the bond.
+     * The order of the bond.
      *
      * @return bond order
      */
     public int order() {
         return order;
-    }
-
-    /**
-     * The total number electrons (not pairs) shared between atoms. If the label
-     * is implicit the value is undefined and invoking the method throws a
-     * runtime exception. When the number of electrons is required all implicit
-     * labels should be converted to either single or aromatic.
-     *
-     * @return number of electrons
-     * @throws IllegalArgumentException the bond is implicit (single or
-     *                                  aromatic) and as such the number of
-     *                                  electrons is unknown.
-     */
-    @Deprecated
-    public int electrons() {
-        return electrons;
-    }
-
-    public int electrons(Atom u, Atom v) {
-        return u.aromatic() && v.aromatic() ? 3 : electrons;
     }
 
     /**
