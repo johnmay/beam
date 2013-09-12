@@ -298,7 +298,8 @@ final class Parser {
 
 
                 // D/T for hydrogen isotopes - non-standard but OpenSMILES spec
-                // says it's possible
+                // says it's possible. The D and T here are automatic converted
+                // to [2H] and [3H].
                 case 'D':
                     addAtom(AtomImpl.DEUTERIUM);
                     break;
