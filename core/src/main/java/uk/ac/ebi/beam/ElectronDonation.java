@@ -32,6 +32,10 @@ package uk.ac.ebi.beam;
 import java.util.BitSet;
 
 import static uk.ac.ebi.beam.Element.AromaticSpecification.Daylight;
+import static uk.ac.ebi.beam.Element.Carbon;
+import static uk.ac.ebi.beam.Element.Nitrogen;
+import static uk.ac.ebi.beam.Element.Oxygen;
+import static uk.ac.ebi.beam.Element.Phosphorus;
 
 /**
  * Defines a model to determine the number of p electrons a particular element
@@ -121,8 +125,8 @@ abstract class ElectronDonation {
                 return -1;
             if (nCyclic == 1 && nAcyclic == 1) {
                 // seems to be a single exception?
-                if (atom.element() == Element.Nitrogen
-                        && g.atom(acyclic.other(u)).element() == Element.Oxygen)
+                if ((atom.element() == Nitrogen || atom.element() == Phosphorus)
+                        && g.atom(acyclic.other(u)).element() == Oxygen)
                     return 1;
                 return -1;
             }
@@ -149,12 +153,12 @@ abstract class ElectronDonation {
         int acyclicContribution(Atom cyclic, Atom acyclic, int charge) {
             switch (cyclic.element()) {
                 case Carbon:
-                    return acyclic.element() != Element.Carbon ? 0 : 1;
+                    return acyclic.element() != Carbon ? 0 : 1;
                 case Nitrogen:
                 case Phosphorus:
                     return charge == 1 ? 1 : -1;
                 case Sulfur:
-                    return charge == 0 && acyclic.element() == Element.Oxygen ? 2
+                    return charge == 0 && acyclic.element() == Oxygen ? 2
                                                                               : -1;
             }
             return -1;
