@@ -91,9 +91,11 @@ abstract class ElectronDonation {
         /** @inheritDoc */
         @Override int contribution(int u, Graph g, Cycle cycle, BitSet cyclic) {
 
-            Atom atom = g.atom(u);
+            Atom    atom = g.atom(u);
+            Element elem = atom.element();
         
-            if (!atom.element().aromatic(Daylight))
+            // the element isn't allow to be aromatic (Daylight spec)
+            if (!elem.aromatic(Daylight))
                 return -1;
             
             // count cyclic and acyclic double bonds
@@ -124,16 +126,17 @@ abstract class ElectronDonation {
             if (nCyclic > 1)
                 return -1;
             if (nCyclic == 1 && nAcyclic == 1) {
-                // seems to be a single exception?
-                if ((atom.element() == Nitrogen || atom.element() == Phosphorus)
+                // [P|N](=O)(=*)* - note arsenic now allowed 
+                if ((elem == Nitrogen || elem == Phosphorus)
                         && g.atom(acyclic.other(u)).element() == Oxygen)
                     return 1;
                 return -1;
             }
             if (nCyclic == 0 && nAcyclic == 1)
                 return acyclicContribution(atom, g.atom(acyclic.other(u)), charge);
-            else if (nCyclic == 1 && nAcyclic == 0)
+            else if (nCyclic == 1 && nAcyclic == 0) {
                 return 1;
+            }
 
             if (Hybridization.lonePairs(g, u) > 0 && charge <= 0)
                 return 2;
@@ -153,13 +156,14 @@ abstract class ElectronDonation {
         int acyclicContribution(Atom cyclic, Atom acyclic, int charge) {
             switch (cyclic.element()) {
                 case Carbon:
+                    // carbon bonded to any exocyclic element (other than carbon)
+                    // gives 1 electron
                     return acyclic.element() != Carbon ? 0 : 1;
                 case Nitrogen:
                 case Phosphorus:
                     return charge == 1 ? 1 : -1;
-                case Sulfur:
-                    return charge == 0 && acyclic.element() == Oxygen ? 2
-                                                                              : -1;
+                case Sulfur:                    
+                    return charge == 0 && acyclic.element() == Oxygen ? 2 : -1;
             }
             return -1;
         }
