@@ -511,6 +511,13 @@ public class DaylightDelocalisationTest {
     
     /* Selenium Examples */
 
+    // misc
+    
+    @Test public void multi_cyclic_components() throws Exception {
+        test("CCCCCC[N+]1=C(\\C=C/2\\C(=C(C2=O)C3=CC=C(S3)C4=CC=C(S4)C5=CC=C(S5)C6=C([O-])\\C(=C/C=7SC8=CC=CC=C8[N+]7CCCCCC)\\C6=O)[O-])SC9=CC=CC=C19",
+             "CCCCCC[n+]1c(\\C=C/2\\C(=C(C2=O)c3ccc(s3)c4ccc(s4)c5ccc(s5)C6=C([O-])\\C(=C/c7sc8ccccc8[n+]7CCCCCC)\\C6=O)[O-])sc9ccccc19");
+    }
+    
 
     /** Daylight Examples http://www.daylight.com/dayhtml_tutorials/languages/smiles/smiles_examples.html */
     @Ignore("need to kekulize") public void daylightExamples() throws Exception {
