@@ -43,17 +43,19 @@ final class AllCycles {
     /** Number of pi electrons for Sp2 atoms. */
     private final int[] ps;
 
-    private final List<PathEdge> g[];
+    private final List<PathEdge> pathGraph[];
 
     boolean[] aromatic;
 
     private final Graph org;
+    
+    private static final int MAX_VERTEX_DEGREE = 684;
 
     @SuppressWarnings("unchecked") AllCycles(Graph g, ElectronDonation model) {
 
         this.org = g;
         this.ps = new int[g.order()];
-        this.g = new List[g.order()];
+        this.pathGraph = new List[g.order()];
         this.aromatic = new boolean[g.order()];
 
         ElectronDonation.Cycle cycle = new ElectronDonation.Cycle() {
@@ -68,21 +70,21 @@ final class AllCycles {
             ps[u] = model.contribution(u, g, cycle, cyclic);
 
         for (int u = 0; u < g.order(); u++)
-            this.g[u] = new ArrayList<PathEdge>();
+            this.pathGraph[u] = new ArrayList<PathEdge>();
 
         // build the path graph
         for (Edge e : g.edges()) {
             int u = e.either();
             int v = e.other(u);
-            if (ps[u] >= 0 && ps[v] >= 0) {
+            if (cyclic.get(u) && cyclic.get(v) && ps[u] >= 0 && ps[v] >= 0) {
                 PathEdge f = new PathEdge(u, v, EMPTY_SET, 0);
                 add(u, v, f);
             }
         }
 
         for (int u = 0; u < g.order(); u++) {
-            if (this.g[u].size() > 50)
-                throw new IllegalArgumentException("too many cycles generated");
+            if (this.pathGraph[u].size() > MAX_VERTEX_DEGREE)
+                throw new IllegalArgumentException("too many cycles generated: " + pathGraph[u].size());
             reduce(u);
         }
     }
@@ -131,11 +133,11 @@ final class AllCycles {
     }
 
     private void add(int u, int v, PathEdge e) {
-        this.g[Math.min(u, v)].add(e);
+        this.pathGraph[Math.min(u, v)].add(e);
     }
 
     private void reduce(int x) {
-        List<PathEdge> es = g[x];
+        List<PathEdge> es = pathGraph[x];
         int deg = es.size();
         for (int i = 0; i < deg; i++) {
             PathEdge e1 = es.get(i);
@@ -154,7 +156,7 @@ final class AllCycles {
                 }
             }
         }
-        g[x].clear();
+        pathGraph[x].clear();
     }
 
     /** An empty bit-set. */
