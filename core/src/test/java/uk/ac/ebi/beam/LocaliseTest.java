@@ -31,15 +31,15 @@ public class LocaliseTest {
     }
     
     @Test(expected = InvalidSmilesException.class)
-    public void proene() throws Exception {
+    public void invalid_acyclic_chain() throws Exception {
         test("ccc", "n/a");
     }
 
-    @Test public void butene() throws Exception {
+    @Test public void buta_1_3_diene() throws Exception {
         test("cccc", "C=CC=C");
     }
 
-    @Test public void hexane() throws Exception {
+    @Test public void _hexa_1_3_5_triene() throws Exception {
         test("cccccc", "C=CC=CC=C");
     }
 
