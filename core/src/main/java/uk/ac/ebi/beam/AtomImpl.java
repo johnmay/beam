@@ -189,10 +189,17 @@ final class AtomImpl {
         }
 
         @Override public int hydrogens(Graph g, int u) {
-            int sum = 1; // note start at 1
+            
+            int sum = 0; 
             for (final Edge e : g.edges(u)) {
                 sum += e.bond().order();
             }
+            
+            // no double, triple or quadruple bonds - then for aromatic atoms
+            // we increase the bond order sum by '1'
+            if (sum == g.degree(u))
+                sum++;
+            
             // only check first valence
             return element.aromaticImplicitHydrogens(sum);
         }
