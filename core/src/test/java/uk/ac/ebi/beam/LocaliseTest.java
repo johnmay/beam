@@ -42,6 +42,10 @@ public class LocaliseTest {
     @Test public void _hexa_1_3_5_triene() throws Exception {
         test("cccccc", "C=CC=CC=C");
     }
+    
+    @Test public void _4H_pyran_4_one() throws Exception {
+        test("oc1ccocc1", "O=C1C=COC=C1");
+    }
 
     @Test public void pyrole() throws Exception {
         test("[nH]1cccc1", "[NH]1C=CC=C1");
