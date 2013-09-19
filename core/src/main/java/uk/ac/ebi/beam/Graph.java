@@ -84,6 +84,18 @@ public final class Graph {
     }
 
     /**
+     * Resize the graph if we are at maximum capacity.
+     */
+    private void ensureCapacity() {
+        if (order >= atoms.length) {
+            atoms = Arrays.copyOf(atoms, order * 2);
+            edges = Arrays.copyOf(edges, order * 2);
+            for (int i = order; i < edges.length; i++)
+                edges[i] = new ArrayList<Edge>(4);
+        }    
+    }    
+    
+    /**
      * Add an atom to the graph and return the index to which the atom was
      * added.
      *
@@ -91,15 +103,9 @@ public final class Graph {
      * @return index of the atom in the graph (vertex)
      */
     int addAtom(Atom a) {
-        int index = order;
-        if (order == atoms.length) {
-            atoms = Arrays.copyOf(atoms, order * 2);
-            edges = Arrays.copyOf(edges, order * 2);
-            for (int i = order; i < edges.length; i++)
-                edges[i] = new ArrayList<Edge>(4);
-        }
+        ensureCapacity();
         atoms[order++] = a;
-        return index;
+        return order - 1;
     }
 
     /**
