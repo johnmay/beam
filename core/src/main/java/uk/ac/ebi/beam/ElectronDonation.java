@@ -32,6 +32,7 @@ package uk.ac.ebi.beam;
 import java.util.BitSet;
 
 import static uk.ac.ebi.beam.Element.AromaticSpecification.Daylight;
+import static uk.ac.ebi.beam.Element.Arsenic;
 import static uk.ac.ebi.beam.Element.Carbon;
 import static uk.ac.ebi.beam.Element.Nitrogen;
 import static uk.ac.ebi.beam.Element.Oxygen;
@@ -126,20 +127,24 @@ abstract class ElectronDonation {
             if (nCyclic > 1)
                 return -1;
             if (nCyclic == 1 && nAcyclic == 1) {
-                // [P|N](=O)(=*)* - note arsenic now allowed 
+                // [P|N](=O)(=*)* - note arsenic not allowed 
                 if ((elem == Nitrogen || elem == Phosphorus)
                         && g.atom(acyclic.other(u)).element() == Oxygen)
                     return 1;
                 return -1;
-            }
-            if (nCyclic == 0 && nAcyclic == 1)
+            } else if (nCyclic == 1 && nAcyclic == 0) {
+                // any element (except Arsenic) with a single cyclic double bond
+                // contributes 1 p electron
+                return elem != Arsenic ? 1 : -1;
+            } else if (nCyclic == 0 && nAcyclic == 1) {
+                // a cyclic exo-cyclic double bond - how many electrons determine
+                // by acyclicContribution()
                 return acyclicContribution(atom, g.atom(acyclic.other(u)), charge);
-            else if (nCyclic == 1 && nAcyclic == 0) {
-                return 1;
+            } else if (nCyclic == 0 && nAcyclic == 0) {
+                // no double bonds - do we have any lone pairs to contribute?
+                if (Hybridization.lonePairs(g, u) > 0 && charge <= 0)
+                    return 2;    
             }
-
-            if (Hybridization.lonePairs(g, u) > 0 && charge <= 0)
-                return 2;
 
             return -1;
         }
