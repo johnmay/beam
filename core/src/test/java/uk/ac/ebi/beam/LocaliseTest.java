@@ -79,6 +79,11 @@ public class LocaliseTest {
         test("Nc1c2nc[nH]c2ncn1=O", "NC1=C2N=C[NH]C2=NC=N1=O");
     }
     
+    @Test public void biphenyl() throws Exception {
+        test("c1ccccc1c1ccccc1",  "C1=CC=CC=C1C2=CC=CC=C2");
+        test("c1ccccc1-c1ccccc1", "C1=CC=CC=C1C2=CC=CC=C2");
+    }
+    
     @Test public void phospho_nitro_ring() throws Exception {
         test("n1pnpnp1", "N1=PN=PN=P1");
     }
