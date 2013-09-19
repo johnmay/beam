@@ -45,8 +45,8 @@ final class Localise {
             Edge newEdge = edgeAssignments.get(orgEdge);
             if (newEdge != null)
                 localised.addEdge(newEdge);
-            else if (orgEdge.bond() == Bond.AROMATIC)
-                localised.addEdge(Bond.SINGLE.edge(orgEdge.either(),
+            else if (orgEdge.bond() == Bond.AROMATIC || orgEdge.bond() == Bond.SINGLE)
+                localised.addEdge(Bond.IMPLICIT.edge(orgEdge.either(),
                                                    orgEdge.other(orgEdge.either())));
             else
                 localised.addEdge(orgEdge);

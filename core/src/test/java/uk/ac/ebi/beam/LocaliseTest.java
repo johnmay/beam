@@ -135,9 +135,11 @@ public class LocaliseTest {
         test("c1nc2ccccc2n1", "n/a");
     }
     
-    @Test(expected = InvalidSmilesException.class)
-    public void invalid_benzene() throws Exception {
-        test("c1=cc=cc=c1", "n/a");
+    @Test
+    public void mixing_aromatic_and_aliphatic() throws Exception {
+        test("c1=cc=cc=c1",    "C1=CC=CC=C1");
+        test("c-1c-cc-cc1",    "C1=CC=CC=C1");
+        test("C:1:C:C:C:C:C1", "C:1:C:C:C:C:C1");
     }
     
     /* Examples from http://www.daylight.com/dayhtml_tutorials/languages/smiles/smiles_examples.html */
@@ -149,7 +151,7 @@ public class LocaliseTest {
 
     @Test public void xanax() throws Exception {
         test("Cc1nnc2CN=C(c3ccccc3)c4cc(Cl)ccc4-n12",
-             "CC1=NN=C2CN=C(C3=CC=CC=C3)C4=CC(Cl)=CC=C4-N12");
+             "CC1=NN=C2CN=C(C3=CC=CC=C3)C4=CC(Cl)=CC=C4N12");
     }
 
     @Test public void phentermine() throws Exception {
