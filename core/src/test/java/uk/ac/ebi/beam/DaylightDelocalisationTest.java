@@ -518,6 +518,63 @@ public class DaylightDelocalisationTest {
              "CCCCCC[n+]1c(\\C=C/2\\C(=C(C2=O)c3ccc(s3)c4ccc(s4)c5ccc(s5)C6=C([O-])\\C(=C/c7sc8ccccc8[n+]7CCCCCC)\\C6=O)[O-])sc9ccccc19");
     }
     
+    /* 
+     * Tests referring to compounds from - 
+     * http://blueobelisk.shapado.com/questions/aromaticity-perception-differences
+     */
+
+    @Test public void bo_6678() throws Exception {
+        // note different from daylight due to their use of SSSR
+        test("O=C1OC(=O)C2=C3C1=CC=C1C(=O)OC(=O)C(C=C2)=C31",
+             "O=C1OC(=O)c2c3c1ccc4C(=O)OC(=O)c(cc2)c34");
+    }
+    
+    @Test public void bo_8317() throws Exception {
+        // note different from daylight due to their use of SSS
+        test("O=C1C2=CC=CC=C2C2=C3C1=CC=C1C4=CC=C5C(=O)C6=CC=CC=C6C6=C5C4=C(C=C6)C(C=C2)=C31",
+             "O=C1c2ccccc2c3c4c1ccc5c6ccc7C(=O)c8ccccc8c9c7c6c(cc9)c(cc3)c45");
+    }
+    
+    @Test public void bo_8978() throws Exception {
+        test("C1=CC=C2C(=C1)C1=N\\C\\2=N/C2=N/C(=N\\C3=N\\C(=N/C4=N/C(=N\\1)/C1=CC=CC=C41)\\C1=CC=CC=C31)/C1=CC=CC=C21",
+             "c1ccc2c(c1)c3nc2nc4nc(nc5nc(nc6nc(n3)c7ccccc67)c8ccccc58)c9ccccc49");
+    }
+    
+    @Test public void bo_18301() throws Exception {
+        // note different from daylight due to their use of SSSR
+        test("O=C1C=CC2=C3C1=CC=C1C(=O)C4=CC=CC=C4C(C=C2)=C31",
+             "O=C1C=Cc2c3c1ccc4C(=O)c5ccccc5c(cc2)c34");
+    }
+    
+    @Test public void bo_21963() throws Exception {
+        test("O=C1C2=CC=CC3=C2C2=C(C=CC=C12)C=C3",
+             "O=c1c2cccc3c2c4c(cccc14)cc3");
+    }
+    
+    @Test public void bo_25756() throws Exception {
+        test("NC1=C2C3=CC=CC=C3C3=CC=CC(C=C1)=C23",
+             "Nc1c2c3ccccc3c4cccc(cc1)c24");
+    }
+    
+    @Test public void bo_39171() throws Exception {
+        test("O=C1C(=O)C2=CC3=CC=CC=C3C3=C2C2=C(C=CC=C12)C=C3",
+             "O=c1c(=O)c2cc3ccccc3c4c2c5c(cccc15)cc4");
+    }
+    
+    @Test public void bo_75696() throws Exception {
+        test("O=C1NC(=O)C2=CC3=C(C=C12)C(=O)NC3=O",
+             "O=c1[nH]c(=O)c2cc3c(cc12)c(=O)[nH]c3=O");
+    }
+    
+    @Test public void bo_78222() throws Exception {
+        test("[O-]S(=O)(=O)OC1=C2C=CC3=C(NC4=CC=C5C6=CC=CC=C6C(=O)C6=C5C4=C3C=C6)C2=C(OS([O-])(=O)=O)C2=CC=CC=C12",
+             "[O-]S(=O)(=O)Oc1c2ccc3c([nH]c4ccc5c6ccccc6c(=O)c7c5c4c3cc7)c2c(OS([O-])(=O)=O)c8ccccc18");
+    }
+    
+    @Test public void bo_83217() throws Exception {
+        test("CN(C)C1=CC=[C-]C=C1",
+             "CN(C)c1cc[c-]cc1");
+    }
 
     /** Daylight Examples http://www.daylight.com/dayhtml_tutorials/languages/smiles/smiles_examples.html */
     @Ignore("need to kekulize") public void daylightExamples() throws Exception {
