@@ -151,6 +151,15 @@ public class LocaliseTest {
         test("C:1:C:C:C:C:C1", "C:1:C:C:C:C:C1");
     }
     
+    // http://sourceforge.net/mailarchive/forum.php?thread_name=60825b0f0709302037g2d68f2eamdb5ebecf3baea6d1%40mail.gmail.com&forum_name=blueobelisk-smiles
+    @Test public void bezene_inconsistent() throws Exception {
+        test("c1=ccccc1",     "C1=CC=CC=C1");    
+        test("c1=cc=ccc1",    "C1=CC=CC=C1");    
+        test("c1=cc=cc=c1",   "C1=CC=CC=C1");    
+        test("c1=c:c:c:c:c1", "C1=CC=CC=C1");    
+        test("c1=c:c=c:c:c1", "C1=CC=CC=C1");    
+        test("c1=c-c=c:c:c1", "C1=CC=CC=C1");    
+    }
     /* Examples from http://www.daylight.com/dayhtml_tutorials/languages/smiles/smiles_examples.html */
 
     @Test public void viagra() throws Exception {
