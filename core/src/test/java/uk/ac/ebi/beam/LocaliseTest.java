@@ -160,6 +160,25 @@ public class LocaliseTest {
         test("c1=c:c=c:c:c1", "C1=CC=CC=C1");    
         test("c1=c-c=c:c:c1", "C1=CC=CC=C1");    
     }
+    
+    @Test public void fluorene() throws Exception {
+        test("C1c2ccccc2-c3ccccc13", "C1C2=CC=CC=C2C3=CC=CC=C13");
+        test("C1c2ccccc2c3ccccc13",   "C1C2=CC=CC=C2C3=CC=CC=C13");
+    }
+    
+    @Test public void pyrole_aliphatic_n() throws Exception {
+        test("c1cNcc1", "C1=CNC=C1");
+    }
+
+    @Test public void furan_aliphatic_o() throws Exception {
+        test("c1cOcc1", "C1=COC=C1");
+    }
+    
+    @Test public void bo_25756() throws Exception {
+        test("Nc1c2c3ccccc3c4cccc(cc1)c24",
+             "NC1=C2C3=CC=CC=C3C4=CC=CC(C=C1)=C24");
+    }
+    
     /* Examples from http://www.daylight.com/dayhtml_tutorials/languages/smiles/smiles_examples.html */
 
     @Test public void viagra() throws Exception {
