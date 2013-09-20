@@ -38,6 +38,12 @@ public class LocaliseTest {
     @Test public void buta_1_3_diene() throws Exception {
         test("cccc", "C=CC=C");
     }
+    
+    // some allow lower-case to be radical, this should throw an exception
+    @Test(expected = InvalidSmilesException.class)
+    public void carbon_radical() throws Exception {
+        test("C1CCcCC1",  "n/a");
+    }
 
     @Test public void _hexa_1_3_5_triene() throws Exception {
         test("cccccc", "C=CC=CC=C");
