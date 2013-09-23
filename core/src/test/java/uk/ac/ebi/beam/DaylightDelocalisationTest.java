@@ -203,6 +203,10 @@ public class DaylightDelocalisationTest {
     @Test public void carbon_cation_6_memberRing() throws Exception {
         test("C1=CC=[C+]C=C1", "c1cc[c+]cc1");
     }
+    
+    @Test public void carbon_cation_7_memberRing() throws Exception {
+        test("C=1[CH+]C=CC=CC1","c1[cH+]ccccc1");
+    }
 
     // carbon dication gives 0 electron (4 * 1) % 4 != 2
     @Test public void carbon_dication_5_memberRing() throws Exception {

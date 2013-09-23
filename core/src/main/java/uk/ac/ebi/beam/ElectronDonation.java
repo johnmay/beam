@@ -143,7 +143,9 @@ abstract class ElectronDonation {
             } else if (nCyclic == 0 && nAcyclic == 0) {
                 // no double bonds - do we have any lone pairs to contribute?
                 if (Hybridization.lonePairs(g, u) > 0 && charge <= 0)
-                    return 2;    
+                    return 2;
+                if (charge == 1 && atom.element() == Carbon)
+                    return 0;
             }
 
             return -1;
