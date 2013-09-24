@@ -29,6 +29,7 @@
 
 package uk.ac.ebi.beam;
 
+import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,6 +37,7 @@ import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /** @author John May */
 public class ParserTest {
@@ -135,4 +137,15 @@ public class ParserTest {
     public void tritium_strict() throws IOException {
         Graph g = Parser.strict("TT");
     }
+    
+    @Test public void tellurium() throws IOException{
+        Graph g = Parser.losse("[te]");
+        assertTrue(g.atom(0).aromatic());
+        assertThat(g.atom(0).element(), is(Element.Tellurium));
+    }
+    
+    @Test(expected = InvalidSmilesException.class)
+    public void tellurium_strict() throws IOException{
+        Graph g = Parser.strict("[te]");
+    }    
 }

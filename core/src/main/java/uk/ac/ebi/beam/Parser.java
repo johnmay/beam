@@ -447,9 +447,13 @@ final class Parser {
         final int isotope = buffer.getNumber();
         final boolean aromatic = buffer.next() >= 'a' && buffer.next() <= 'z';
         final Element element = Element.read(buffer);
-
+        
         if (element == null)
             throw new InvalidSmilesException("Unrecognised element symbol: ", buffer);
+                          
+        // element isn't aromatic as per the OpenSMILES specification
+        if (strict && !element.aromatic(Element.AromaticSpecification.OpenSmiles))
+            throw new InvalidSmilesException("Abnormal aromatic element", buffer);
 
         configuration = Configuration.read(buffer);
 
