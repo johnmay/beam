@@ -1,8 +1,14 @@
 package uk.ac.ebi.beam;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Utility to localise aromatic bonds.
@@ -12,20 +18,19 @@ import java.util.Map;
 final class Localise {
 
     private final Graph delocalised, localised;
-    private final IntSet subset;
+    private final BitSet subset;
     private final Map<Edge, Edge> edgeAssignments = new HashMap<Edge, Edge>();
 
-    private Localise(Graph delocalised, IntSet subset) throws InvalidSmilesException {
+    private Localise(Graph delocalised, BitSet subset) throws InvalidSmilesException {
 
         this.delocalised = delocalised;
-        this.localised = new Graph(delocalised.order());
-        this.subset = subset;
+        this.localised   = new Graph(delocalised.order());
+        this.subset      = subset;
 
         // make initial matching - then improve it
         Matching m = MaximumMatching.maximise(delocalised,
                                               ArbitraryMatching.of(delocalised, subset),
-                                              subset);
-
+                                              IntSet.fromBitSet(subset));
 
         // the edge assignments have all aromatic bonds going to single bonds
         // we now use the matching to update these 
@@ -41,13 +46,14 @@ final class Localise {
             localised.addAtom(delocalised.atom(v).toAliphatic());
             localised.addTopology(delocalised.topologyOf(v));
         }
+             
         for (Edge orgEdge : delocalised.edges()) {
             Edge newEdge = edgeAssignments.get(orgEdge);
             if (newEdge != null)
                 localised.addEdge(newEdge);
             else if (orgEdge.bond() == Bond.AROMATIC || orgEdge.bond() == Bond.SINGLE)
                 localised.addEdge(Bond.IMPLICIT.edge(orgEdge.either(),
-                                                   orgEdge.other(orgEdge.either())));
+                                                     orgEdge.other(orgEdge.either())));
             else
                 localised.addEdge(orgEdge);
         }
@@ -61,33 +67,24 @@ final class Localise {
     }
 
 
-    static IntSet buildSet(Graph g) {
-
-        int count = 0;
+    static BitSet buildSet(Graph g) {
 
         BitSet undecided = new BitSet(g.order());
-
+        
         for (int v = 0; v < g.order(); v++) {
-
             if (g.atom(v).aromatic()) {
-                count++;
-
-                // if the all aromatic bonds are single
-                if (!predetermined(g, v)) {
-                    undecided.set(v);
-                }
+                undecided.set(v, !predetermined(g, v));
             }
         }
 
-        return count == 0 ? null
-                          : IntSet.fromBitSet(undecided);
+        return undecided;
     }
 
     static boolean predetermined(Graph g, int v) {
 
         Atom a = g.atom(v);
 
-        int q = a.charge();
+        int q   = a.charge();
         int deg = g.degree(v) + g.implHCount(v);
 
         for (Edge e : g.edges(v)) {
@@ -103,7 +100,6 @@ final class Localise {
                 return true;
             }
         }
-
 
         switch (a.element()) {
             case Carbon:
@@ -133,12 +129,16 @@ final class Localise {
 
         return false;
     }
-
-
+     
     static Graph localise(Graph delocalised) throws InvalidSmilesException {
-        IntSet subset = buildSet(delocalised);
-        if (subset == null)
-            return delocalised;
-        return new Localise(delocalised, subset).localised;
+        BitSet subset = buildSet(delocalised);         
+        if (hasOddCardinality(subset))
+            throw new InvalidSmilesException("No localised structure can be assigned.");
+        return subset.isEmpty() ? delocalised 
+                                : new Localise(delocalised, subset).localised;
+    }
+
+    private static boolean hasOddCardinality(BitSet s) {
+        return (s.cardinality() & 0x1) == 1;
     }
 }
