@@ -1,5 +1,7 @@
 package uk.ac.ebi.beam;
 
+import java.util.BitSet;
+
 /**
  * Simple matching greedily chooses edges and matches. The produced matching is
  * not guaranteed to be maximum but provides a starting point for improvement
@@ -17,21 +19,21 @@ final class ArbitraryMatching {
      * @param s subset of vertices
      * @return non-maximal matching
      */
-    static Matching of(final Graph g, final IntSet s) {
+    static Matching of(final Graph g, final BitSet s) {
 
         final Matching m = Matching.empty(g);
 
-        for (int v = 0; v < g.order(); v++) {
+        for (int v = s.nextSetBit(0); v >= 0; v = s.nextSetBit(v + 1)) {
 
-            // skip if not in the subset of vertices or already matched
-            if (!s.contains(v) || !m.unmatched(v))
+            // skip if already matched
+            if (!m.unmatched(v))
                 continue;
 
             // find a single edge which is not matched and match it
             for (Edge e : g.edges(v)) {
                 int w = e.other(v);
 
-                if (!s.contains(w) || !m.unmatched(w))
+                if (!s.get(w) || !m.unmatched(w))
                     continue;
 
                 m.match(v, w);
