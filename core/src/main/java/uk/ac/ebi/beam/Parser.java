@@ -140,7 +140,7 @@ final class Parser {
      * @throws InvalidSmilesException
      */
     static Graph losse(String str) throws InvalidSmilesException {
-        return new Parser(CharBuffer.fromString(str), true).molecule();
+        return new Parser(CharBuffer.fromString(str), false).molecule();
     }
 
     /**
