@@ -122,11 +122,11 @@ final class Parser {
      * throw more exceptions for unusual input. 
      * 
      * @param str the SMILES string to process
-     * @return a new strict parser
+     * @return a graph created with the strict parser
      * @throws InvalidSmilesException
      */
-    static Parser strict(String str) throws InvalidSmilesException {
-        return new Parser(CharBuffer.fromString(str), true);
+    static Graph strict(String str) throws InvalidSmilesException {
+        return new Parser(CharBuffer.fromString(str), true).molecule();
     }
 
     /**
@@ -136,11 +136,11 @@ final class Parser {
      * hydrogen and isotopes are replaced with their correct bracket equivalent. 
      *
      * @param str the SMILES string to process
-     * @return a new loose parser
+     * @return a graph created with the loose parser
      * @throws InvalidSmilesException
      */
-    static Parser losse(String str) throws InvalidSmilesException {
-        return new Parser(CharBuffer.fromString(str), true);
+    static Graph losse(String str) throws InvalidSmilesException {
+        return new Parser(CharBuffer.fromString(str), true).molecule();
     }
 
     /**
