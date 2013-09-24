@@ -330,10 +330,22 @@ final class Parser {
                 // D/T for hydrogen isotopes - non-standard but OpenSMILES spec
                 // says it's possible. The D and T here are automatic converted
                 // to [2H] and [3H].
+                case 'H':
+                    if (strict)
+                        throw new InvalidSmilesException("Hydrogens should be specified in square brackets - '[H]'", 
+                                                         buffer);
+                    addAtom(AtomImpl.EXPLICIT_HYDROGEN);
+                    break;
                 case 'D':
+                    if (strict)
+                        throw new InvalidSmilesException("Deuterium should be specified as a hydrogen isotope - '[2H]'",
+                                                         buffer);
                     addAtom(AtomImpl.DEUTERIUM);
                     break;
                 case 'T':
+                    if (strict)
+                        throw new InvalidSmilesException("Tritium should be specified as a hydrogen isotope - '[3H]'",
+                                                         buffer);
                     addAtom(AtomImpl.TRITIUM);
                     break;
 

@@ -32,6 +32,8 @@ package uk.ac.ebi.beam;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -99,5 +101,38 @@ public class ParserTest {
         for (Edge e : g.edges()) {
             assertThat(e.bond(), is(Bond.AROMATIC));
         }
+    }
+    
+    @Test public void hydrogen() throws IOException {
+        Graph g = Parser.losse("HH");
+        assertThat(g.order(), is(2));
+        assertThat(g.toSmiles(), is("[H][H]"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void hydrogen_strict() throws IOException {
+        Graph g = Parser.strict("HH");
+    }
+    
+    @Test public void deuterium() throws IOException {
+        Graph g = Parser.losse("DD");
+        assertThat(g.order(), is(2));
+        assertThat(g.toSmiles(), is("[2H][2H]"));
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void deuterium_strict() throws IOException {
+        Graph g = Parser.strict("DD");
+    }
+    
+    @Test public void tritium() throws IOException {
+        Graph g = Parser.losse("TT");
+        assertThat(g.order(), is(2));
+        assertThat(g.toSmiles(), is("[3H][3H]"));
+    }
+    
+    @Test(expected = InvalidSmilesException.class)
+    public void tritium_strict() throws IOException {
+        Graph g = Parser.strict("TT");
     }
 }
