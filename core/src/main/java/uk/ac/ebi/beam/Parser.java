@@ -41,8 +41,8 @@ import static java.util.Map.Entry;
 
 
 /**
- * Parse a SMILES string and create a {@link Graph}. A new parser should
- * be created for each invocation, for convenience {@link #parse(String)} is
+ * Parse a SMILES string and create a {@link Graph}. A new parser should be
+ * created for each invocation, for convenience {@link #parse(String)} is
  * provided.
  *
  * <blockquote><pre>
@@ -86,13 +86,17 @@ final class Parser {
     /** Number of open rings - all rings should be closed. */
     private int openRings = 0;
 
+    /** Strict parsing. */
+    private final boolean strict;
+
     /**
      * Create a new parser for the specified buffer.
      *
      * @param buffer character buffer holding a SMILES string
      * @throws InvalidSmilesException thrown if the SMILES could not be parsed
      */
-    Parser(CharBuffer buffer) throws InvalidSmilesException {
+    Parser(CharBuffer buffer, boolean strict) throws InvalidSmilesException {
+        this.strict = strict;
         g = new Graph(1 + (2 * (buffer.length() / 3)));
         readSmiles(buffer);
         if (openRings > 0)
@@ -104,13 +108,39 @@ final class Parser {
     }
 
     /**
-     * Create a new parser for the specified string.
+     * Create a new (loose) parser for the specified string.
      *
      * @param str SMILES string
      * @throws InvalidSmilesException thrown if the SMILES could not be parsed
      */
     Parser(String str) throws InvalidSmilesException {
-        this(CharBuffer.fromString(str));
+        this(CharBuffer.fromString(str), false);
+    }
+
+    /**
+     * Strict parsing of the provided SMILES string. The strict parser will 
+     * throw more exceptions for unusual input. 
+     * 
+     * @param str the SMILES string to process
+     * @return a new strict parser
+     * @throws InvalidSmilesException
+     */
+    static Parser strict(String str) throws InvalidSmilesException {
+        return new Parser(CharBuffer.fromString(str), true);
+    }
+
+    /**
+     * Loose parsing of the provided SMILES string. The loose parser is more 
+     * relaxed and will allow abnormal aromatic elements (e.g. 'te') as well
+     * as bare 'H', 'D' and 'T' for hydrogen and it's isotopes. Note the 
+     * hydrogen and isotopes are replaced with their correct bracket equivalent. 
+     *
+     * @param str the SMILES string to process
+     * @return a new loose parser
+     * @throws InvalidSmilesException
+     */
+    static Parser losse(String str) throws InvalidSmilesException {
+        return new Parser(CharBuffer.fromString(str), true);
     }
 
     /**
