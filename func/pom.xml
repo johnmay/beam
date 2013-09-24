@@ -25,7 +25,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>uk.ac.ebi.grins</groupId>
+            <groupId>uk.ac.ebi.beam</groupId>
             <artifactId>beam-core</artifactId>
             <version>${project.version}</version>
         </dependency>
