@@ -463,7 +463,7 @@ public final class Graph {
         List<Edge> es = new ArrayList<Edge>(size);
         for (int u = 0; u < order; u++) {
             for (Edge e : this.edges[u]) {
-                if (e.other(u) > u)
+                if (e.other(u) < u)
                     es.add(e);
             }
         }
