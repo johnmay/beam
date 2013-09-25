@@ -57,6 +57,9 @@ public final class Graph {
 
     /** Vertex and edge counts. */
     private int order, size;
+    
+    /** Indicates at least part of the molecule is delocalised. */
+    private boolean delocalised;
 
     /**
      * Create a new chemical graph with expected size.
@@ -105,6 +108,7 @@ public final class Graph {
     int addAtom(Atom a) {
         ensureCapacity();
         atoms[order++] = a;
+        delocalised = delocalised | a.aromatic();
         return order - 1;
     }
 
@@ -510,6 +514,14 @@ public final class Graph {
         }
         order = 0;
         size = 0;
+    }
+    
+    void markDelocalised() {
+        delocalised = true;
+    }
+    
+    boolean isDelocalised() {
+        return delocalised;
     }
 
     private int checkRange(int u) {

@@ -388,6 +388,7 @@ final class Parser {
                     bond = Bond.QUADRUPLE;
                     break;
                 case ':':
+                    g.markDelocalised();
                     bond = Bond.AROMATIC;
                     break;
                 case '/':
