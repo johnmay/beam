@@ -131,11 +131,15 @@ final class Localise {
     }
      
     static Graph localise(Graph delocalised) throws InvalidSmilesException {
+        
+        // nothing to do
+        if (!delocalised.isDelocalised())
+            return delocalised;
+        
         BitSet subset = buildSet(delocalised);         
         if (hasOddCardinality(subset))
             throw new InvalidSmilesException("No localised structure can be assigned.");
-        return subset.isEmpty() ? delocalised 
-                                : new Localise(delocalised, subset).localised;
+        return new Localise(delocalised, subset).localised;
     }
 
     private static boolean hasOddCardinality(BitSet s) {

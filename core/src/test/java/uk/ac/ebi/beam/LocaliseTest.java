@@ -154,7 +154,7 @@ public class LocaliseTest {
     public void mixing_aromatic_and_aliphatic() throws Exception {
         test("c1=cc=cc=c1",    "C1=CC=CC=C1");
         test("c-1c-cc-cc1",    "C1=CC=CC=C1");
-        test("C:1:C:C:C:C:C1", "C:1:C:C:C:C:C1");
+        test("C:1:C:C:C:C:C1", "C1CCCCC1");
     }
     
     // http://sourceforge.net/mailarchive/forum.php?thread_name=60825b0f0709302037g2d68f2eamdb5ebecf3baea6d1%40mail.gmail.com&forum_name=blueobelisk-smiles
@@ -170,6 +170,10 @@ public class LocaliseTest {
     @Test public void fluorene() throws Exception {
         test("C1c2ccccc2-c3ccccc13", "C1C2=CC=CC=C2C3=CC=CC=C13");
         test("C1c2ccccc2c3ccccc13",   "C1C2=CC=CC=C2C3=CC=CC=C13");
+    }
+    
+    @Test public void hexaoxane() throws Exception {
+        test("o1ooooo1", "O1OOOOO1");
     }
     
     @Test public void pyrole_aliphatic_n() throws Exception {
@@ -239,7 +243,7 @@ public class LocaliseTest {
 
     @Test public void strychnine() throws Exception {
         test("O=C1C[C@H]2OCC=C3CN4CC[C@@]56[C@H]4C[C@H]3[C@H]2[C@H]6N1c7ccccc75",
-             "O=C1C[C@H]2OCC=C3CN4CC[C@]56[C@H]4C[C@H]3[C@H]2[C@H]5N1C7=CC=CC=C67");
+             "O=C1C[C@H]2OCC=C3CN4CC[C@]56[C@H]4C[C@H]3[C@H]2[C@H]5N1C7=CC=CC=C76");
     }
 
     @Test public void cocaine() throws Exception {
