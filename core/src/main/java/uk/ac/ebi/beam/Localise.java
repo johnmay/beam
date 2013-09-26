@@ -73,7 +73,8 @@ final class Localise {
         
         for (int v = 0; v < g.order(); v++) {
             if (g.atom(v).aromatic()) {
-                undecided.set(v, !predetermined(g, v));
+                if (!predetermined(g, v))
+                    undecided.set(v);
             }
         }
 
