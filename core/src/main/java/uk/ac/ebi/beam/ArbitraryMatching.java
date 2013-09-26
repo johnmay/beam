@@ -26,17 +26,14 @@ final class ArbitraryMatching {
         for (int v = s.nextSetBit(0); v >= 0; v = s.nextSetBit(v + 1)) {
 
             // skip if already matched
-            if (!m.unmatched(v))
+            if (m.matched(v))
                 continue;
 
             // find a single edge which is not matched and match it
-            for (Edge e : g.edges(v)) {
+            for (final Edge e : g.edges(v)) {
                 int w = e.other(v);
-
-                if (!s.get(w) || !m.unmatched(w))
-                    continue;
-
-                m.match(v, w);
+                if (m.unmatched(v) && s.get(w))
+                    m.match(v, w);
                 break;
             }
         }
