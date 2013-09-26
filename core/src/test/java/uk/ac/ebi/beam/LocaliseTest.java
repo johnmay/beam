@@ -285,7 +285,13 @@ public class LocaliseTest {
         test("Cn1cnc2n(C)c(=O)n(C)c(=O)c12",
              "CN1C=NC=2N(C)C(=O)N(C)C(=O)C12");
     }
-
+    
+    // N,N-Diallylmelamine 
+    @Test public void ncs4420() throws Exception {
+        test("[nH2]c1nc(nc(n1)n(Ccc)Ccc)[nH2]",
+             "[NH2]C1=NC(=NC(=N1)N(CC=C)CC=C)[NH2]");
+    }
+    
     static void test(String delocalised, String localised) throws Exception {
         Graph g = Graph.fromSmiles(delocalised);        
         Graph h = Localise.localise(g);
