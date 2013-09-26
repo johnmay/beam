@@ -89,8 +89,7 @@ final class Localise {
 
         for (Edge e : g.edges(v)) {
             if (e.bond() == Bond.DOUBLE) {
-                if (q == 0
-                        && (a.element() == Element.Nitrogen || (a.element() == Element.Sulfur && deg > 3))
+                if (q == 0 && (a.element() == Element.Nitrogen || (a.element() == Element.Sulfur && deg > 3))
                         && g.atom(e.other(v)).element() == Element.Oxygen)
                     return false;
                 return true;
@@ -100,10 +99,12 @@ final class Localise {
                 return true;
             }
         }
-
+        
+        // no pi bonds does the degree and charge indicate that
+        // there can be no other pi bonds
         switch (a.element()) {
             case Carbon:
-                if (q == 1 && deg == 3) return true;
+                return (q == 1 || q == -1) && deg == 3;
             case Silicon:
             case Germanium:
                 return q < 0 ? true : false;

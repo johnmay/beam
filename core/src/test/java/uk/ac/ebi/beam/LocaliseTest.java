@@ -292,6 +292,13 @@ public class LocaliseTest {
              "[NH2]C1=NC(=NC(=N1)N(CC=C)CC=C)[NH2]");
     }
     
+    @Test public void carbon_anion() throws Exception {
+        test("O=c1cc[cH-]cc1",
+             "O=C1C=C[CH-]C=C1");
+        test("oc1cc[cH-]cc1",
+             "O=C1C=C[CH-]C=C1");
+    }
+    
     static void test(String delocalised, String localised) throws Exception {
         Graph g = Graph.fromSmiles(delocalised);        
         Graph h = Localise.localise(g);
