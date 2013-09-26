@@ -1,6 +1,5 @@
 package uk.ac.ebi.beam;
 
-import com.google.common.io.CharStreams;
 import org.junit.Test;
 
 import java.io.FileInputStream;
