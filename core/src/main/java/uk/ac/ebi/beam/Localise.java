@@ -32,15 +32,20 @@ final class Localise {
                                               ArbitraryMatching.of(delocalised, subset),
                                               IntSet.fromBitSet(subset));
 
+        
         // the edge assignments have all aromatic bonds going to single bonds
         // we now use the matching to update these 
-        for (Tuple tuple : m.matches()) {
-            int u = tuple.first();
-            int v = tuple.second();
+        for (int u = subset.nextSetBit(0); u >= 0; u = subset.nextSetBit(u + 1)) {
+            if (m.unmatched(u)) {
+                throw new InvalidSmilesException("A valid kekule structure could not be assigned to: " +
+                                                         delocalised.toSmiles());
+            }
+            int v = m.other(u);            
+            subset.clear(v);
             edgeAssignments.put(delocalised.edge(u, v),
                                 Bond.DOUBLE.edge(u, v));
         }
-
+        
         // create the new graph
         for (int v = 0; v < delocalised.order(); v++) {
             localised.addAtom(delocalised.atom(v).toAliphatic());
@@ -56,13 +61,6 @@ final class Localise {
                                                      orgEdge.other(orgEdge.either())));
             else
                 localised.addEdge(orgEdge);
-        }
-
-        // verify hydrogen count
-        for (int v = 0; v < delocalised.order(); v++) {
-            if (localised.implHCount(v) != delocalised.implHCount(v)) {
-                throw new InvalidSmilesException("cannot assign localised bonds to structure - valence error");
-            }
         }
     }
 
@@ -140,7 +138,8 @@ final class Localise {
         
         BitSet subset = buildSet(delocalised);         
         if (hasOddCardinality(subset))
-            throw new InvalidSmilesException("No localised structure can be assigned.");
+            throw new InvalidSmilesException("A valid kekule structure could not be assigned to: " +
+                                             delocalised.toSmiles());
         return new Localise(delocalised, subset).localised;
     }
 

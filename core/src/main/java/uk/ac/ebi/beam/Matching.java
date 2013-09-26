@@ -35,6 +35,10 @@ final class Matching {
         Arrays.fill(match, UNMATCHED);
     }
 
+    boolean matched(int v) {
+        return !unmatched(v);
+    }
+    
     /**
      * Is the vertex v 'unmatched'.
      *
