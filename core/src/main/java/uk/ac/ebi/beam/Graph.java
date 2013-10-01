@@ -108,7 +108,6 @@ public final class Graph {
     int addAtom(Atom a) {
         ensureCapacity();
         atoms[order++] = a;
-        delocalised = delocalised | a.aromatic();
         return order - 1;
     }
 

@@ -29,13 +29,18 @@
 
 package uk.ac.ebi.beam;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Map.Entry;
 
@@ -118,9 +123,9 @@ final class Parser {
     }
 
     /**
-     * Strict parsing of the provided SMILES string. The strict parser will 
-     * throw more exceptions for unusual input. 
-     * 
+     * Strict parsing of the provided SMILES string. The strict parser will
+     * throw more exceptions for unusual input.
+     *
      * @param str the SMILES string to process
      * @return a graph created with the strict parser
      * @throws InvalidSmilesException
@@ -130,10 +135,10 @@ final class Parser {
     }
 
     /**
-     * Loose parsing of the provided SMILES string. The loose parser is more 
-     * relaxed and will allow abnormal aromatic elements (e.g. 'te') as well
-     * as bare 'H', 'D' and 'T' for hydrogen and it's isotopes. Note the 
-     * hydrogen and isotopes are replaced with their correct bracket equivalent. 
+     * Loose parsing of the provided SMILES string. The loose parser is more
+     * relaxed and will allow abnormal aromatic elements (e.g. 'te') as well as
+     * bare 'H', 'D' and 'T' for hydrogen and it's isotopes. Note the hydrogen
+     * and isotopes are replaced with their correct bracket equivalent.
      *
      * @param str the SMILES string to process
      * @return a graph created with the loose parser
@@ -189,7 +194,8 @@ final class Parser {
                 vs = insertDbImplicitRef(u, vs); // XXX: temp fix
 
             g.addTopology(Topology.create(u, vs, es, c));
-        } else {
+        }
+        else {
             int[] vs = new int[g.degree(u)];
             List<Edge> es = g.edges(u);
             for (int i = 0; i < vs.length; i++)
@@ -309,21 +315,27 @@ final class Parser {
                 // aromatic subset
                 case 'b':
                     addAtom(AtomImpl.AromaticSubset.Boron);
+                    g.markDelocalised();
                     break;
                 case 'c':
                     addAtom(AtomImpl.AromaticSubset.Carbon);
+                    g.markDelocalised();
                     break;
                 case 'n':
                     addAtom(AtomImpl.AromaticSubset.Nitrogen);
+                    g.markDelocalised();
                     break;
                 case 'o':
                     addAtom(AtomImpl.AromaticSubset.Oxygen);
+                    g.markDelocalised();
                     break;
                 case 'p':
                     addAtom(AtomImpl.AromaticSubset.Phosphorus);
+                    g.markDelocalised();
                     break;
                 case 's':
                     addAtom(AtomImpl.AromaticSubset.Sulfur);
+                    g.markDelocalised();
                     break;
 
 
@@ -332,7 +344,7 @@ final class Parser {
                 // to [2H] and [3H].
                 case 'H':
                     if (strict)
-                        throw new InvalidSmilesException("Hydrogens should be specified in square brackets - '[H]'", 
+                        throw new InvalidSmilesException("Hydrogens should be specified in square brackets - '[H]'",
                                                          buffer);
                     addAtom(AtomImpl.EXPLICIT_HYDROGEN);
                     break;
@@ -448,10 +460,12 @@ final class Parser {
         final int isotope = buffer.getNumber();
         final boolean aromatic = buffer.next() >= 'a' && buffer.next() <= 'z';
         final Element element = Element.read(buffer);
-        
+
         if (element == null)
             throw new InvalidSmilesException("Unrecognised element symbol: ", buffer);
-                          
+
+        if (element.aromatic())
+            g.markDelocalised();
         // element isn't aromatic as per the OpenSMILES specification
         if (strict && !element.aromatic(Element.AromaticSpecification.OpenSmiles))
             throw new InvalidSmilesException("Abnormal aromatic element", buffer);
@@ -553,12 +567,13 @@ final class Parser {
      */
     private void ring(int rnum, CharBuffer buffer) throws InvalidSmilesException {
         if (bond == Bond.DOT)
-            throw new InvalidSmilesException("A ring bond can not be a 'dot':", 
+            throw new InvalidSmilesException("A ring bond can not be a 'dot':",
                                              buffer,
                                              -1);
         if (rings.length <= rnum || rings[rnum] == null) {
             openRing(rnum);
-        } else {
+        }
+        else {
             closeRing(rnum, buffer);
         }
     }
@@ -570,7 +585,8 @@ final class Parser {
      */
     private void openRing(int rnum) {
         if (rnum >= rings.length)
-            rings = Arrays.copyOf(rings, rnum + 1);
+            rings = Arrays.copyOf(rings,
+                                  Math.min(99, rings.length * 2)); // max rnum: 99
         int u = stack.peek();
 
         // create a ring bond
@@ -647,7 +663,7 @@ final class Parser {
      * @throws InvalidSmilesException ring bonds did not match
      */
     static Bond decideBond(final Bond a, final Bond b, CharBuffer buffer) throws
-                                                       InvalidSmilesException {
+                                                                          InvalidSmilesException {
         if (a == b)
             return a;
         else if (a == Bond.IMPLICIT)
@@ -655,7 +671,7 @@ final class Parser {
         else if (b == Bond.IMPLICIT)
             return a;
         throw new InvalidSmilesException("Ring closure bonds did not match. Ring was opened with '" + a + "' and closed with '" + b + "'." +
-                                         " Note - directional bonds ('/','\\') are relative.",
+                                                 " Note - directional bonds ('/','\\') are relative.",
                                          buffer,
                                          -1);
     }
