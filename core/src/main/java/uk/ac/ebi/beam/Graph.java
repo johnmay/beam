@@ -57,7 +57,7 @@ public final class Graph {
 
     /** Vertex and edge counts. */
     private int order, size;
-    
+
     /** Indicates at least part of the molecule is delocalised. */
     private boolean delocalised;
 
@@ -86,18 +86,16 @@ public final class Graph {
         atoms[i] = a;
     }
 
-    /**
-     * Resize the graph if we are at maximum capacity.
-     */
+    /** Resize the graph if we are at maximum capacity. */
     private void ensureCapacity() {
         if (order >= atoms.length) {
             atoms = Arrays.copyOf(atoms, order * 2);
             edges = Arrays.copyOf(edges, order * 2);
             for (int i = order; i < edges.length; i++)
                 edges[i] = new ArrayList<Edge>(4);
-        }    
-    }    
-    
+        }
+    }
+
     /**
      * Add an atom to the graph and return the index to which the atom was
      * added.
@@ -357,7 +355,7 @@ public final class Graph {
     /**
      * Delocalise a kekulé graph representation to one with <i>aromatic</i>
      * bonds. The original graph remains unchanged.
-     * 
+     *
      * TODO: more explanation
      *
      * @return aromatic representation
@@ -367,7 +365,7 @@ public final class Graph {
         // provide the AllCycles method
         return AllCycles.daylightModel(this).aromaticForm();
     }
-  
+
     /**
      * Localise delocalized (aromatic) bonds in this molecule producing the
      * Kekulé form. The original graph is not modified.
@@ -398,6 +396,21 @@ public final class Graph {
      */
     public Graph kekule() throws InvalidSmilesException {
         return Localise.localise(this);
+    }
+
+
+    /**
+     * Verify that electrons can be assigned to any delocalised (aromatic)
+     * bonds. This method is faster than doing a full kekulisation and allows
+     * versification of aromatic structures without localising the bond orders.
+     * However the method of determining the Kekulé structure is very similar
+     * and often is preferable to provide a molecule with defined bond orders.
+     *
+     * @return electrons can be assigned
+     * @see #kekule()
+     */
+    public boolean assignable() {
+        return ElectronAssignment.verify(this);
     }
 
     /**
@@ -514,11 +527,11 @@ public final class Graph {
         order = 0;
         size = 0;
     }
-    
+
     void markDelocalised() {
         delocalised = true;
     }
-    
+
     boolean isDelocalised() {
         return delocalised;
     }
