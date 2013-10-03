@@ -464,8 +464,9 @@ final class Parser {
         if (element == null)
             throw new InvalidSmilesException("Unrecognised element symbol: ", buffer);
 
-        if (element.aromatic())
+        if (aromatic)
             g.markDelocalised();
+        
         // element isn't aromatic as per the OpenSMILES specification
         if (strict && !element.aromatic(Element.AromaticSpecification.OpenSmiles))
             throw new InvalidSmilesException("Abnormal aromatic element", buffer);
