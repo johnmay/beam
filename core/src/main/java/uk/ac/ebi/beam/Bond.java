@@ -58,11 +58,17 @@ public enum Bond {
     /** Atoms are bonded by either a single or aromatic bond. */
     IMPLICIT("", 1),
 
+    /** An implicit bond which is delocalised. */
+    IMPLICIT_AROMATIC("", 1),
+
     /** Atoms are bonded by a single pair of electrons. */
     SINGLE("-", 1),
-
+    
     /** Atoms are bonded by two pairs of electrons. */
     DOUBLE("=", 2),
+
+    /** A double bond which is delocalised. */
+    DOUBLE_AROMATIC("=", 2),
 
     /** Atoms are bonded by three pairs of electrons. */
     TRIPLE("#", 3),
