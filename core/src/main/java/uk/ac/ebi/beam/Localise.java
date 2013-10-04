@@ -1,14 +1,8 @@
 package uk.ac.ebi.beam;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.zip.GZIPInputStream;
 
 /**
  * Utility to localise aromatic bonds.
@@ -21,18 +15,18 @@ final class Localise {
     private final BitSet subset;
     private final Map<Edge, Edge> edgeAssignments = new HashMap<Edge, Edge>();
 
-    private Localise(Graph delocalised, BitSet subset) throws InvalidSmilesException {
+    private Localise(Graph delocalised, BitSet subset, BitSet aromatic) throws InvalidSmilesException {
 
         this.delocalised = delocalised;
-        this.localised   = new Graph(delocalised.order());
-        this.subset      = subset;
+        this.localised = new Graph(delocalised.order());
+        this.subset = subset;
 
         // make initial matching - then improve it
         Matching m = MaximumMatching.maximise(delocalised,
                                               ArbitraryMatching.of(delocalised, subset),
                                               IntSet.fromBitSet(subset));
 
-        
+
         // the edge assignments have all aromatic bonds going to single bonds
         // we now use the matching to update these 
         for (int u = subset.nextSetBit(0); u >= 0; u = subset.nextSetBit(u + 1)) {
@@ -40,37 +34,58 @@ final class Localise {
                 throw new InvalidSmilesException("A valid kekule structure could not be assigned to: " +
                                                          delocalised.toSmiles());
             }
-            int v = m.other(u);            
+            int v = m.other(u);
             subset.clear(v);
             edgeAssignments.put(delocalised.edge(u, v),
-                                Bond.DOUBLE.edge(u, v));
+                                Bond.DOUBLE_AROMATIC.edge(u, v));
         }
-        
+
         // create the new graph
         for (int v = 0; v < delocalised.order(); v++) {
             localised.addAtom(delocalised.atom(v).toAliphatic());
             localised.addTopology(delocalised.topologyOf(v));
         }
-             
+
         for (Edge orgEdge : delocalised.edges()) {
             Edge newEdge = edgeAssignments.get(orgEdge);
-            if (newEdge != null)
+            if (newEdge != null) {
                 localised.addEdge(newEdge);
-            else if (orgEdge.bond() == Bond.AROMATIC || orgEdge.bond() == Bond.SINGLE)
-                localised.addEdge(Bond.IMPLICIT.edge(orgEdge.either(),
-                                                     orgEdge.other(orgEdge.either())));
-            else
-                localised.addEdge(orgEdge);
+            }
+            else {
+                switch (orgEdge.bond()) {
+                    case SINGLE:
+                        localised.addEdge(Bond.IMPLICIT.edge(orgEdge.either(),
+                                                             orgEdge.other(orgEdge.either())));
+                        break;
+                    case AROMATIC:
+                        localised.addEdge(Bond.IMPLICIT_AROMATIC.edge(orgEdge.either(),
+                                                                      orgEdge.other(orgEdge.either())));
+                        break;
+                    case IMPLICIT:
+                        int u = orgEdge.either();
+                        int v = orgEdge.other(u);
+                        if (aromatic.get(u) && aromatic.get(v))
+                            localised.addEdge(Bond.IMPLICIT_AROMATIC.edge(orgEdge.either(),
+                                                                          orgEdge.other(orgEdge.either())));
+                        else
+                            localised.addEdge(orgEdge);
+                        break;
+                    default:
+                        localised.addEdge(orgEdge);
+                        break;
+                }
+            }
         }
     }
 
 
-    static BitSet buildSet(Graph g) {
+    static BitSet buildSet(Graph g, BitSet aromatic) {
 
         BitSet undecided = new BitSet(g.order());
-        
+
         for (int v = 0; v < g.order(); v++) {
             if (g.atom(v).aromatic()) {
+                aromatic.set(v);
                 if (!predetermined(g, v))
                     undecided.set(v);
             }
@@ -83,7 +98,7 @@ final class Localise {
 
         Atom a = g.atom(v);
 
-        int q   = a.charge();
+        int q = a.charge();
         int deg = g.degree(v) + g.implHCount(v);
 
         for (Edge e : g.edges(v)) {
@@ -98,7 +113,7 @@ final class Localise {
                 return true;
             }
         }
-        
+
         // no pi bonds does the degree and charge indicate that
         // there can be no other pi bonds
         switch (a.element()) {
@@ -129,18 +144,19 @@ final class Localise {
 
         return false;
     }
-     
+
     static Graph localise(Graph delocalised) throws InvalidSmilesException {
-        
+
         // nothing to do
         if (!delocalised.isDelocalised())
             return delocalised;
-        
-        BitSet subset = buildSet(delocalised);         
+
+        BitSet aromatic = new BitSet();
+        BitSet subset   = buildSet(delocalised, aromatic);
         if (hasOddCardinality(subset))
             throw new InvalidSmilesException("A valid kekule structure could not be assigned to: " +
-                                             delocalised.toSmiles());
-        return new Localise(delocalised, subset).localised;
+                                                     delocalised.toSmiles());
+        return new Localise(delocalised, subset, aromatic).localised;
     }
 
     private static boolean hasOddCardinality(BitSet s) {

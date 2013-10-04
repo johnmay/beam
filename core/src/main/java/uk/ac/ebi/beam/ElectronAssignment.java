@@ -112,6 +112,6 @@ final class ElectronAssignment {
      */
     static boolean verify(Graph g) {
         return !g.isDelocalised()
-                || !containsOddCardinalitySubgraph(g, Localise.buildSet(g));
+                || !containsOddCardinalitySubgraph(g, Localise.buildSet(g, new BitSet()));
     }
 }
