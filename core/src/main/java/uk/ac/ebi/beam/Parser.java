@@ -587,7 +587,7 @@ final class Parser {
     private void openRing(int rnum) {
         if (rnum >= rings.length)
             rings = Arrays.copyOf(rings,
-                                  Math.min(99, rnum * 2)); // max rnum: 99
+                                  Math.min(100, rnum * 2)); // max rnum: 99
         int u = stack.peek();
 
         // create a ring bond

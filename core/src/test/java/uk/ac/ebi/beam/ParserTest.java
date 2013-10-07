@@ -148,4 +148,8 @@ public class ParserTest {
     public void tellurium_strict() throws IOException{
         Graph g = Parser.strict("[te]");
     }    
+    
+    @Test public void largeRnum() throws Exception {
+        Graph g = Parser.parse("C%99CCCC%99");
+    }
 }
