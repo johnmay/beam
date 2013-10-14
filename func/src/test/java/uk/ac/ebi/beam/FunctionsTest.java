@@ -41,4 +41,12 @@ public class FunctionsTest {
         assertThat(h.toSmiles(),
                    is("O(CC)CC"));
     }
+    
+    @Test public void canoncalise2() throws IOException {
+        Graph g = Graph.fromSmiles("CN1CCC1");
+        Graph h = Functions.canonicalize(g,
+                                         new long[]{2, 1, 3, 5, 4});       
+        assertThat(h.toSmiles(),
+                   is("N1(C)CCC1"));
+    }
 }
