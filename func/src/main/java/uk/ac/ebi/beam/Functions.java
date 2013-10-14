@@ -137,9 +137,9 @@ public final class Functions {
         // TODO: replace with radix sort (i.e. using a custom comparator)
         Arrays.sort(is, new Comparator<Integer>() {
             @Override public int compare(Integer i, Integer j) {
-                if (labels[i] < labels[j])
+                if (labels[i] > labels[j])
                     return +1;
-                else if (labels[i] > labels[j])
+                else if (labels[i] < labels[j])
                     return -1;
                 return 0;
             }
@@ -147,8 +147,7 @@ public final class Functions {
 
         int[] p = new int[g.order()];
         for (int i = 0; i < is.length; i++)
-            p[i] = is[i];
-
+            p[is[i]] = i;
         return g.permute(p);
     }
 

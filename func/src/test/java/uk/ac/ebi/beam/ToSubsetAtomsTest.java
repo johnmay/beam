@@ -73,44 +73,6 @@ public class ToSubsetAtomsTest {
         transform("[CH]([NH2])([OH])[CH3]", "C(N)(O)C");
     }
 
-    @Test public void aliphaticSubset() throws Exception {
-        for (Atom a : AtomImpl.AliphaticSubset.values()){
-            Assert.assertThat(toSubset(a, 0), CoreMatchers.is(CoreMatchers
-                                                                      .sameInstance(a)));
-        }
-    }
-
-    @Test public void aromaticSubset() throws Exception {
-        for (Atom a : AtomImpl.AromaticSubset.values()){
-            Assert.assertThat(toSubset(a, 0), CoreMatchers.is(CoreMatchers
-                                                                      .sameInstance(a)));
-        }
-    }
-
-    @Test public void atomWithCharge() throws Exception {
-        Atom a = new AtomImpl.BracketAtom(-1, Element.Oxygen, 0, -1, 0, false);
-        Assert.assertThat(toSubset(a, 0), CoreMatchers.is(CoreMatchers
-                                                                  .sameInstance(a)));
-    }
-
-    @Test public void atomWithClassLabel() throws Exception {
-        Atom a = new AtomImpl.BracketAtom(-1, Element.Oxygen, 1, 0, 1, false);
-        Assert.assertThat(toSubset(a, 0), CoreMatchers.is(CoreMatchers
-                                                                  .sameInstance(a)));
-    }
-
-    @Test public void atomWithIsotopeLabel() throws Exception {
-        Atom a = new AtomImpl.BracketAtom(0, Element.Sulfur, 0, 0, 0, false);
-        Assert.assertThat(toSubset(a, 0), CoreMatchers.is(CoreMatchers
-                                                                  .sameInstance(a)));
-    }
-
-    @Test public void atomWithRequiredHydrogens() throws Exception {
-        Atom a = new AtomImpl.BracketAtom(0, Element.Oxygen, 2, 0, 0, false);
-        Assert.assertThat(toSubset(a, 0), CoreMatchers.is(CoreMatchers
-                                                                  .sameInstance(a)));
-    }
-
     @Test public void tricyclazole() throws Exception {
         transform("[CH3][c]1[cH][cH][cH][c]2[s][c]3[n][n][cH][n]3[c]12",
                   "Cc1cccc2sc3nncn3c12");
@@ -131,9 +93,6 @@ public class ToSubsetAtomsTest {
                   "c1cc(ccc1/C=c\\2/c(=O)o/c(=C\\Cl)/[nH]2)F");
     }
 
-    private Atom toSubset(Atom a, int bondOrderSum) {
-        return ToSubsetAtoms.toSubset(a, bondOrderSum * 2);
-    }
 
     private void transform(String input, String expected) throws
                                                           InvalidSmilesException {
