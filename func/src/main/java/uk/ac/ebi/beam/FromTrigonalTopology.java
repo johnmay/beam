@@ -55,7 +55,7 @@ final class FromTrigonalTopology extends AbstractFunction<Graph,Graph> {
           sum += e.bond().order();
         }
 
-        return ToSubsetAtoms.toSubset(g.atom(u), sum);
+        return ToSubsetAtoms.toSubset(g.atom(u), g, u);
     }
 
     private static final class Traversal {

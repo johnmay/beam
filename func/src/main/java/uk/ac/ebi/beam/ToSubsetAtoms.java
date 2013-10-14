@@ -22,8 +22,7 @@ final class ToSubsetAtoms extends AbstractFunction<Graph,Graph> {
             Topology t = g.topologyOf(u);
 
             if (t.type() == None) {
-                h.addAtom(toSubset(g.atom(u),
-                                   bondOrderSum(g.edges(u), g)));
+                h.addAtom(toSubset(g.atom(u), g, u));
             } else {
                 h.addAtom(g.atom(u));
                 h.addTopology(t);
@@ -37,7 +36,7 @@ final class ToSubsetAtoms extends AbstractFunction<Graph,Graph> {
         return h;
     }
 
-    static Atom toSubset(Atom a, int sum) {
+    static Atom toSubset(Atom a, Graph g, int u) {
 
         // atom is already a subset atom
         if (a.subset())
@@ -47,33 +46,18 @@ final class ToSubsetAtoms extends AbstractFunction<Graph,Graph> {
         if (!a.element().organic())
             return a;
 
-
         // if any of these values are set the atom cannot be a subset atom
         if (a.charge() != 0 || a.atomClass() != 0 || a.isotope() >= 0)
            return a;
 
+        Atom subset = a.aromatic() ? AtomImpl.AromaticSubset.ofElement(a.element())
+                                   : AtomImpl.AliphaticSubset.ofElement(a.element());
+        
         // does the implied availableElectrons from the bond order sum match that
         // which was stored - if aromatic we only check the lowest valence state
-        int impliedHCount = a.aromatic() ? a.element().aromaticImplicitHydrogens(sum + 1)
-                                         : a.element().implicitHydrogens(sum);
-
+        int impliedHCount = subset.hydrogens(g, u);
+       
         // mismatch in number of hydrogens we must write this as a bracket atom
-        if (impliedHCount != a.hydrogens())
-            return a;
-
-        if (a.aromatic()) {
-            return AtomImpl.AromaticSubset.ofElement(a.element());
-        } else {
-            return AtomImpl.AliphaticSubset.ofElement(a.element());
-        }
-    }
-
-    private int bondOrderSum(final List<Edge> es,
-                             final Graph g) {
-        int sum = 0;
-        for (Edge e : es) {           
-            sum += e.bond().order();
-        }
-        return sum;
+        return impliedHCount != a.hydrogens() ? a : subset;
     }
 }
