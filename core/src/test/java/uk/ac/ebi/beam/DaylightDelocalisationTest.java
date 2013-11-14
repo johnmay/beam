@@ -161,6 +161,17 @@ public class DaylightDelocalisationTest {
         }));
     }
 
+    // same as above but without the hydrogens http://www.eyesopen.com/docs/toolkits/current/html/OEChem_TK-python/_images/OEAssignAromaticFlags_Table.png
+    @Test public void porphyrin() throws IOException {
+        Graph g = Graph.fromSmiles("C1=CC=2C=C3C=CC(C=C4C=CC(C=C5C=CC(C=C1N2)=N5)=N4)=N3");
+        AllCycles d = AllCycles.daylightModel(g);
+        assertThat(d.aromatic, is(new boolean[]{
+                true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true,
+        }));
+    }
+
     /* Carbon Examples */
 
     // carbon gives 1 electron (double bond) (6 * 1) % 4 = 2 

@@ -126,6 +126,16 @@ public class LocaliseTest {
         test("[te]1cccc1", "[Te]1C=CC=C1");
     }
 
+    @Test public void porphyrin1() throws Exception {
+        test("c1cc2cc3ccc(cc4ccc(cc5ccc(cc1n2)[nH]5)n4)[nH]3",
+             "C1=CC2=CC3=CC=C(C=C4C=CC(C=C5C=CC(=CC1=N2)[NH]5)=N4)[NH]3");
+    }
+
+    @Test public void porphyrin2() throws Exception {
+        test("c1cc2cc3ccc(cc4ccc(cc5ccc(cc1n2)n5)n4)n3",
+             "C1=CC=2C=C3C=CC(C=C4C=CC(C=C5C=CC(C=C1N2)=N5)=N4)=N3");
+    }
+
     // Sulphur with two double bonds
     @Test public void chembl_1188068() throws Exception {
         test("COc1cc2nc(ns(=O)(C)c2cc1OC)N3CCN(CC3)C(=O)c4oc(SC)nn4",
