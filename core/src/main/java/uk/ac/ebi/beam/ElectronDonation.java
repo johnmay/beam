@@ -37,6 +37,7 @@ import static uk.ac.ebi.beam.Element.Carbon;
 import static uk.ac.ebi.beam.Element.Nitrogen;
 import static uk.ac.ebi.beam.Element.Oxygen;
 import static uk.ac.ebi.beam.Element.Phosphorus;
+import static uk.ac.ebi.beam.Element.Unknown;
 
 /**
  * Defines a model to determine the number of p electrons a particular element
@@ -96,7 +97,7 @@ abstract class ElectronDonation {
             Element elem = atom.element();
         
             // the element isn't allow to be aromatic (Daylight spec)
-            if (!elem.aromatic(Daylight))
+            if (!elem.aromatic(Daylight) || elem == Unknown)
                 return -1;
             
             // count cyclic and acyclic double bonds
@@ -142,13 +143,44 @@ abstract class ElectronDonation {
                 return acyclicContribution(atom, g.atom(acyclic.other(u)), charge);
             } else if (nCyclic == 0 && nAcyclic == 0) {
                 // no double bonds - do we have any lone pairs to contribute?
-                if (Hybridization.lonePairs(g, u) > 0 && charge <= 0)
+                int v = valence(elem, charge);
+                if (v - sum >= 2 && charge <= 0)
                     return 2;
                 if (charge == 1 && atom.element() == Carbon)
                     return 0;
             }
 
             return -1;
+        }
+
+        private int valence(Element elem, int q) {
+            return valence(Element.ofNumber(elem.atomicNumber() - q));           
+        }
+
+        private int valence(Element elem) {
+            switch (elem) {
+                case Boron:   
+                case Aluminum:
+                case Gallium:
+                    return 3;
+                case Carbon:
+                case Silicon:  
+                case Germanium:
+                    return 4;
+                case Nitrogen:
+                case Phosphorus:
+                case Arsenic:
+                    return 5;
+                case Oxygen:
+                case Sulfur:
+                case Selenium:
+                    return 6;
+                case Fluorine:
+                case Chlorine:
+                case Bromine: 
+                    return 7;
+            }
+            throw new UnsupportedOperationException("Valence not yet handled for element with atomic number " + elem);
         }
 
         /**
