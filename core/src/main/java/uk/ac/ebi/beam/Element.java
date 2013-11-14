@@ -245,8 +245,7 @@ public enum Element {
 
     static {
         for (Element element : values()) {
-            if (element.aromatic())
-                elementMap.put(element.symbol().toLowerCase(), element);
+            elementMap.put(element.symbol().toLowerCase(), element);
             elementMap.put(element.symbol(), element);
             elements[element.atomicNumber] = element;
         }
