@@ -363,7 +363,13 @@ public final class Graph {
     public Graph aromatic() {
         // note Daylight use SSSR - should update and use that by default but
         // provide the AllCycles method
-        return AllCycles.daylightModel(this).aromaticForm();
+        try {
+            return AllCycles.daylightModel(this).aromaticForm();
+        } catch (IllegalArgumentException e) {
+            // too many cycles - use a simpler model which only allows rings of
+            // size 6 (catches fullerenes)
+            return AllCycles.daylightModel(this, 6).aromaticForm();
+        }
     }
 
     /**
