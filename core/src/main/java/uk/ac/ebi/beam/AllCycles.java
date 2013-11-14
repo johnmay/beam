@@ -51,7 +51,7 @@ final class AllCycles {
     
     private static final int MAX_VERTEX_DEGREE = 684;
 
-    @SuppressWarnings("unchecked") AllCycles(Graph g, ElectronDonation model) {
+    @SuppressWarnings("unchecked") AllCycles(Graph g, ElectronDonation model, int lim) {
 
         this.org = g;
         this.ps = new int[g.order()];
@@ -85,7 +85,7 @@ final class AllCycles {
         for (int u = 0; u < g.order(); u++) {
             if (this.pathGraph[u].size() > MAX_VERTEX_DEGREE)
                 throw new IllegalArgumentException("too many cycles generated: " + pathGraph[u].size());
-            reduce(u);
+            reduce(u, lim);
         }
     }
 
@@ -136,7 +136,7 @@ final class AllCycles {
         this.pathGraph[Math.min(u, v)].add(e);
     }
 
-    private void reduce(int x) {
+    private void reduce(int x, int lim) {
         List<PathEdge> es = pathGraph[x];
         int deg = es.size();
         for (int i = 0; i < deg; i++) {
@@ -145,6 +145,8 @@ final class AllCycles {
                 PathEdge e2 = es.get(j);
                 if (!e1.intersects(e2)) {
                     PathEdge reduced = reduce(e1, e2, x);
+                    if (reduced.xs.cardinality() >= lim)
+                        continue;
                     if (reduced.loop()) {
                         if (reduced.checkPiElectrons(ps)) {
                             reduced.flag(aromatic);
@@ -221,6 +223,10 @@ final class AllCycles {
     }
 
     static AllCycles daylightModel(Graph g) {
-        return new AllCycles(g, ElectronDonation.daylight());
+        return new AllCycles(g, ElectronDonation.daylight(), g.order());
+    }
+
+    static AllCycles daylightModel(Graph g, int lim) {
+        return new AllCycles(g, ElectronDonation.daylight(), lim);
     }
 }

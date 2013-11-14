@@ -172,6 +172,17 @@ public class DaylightDelocalisationTest {
         }));
     }
 
+    @Test public void limit_all_cycles() throws Exception {
+        test("C1=CC=CC=C1", "c1ccccc1", 6);
+        test("[CH+]1C=CC=CC=C1", "[CH+]1C=CC=CC=C1", 6);
+    }
+    
+    @Test public void fullerene_c70() throws Exception {
+        test("C1=2C3=C4C5=C1C1=C6C7=C5C5=C8C4=C4C9=C3C3=C%10C=2C2=C1C1=C%11C%12=C%13C%14=C%15C%16=C%17C%18=C%19C%20=C%16C%16=C%14C%12=C%12C%14=C%21C%22=C(C%20=C%16%14)C%14=C%19C%16=C(C4=C8C(=C%18%16)C4=C%17C%15=C(C7=C54)C%13=C61)C1=C%14C%22=C(C3=C91)C1=C%21C%12=C%11C2=C%101",
+             "c12c3c4c5c1c6c7c8c5c9c%10c4c%11c%12c3c%13c%14c2c%15c6c%16c%17c%18c%19c%20c%21c%22c%23c%24c%25c%26c%22c%27c%20c%18c%28c%29c%30c%31c(c%26c%27%29)c%32c%25c%33c(c%11c%10c(c%24%33)c%34c%23c%21c(c8c9%34)c%19c7%16)c%35c%32c%31c(c%13c%12%35)c%36c%30c%28c%17c%15c%14%36",
+             6);
+    }
+
     /* Carbon Examples */
 
     // carbon gives 1 electron (double bond) (6 * 1) % 4 = 2 
@@ -214,9 +225,9 @@ public class DaylightDelocalisationTest {
     @Test public void carbon_cation_6_memberRing() throws Exception {
         test("C1=CC=[C+]C=C1", "c1cc[c+]cc1");
     }
-    
+
     @Test public void carbon_cation_7_memberRing() throws Exception {
-        test("C=1[CH+]C=CC=CC1","c1[cH+]ccccc1");
+        test("C=1[CH+]C=CC=CC1", "c1[cH+]ccccc1");
     }
 
     // carbon dication gives 0 electron (4 * 1) % 4 != 2
@@ -509,7 +520,7 @@ public class DaylightDelocalisationTest {
     
     /* Phosphorus Examples */
     /* Arsenic Examples */
-    
+
     @Test public void arsenic_acyclic() throws Exception {
         test("C=[As+]1C=COC=C1", "C=[As+]1C=COC=C1");
         test("N=[As+]1C=COC=C1", "N=[As+]1C=COC=C1");
@@ -527,7 +538,7 @@ public class DaylightDelocalisationTest {
     /* Selenium Examples */
 
     // misc
-    
+
     @Test public void multi_cyclic_components() throws Exception {
         test("CCCCCC[N+]1=C(\\C=C/2\\C(=C(C2=O)C3=CC=C(S3)C4=CC=C(S4)C5=CC=C(S5)C6=C([O-])\\C(=C/C=7SC8=CC=CC=C8[N+]7CCCCCC)\\C6=O)[O-])SC9=CC=CC=C19",
              "CCCCCC[n+]1c(\\C=C/2\\C(=C(C2=O)c3ccc(s3)c4ccc(s4)c5ccc(s5)C6=C([O-])\\C(=C/c7sc8ccccc8[n+]7CCCCCC)\\C6=O)[O-])sc9ccccc19");
@@ -543,49 +554,49 @@ public class DaylightDelocalisationTest {
         test("O=C1OC(=O)C2=C3C1=CC=C1C(=O)OC(=O)C(C=C2)=C31",
              "O=C1OC(=O)c2c3c1ccc4C(=O)OC(=O)c(cc2)c34");
     }
-    
+
     @Test public void bo_8317() throws Exception {
         // note different from daylight due to their use of SSS
         test("O=C1C2=CC=CC=C2C2=C3C1=CC=C1C4=CC=C5C(=O)C6=CC=CC=C6C6=C5C4=C(C=C6)C(C=C2)=C31",
              "O=C1c2ccccc2c3c4c1ccc5c6ccc7C(=O)c8ccccc8c9c7c6c(cc9)c(cc3)c45");
     }
-    
+
     @Test public void bo_8978() throws Exception {
         test("C1=CC=C2C(=C1)C1=N\\C\\2=N/C2=N/C(=N\\C3=N\\C(=N/C4=N/C(=N\\1)/C1=CC=CC=C41)\\C1=CC=CC=C31)/C1=CC=CC=C21",
              "c1ccc2c(c1)c3nc2nc4nc(nc5nc(nc6nc(n3)c7ccccc67)c8ccccc58)c9ccccc49");
     }
-    
+
     @Test public void bo_18301() throws Exception {
         // note different from daylight due to their use of SSSR
         test("O=C1C=CC2=C3C1=CC=C1C(=O)C4=CC=CC=C4C(C=C2)=C31",
              "O=C1C=Cc2c3c1ccc4C(=O)c5ccccc5c(cc2)c34");
     }
-    
+
     @Test public void bo_21963() throws Exception {
         test("O=C1C2=CC=CC3=C2C2=C(C=CC=C12)C=C3",
              "O=c1c2cccc3c2c4c(cccc14)cc3");
     }
-    
+
     @Test public void bo_25756() throws Exception {
         test("NC1=C2C3=CC=CC=C3C3=CC=CC(C=C1)=C23",
              "Nc1c2c3ccccc3c4cccc(cc1)c24");
     }
-    
+
     @Test public void bo_39171() throws Exception {
         test("O=C1C(=O)C2=CC3=CC=CC=C3C3=C2C2=C(C=CC=C12)C=C3",
              "O=c1c(=O)c2cc3ccccc3c4c2c5c(cccc15)cc4");
     }
-    
+
     @Test public void bo_75696() throws Exception {
         test("O=C1NC(=O)C2=CC3=C(C=C12)C(=O)NC3=O",
              "O=c1[nH]c(=O)c2cc3c(cc12)c(=O)[nH]c3=O");
     }
-    
+
     @Test public void bo_78222() throws Exception {
         test("[O-]S(=O)(=O)OC1=C2C=CC3=C(NC4=CC=C5C6=CC=CC=C6C(=O)C6=C5C4=C3C=C6)C2=C(OS([O-])(=O)=O)C2=CC=CC=C12",
              "[O-]S(=O)(=O)Oc1c2ccc3c([nH]c4ccc5c6ccccc6c(=O)c7c5c4c3cc7)c2c(OS([O-])(=O)=O)c8ccccc18");
     }
-    
+
     @Test public void bo_83217() throws Exception {
         test("CN(C)C1=CC=[C-]C=C1",
              "CN(C)c1cc[c-]cc1");
@@ -614,7 +625,7 @@ public class DaylightDelocalisationTest {
         test("Cn1cnc2n(C)c(=O)n(C)c(=O)c12", "Cn1cnc2n(C)c(=O)n(C)c(=O)c12");
         test("C/C(=C\\CO)/C=C/C=C(/C)\\C=C\\C1=C(C)CCCC1(C)C", "C/C(=C\\CO)/C=C/C=C(/C)\\C=C\\C1=C(C)CCCC1(C)C");
     }
-   
+
     @Test public void non_daylight_aromatic_element() throws Exception {
         test("CC1=CC=C2[Bi](Cl)C3=CC=CC=C3S(=O)(=O)C2=C1",
              "Cc1ccc2[Bi](Cl)c3ccccc3S(=O)(=O)c2c1");
@@ -623,6 +634,12 @@ public class DaylightDelocalisationTest {
     private static void test(String org, String exp) throws Exception {
         Graph g = Graph.fromSmiles(org);
         Graph h = AllCycles.daylightModel(g).aromaticForm();
+        assertThat(h.toSmiles(), is(exp));
+    }
+
+    private static void test(String org, String exp, int lim) throws Exception {
+        Graph g = Graph.fromSmiles(org);
+        Graph h = AllCycles.daylightModel(g, lim).aromaticForm();
         assertThat(h.toSmiles(), is(exp));
     }
 
