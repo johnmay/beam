@@ -208,6 +208,11 @@ public class ElementTest {
             boolean valid = e.verify(0, 0);
         }
     }
+    
+    @Test public void ofNumber() {
+        assertThat(Element.ofNumber(6), is(Element.Carbon));
+        assertThat(Element.ofNumber(8), is(Element.Oxygen));
+    }
 
     @Test
     public void read() {

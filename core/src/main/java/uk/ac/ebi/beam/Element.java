@@ -236,8 +236,9 @@ public enum Element {
     private final int[] electrons;
 
     /** Look up of elements by symbol */
-    private static final Map<String, Element> elementMap
-            = new HashMap<String, Element>();
+    private static final Map<String, Element> elementMap = new HashMap<String, Element>();
+
+    private static final Element[] elements = new Element[117];
 
     /** Provide verification of valence/charge values. */
     private ElementCheck defaults = ElementCheck.NO_CHECK;
@@ -247,6 +248,7 @@ public enum Element {
             if (element.aromatic())
                 elementMap.put(element.symbol().toLowerCase(), element);
             elementMap.put(element.symbol(), element);
+            elements[element.atomicNumber] = element;
         }
 
         // load normal ranges from 'element-defaults.txt' and set for the
@@ -451,6 +453,16 @@ public enum Element {
      */
     public static Element ofSymbol(final String symbol) {
         return elementMap.get(symbol);
+    }
+
+    /**
+     * Access an element by atomic number.
+     * 
+     * @param elem atomic number
+     * @return the element for the atomic number
+     */
+    public static Element ofNumber(final int elem) {
+        return elements[elem];
     }
 
     /**
