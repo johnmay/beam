@@ -3,6 +3,7 @@ package uk.ac.ebi.beam;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 /** @author John May */
@@ -241,5 +242,17 @@ public class AtomBuilderTest {
         Atom a = AtomBuilder.aliphatic(Element.Carbon)
                             .hydrogens(-3)
                             .build();
+    }
+
+    @Test public void aromatic_unknown_from_element() {
+        assertNotNull(AtomBuilder.aromatic(Element.Unknown)
+                                 .build());
+    } 
+    
+    @Test public void aromatic_unknown_from_symbol() {
+        assertNotNull(AtomBuilder.aromatic("*")
+                                 .build());
+        assertNotNull(AtomBuilder.aromatic("R")
+                                 .build());
     }
 }

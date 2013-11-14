@@ -668,7 +668,8 @@ public enum Element {
      */
     enum AromaticSpecification {
 
-        Daylight(Carbon,
+        Daylight(Unknown,
+                 Carbon,
                  Nitrogen,
                  Oxygen,
                  Sulfur,
@@ -676,7 +677,8 @@ public enum Element {
                  Arsenic,
                  Selenium),
 
-        OpenSmiles(Boron,
+        OpenSmiles(Unknown,
+                   Boron,
                    Carbon,
                    Nitrogen,
                    Oxygen,
@@ -685,7 +687,8 @@ public enum Element {
                    Arsenic,
                    Selenium),
 
-        General(Boron,
+        General(Unknown,
+                Boron,
                 Carbon,
                 Nitrogen,
                 Oxygen,
