@@ -72,7 +72,7 @@ for (int i = 0; i < 25; i++)
 System.out.println(sb);
 ```
 
-Bond based double-bond configuration is normal is SMILES but can be problematic.
+Bond based double-bond configuration is normal in SMILES but can be problematic.
 The issue is that a single symbol may be specifying two adjacent configurations.
 A proposed extension was to use atom-based double-bond configuration.
 
