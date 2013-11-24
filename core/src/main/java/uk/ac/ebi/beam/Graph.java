@@ -385,6 +385,16 @@ public final class Graph {
     }
 
     /**
+     * Resonate bond assignments in conjugate rings such that two SMILES with
+     * the same ordering have the same kekulé assignment.
+     * 
+     * @return (self) - the graph is mutated
+     */
+    public Graph resonate() {
+        return Localise.resonate(this);
+    }
+
+    /**
      * Localise delocalized (aromatic) bonds in this molecule producing the
      * Kekulé form. The original graph is not modified.
      *
@@ -444,7 +454,7 @@ public final class Graph {
      * @return a new chemical graph with the vertices permuted by the given
      *         ordering
      */
-    Graph permute(int[] p) {
+    public Graph permute(int[] p) {
 
         if (p.length != order)
             throw new IllegalArgumentException("permuation size should equal |V| (order)");
@@ -531,7 +541,7 @@ public final class Graph {
      */
     Graph sort() {
         for (int u = 0; u < order; u++) {
-            Collections.sort(edges[u], EdgeComparator.forVertex(u));
+            Collections.sort(edges[u], EdgeComparator.forVertex(this, u));
         }
         return this;
     }
@@ -562,18 +572,28 @@ public final class Graph {
 
     private static final class EdgeComparator implements Comparator<Edge> {
         private int u;
+        private Graph g;
 
-        private EdgeComparator(int u) {
+        private EdgeComparator(Graph g, int u) {
             this.u = u;
+            this.g = g;
         }
 
-        static EdgeComparator forVertex(int u) {
-            return new EdgeComparator(u);
+        static EdgeComparator forVertex(Graph g, int u) {
+            return new EdgeComparator(g, u);
         }
 
         @Override public int compare(Edge e, Edge f) {
             int v = e.other(u), w = f.other(u);
-            if (v > w)
+//            if (g.atom(u).element() == Element.Hydrogen)
+//                return -1;
+//            if (g.atom(w).element() == Element.Hydrogen)
+//                return +1;
+            if (e.bond().order() < f.bond().order())
+                return +1;
+            else if (e.bond().order() > f.bond().order())
+                return -1;                 
+            else if (v > w)
                 return +1;
             else if (v < w)
                 return -1;

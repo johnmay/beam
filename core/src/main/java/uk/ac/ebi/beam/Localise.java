@@ -1,7 +1,9 @@
 package uk.ac.ebi.beam;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -145,6 +147,57 @@ final class Localise {
         }
 
         return false;
+    }
+
+    /**
+     * Resonate double bonds in a cyclic system such that given a molecule
+     * with the same ordering produces the same resonance assignment. This 
+     * procedure provides a canonical kekulué representation for conjugated
+     * rings. 
+     * 
+     * @param g graph
+     * @return the input graph (same reference)
+     */
+    static Graph resonate(Graph g) {
+
+        BitSet cyclic = new BiconnectedComponents(g).cyclic();
+        BitSet subset = new BitSet();
+        int[]  count  = new int[g.order()];
+        
+        List<Edge> edges = new ArrayList<Edge>();
+        for (Edge e : g.edges()) {
+            if (e.bond() == Bond.DOUBLE) {
+                int u = e.either();
+                int v = e.other(u);
+                if (cyclic.get(u) && cyclic.get(v)) {
+                    count[u]++;
+                    count[v]++;
+                    edges.add(e);
+                }
+            }
+        }
+
+        for (Edge e : edges) {
+            int u = e.either();
+            int v = e.other(u);
+            if (count[u] == 1 && count[v] == 1) {
+                e.bond(Bond.IMPLICIT);
+                subset.set(u);
+                subset.set(v);
+            }
+        }
+        
+        Matching m = MaximumMatching.maximise(g.sort(),
+                                              ArbitraryMatching.of(g, subset),
+                                              IntSet.fromBitSet(subset));
+
+        for (int v = subset.nextSetBit(0); v >= 0; v = subset.nextSetBit(v + 1)) {
+            int w = m.other(v);
+            subset.clear(w);
+            g.edge(v, w).bond(Bond.DOUBLE);
+        }
+        
+        return g;
     }
 
     static Graph localise(Graph delocalised) throws InvalidSmilesException {

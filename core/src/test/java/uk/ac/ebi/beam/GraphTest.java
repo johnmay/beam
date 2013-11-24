@@ -470,5 +470,37 @@ public class GraphTest {
         assertThat(g.toSmiles(visited), is("[CH3][CH]([CH2][CH2][CH3])[CH3]"));
         assertThat(visited, is(new int[]{0, 1, 2, 5, 3, 4}));
     }
+    
+    @Test public void resonate() throws Exception {
+        // two different resonance forms with the same
+        // ordering
+        Graph g = Graph.fromSmiles("C1=CC2=CC=CC2=C1");
+        Graph h = Graph.fromSmiles("C=1C=C2C=CC=C2C=1");
+        // produce different SMILES
+        assertThat(g.toSmiles(), is("C1=CC2=CC=CC2=C1"));
+        assertThat(h.toSmiles(), is("C=1C=C2C=CC=C2C1"));
+        // but once resonate we get the same SMILES 
+        assertThat(g.resonate().toSmiles(), is("C1=CC2=CC=CC2=C1"));
+        assertThat(h.resonate().toSmiles(), is("C1=CC2=CC=CC2=C1"));
+    }
 
+
+    // ensures we don't loose the carbonyl
+    @Test public void nitrogen_5v() throws Exception {
+        Graph g = Graph.fromSmiles("O=N1=CC=CC=C1");
+        Graph h = Graph.fromSmiles("O=N=1C=CC=CC1");
+        // produce different SMILES
+        assertThat(g.toSmiles(), is("O=N1=CC=CC=C1"));
+        assertThat(h.toSmiles(), is("O=N=1C=CC=CC1"));
+        // but once resonate we get the same SMILES 
+        assertThat(g.resonate().toSmiles(), is("O=N1=CC=CC=C1"));
+        assertThat(h.resonate().toSmiles(), is("O=N1=CC=CC=C1"));    
+    }
+    
+    // ensures we don't loose the allene
+    @Test public void allene() throws Exception {
+        Graph g = Graph.fromSmiles("C1=CC=C=CC=C1");
+        assertThat(g.toSmiles(), is("C1=CC=C=CC=C1"));
+        assertThat(g.resonate().toSmiles(), is("C1=CC=C=CC=C1"));
+    }
 }
