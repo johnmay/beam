@@ -315,6 +315,11 @@ public class LocaliseTest {
         test("oc1cc[cH-]cc1",
              "O=C1C=C[CH-]C=C1");
     }
+    
+    @Test public void sulphur_cation() throws Exception {
+        test("CC(C)(C)c1cc2c3[s-](oc2=O)oc(=O)c3c1",
+             "CC(C)(C)C1=CC2=C3[S-](OC2=O)OC(=O)C3=C1");
+    }
 
     static void test(String delocalised, String localised) throws Exception {
         Graph g = Graph.fromSmiles(delocalised);
