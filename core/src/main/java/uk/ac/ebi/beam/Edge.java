@@ -52,7 +52,7 @@ public final class Edge {
     private final int u, v;
 
     /** Label on the edge. */
-    private final Bond bond;
+    private Bond bond;
 
     Edge(final int u, final int v, final Bond bond) {
         this.u    = u;
@@ -95,6 +95,15 @@ public final class Edge {
      */
     public Bond bond() {
         return bond;
+    }
+
+    /**
+     * Set the bond label.
+     * 
+     * @param bond the bond label
+     */
+    void bond(Bond bond) {
+        this.bond = bond;     
     }
 
     /**
