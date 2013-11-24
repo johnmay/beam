@@ -630,7 +630,12 @@ public class DaylightDelocalisationTest {
         test("CC1=CC=C2[Bi](Cl)C3=CC=CC=C3S(=O)(=O)C2=C1",
              "Cc1ccc2[Bi](Cl)c3ccccc3S(=O)(=O)c2c1");
     }
-
+    
+    @Test public void acyclic_charge() throws Exception {
+        test("[Na+].[Na+].[S-2]",
+             "[Na+].[Na+].[S-2]");
+    }
+    
     private static void test(String org, String exp) throws Exception {
         Graph g = Graph.fromSmiles(org);
         Graph h = AllCycles.daylightModel(g).aromaticForm();

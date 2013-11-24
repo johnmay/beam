@@ -93,6 +93,9 @@ abstract class ElectronDonation {
         /** @inheritDoc */
         @Override int contribution(int u, Graph g, Cycle cycle, BitSet cyclic) {
 
+            if (!cyclic.get(u))
+                return -1;
+            
             Atom    atom = g.atom(u);
             Element elem = atom.element();
         
@@ -141,7 +144,7 @@ abstract class ElectronDonation {
                 // a cyclic exo-cyclic double bond - how many electrons determine
                 // by acyclicContribution()
                 return acyclicContribution(atom, g.atom(acyclic.other(u)), charge);
-            } else if (nCyclic == 0 && nAcyclic == 0) {
+            } else if (nCyclic == 0 && nAcyclic == 0 && charge > -3) {
                 // no double bonds - do we have any lone pairs to contribute?
                 int v = valence(elem, charge);
                 if (v - sum >= 2 && charge <= 0)
