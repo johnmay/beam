@@ -58,10 +58,20 @@ final class Generator {
      * @param g chemical graph
      */
     Generator(Graph g, RingNumbering rnums) {
+        this(g, new int[g.order()], rnums);    
+    }
+    
+    /**
+     * Create a new generator the given chemical graph.
+     *
+     * @param g chemical graph
+     * @param visitedAt the index of the atom in the output         
+     */
+    Generator(Graph g, int[] visitedAt, RingNumbering rnums) {
         this.g = g;
         this.rnums = rnums;
         this.sb = new StringBuilder(g.order() * 2);
-        this.visitedAt = new int[g.order()];
+        this.visitedAt = visitedAt;
         this.tokens = new AtomToken[g.order()];
         this.rings = new HashMap<Integer, List<RingClosure>>();
 
@@ -75,6 +85,7 @@ final class Generator {
 
         // write notation
         visited = 0;
+        i = 0;
         Arrays.fill(visitedAt, -1);
         for (int u = 0; u < g.order() && visited < g.order(); u++) {
             if (visitedAt[u] < 0)
@@ -238,6 +249,18 @@ final class Generator {
      */
     static String generate(final Graph g) {
         return new Generator(g, new IterativeRingNumbering(1)).string();
+    }
+
+    /**
+     * Convenience method for generating a SMILES string for the specified
+     * chemical graph.
+     *
+     * @param g the graph to generate the SMILE for
+     * @param visitedAt store when each atom was visited
+     * @return SMILES gor the provided chemical graph
+     */
+    static String generate(final Graph g, int[] visitedAt) {
+        return new Generator(g, visitedAt, new IterativeRingNumbering(1)).string();
     }
 
     static final class RingClosure {

@@ -353,6 +353,18 @@ public final class Graph {
     }
 
     /**
+     * Generate a SMILES for the Graph. The {@code visitedAt} is filled with
+     * the output rank of each vertex in the graph. This allows one to know
+     * the atom index when the SMILES in read in.
+     * 
+     * @param visitedAt vector to be filled with the output order
+     * @return the SMILES string
+     */
+    public String toSmiles(int[] visitedAt) {
+        return Generator.generate(this, visitedAt);
+    }
+
+    /**
      * Delocalise a kekulé graph representation to one with <i>aromatic</i>
      * bonds. The original graph remains unchanged.
      *

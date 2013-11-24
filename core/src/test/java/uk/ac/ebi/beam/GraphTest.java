@@ -438,6 +438,7 @@ public class GraphTest {
         assertThat(g.implHCount(4), is(0));
         assertThat(g.implHCount(5), is(1));
     }
+    
     @Test public void implHCount_nonExpH() throws Exception{
         Graph g = Graph.fromSmiles("C([H])([H])1NC=C[C]=C1");
         assertThat(g.implHCount(0), is(0)); // 2 exp hs
@@ -448,6 +449,26 @@ public class GraphTest {
         assertThat(g.implHCount(5), is(1));
         assertThat(g.implHCount(6), is(0));
         assertThat(g.implHCount(7), is(1));
+    }
+    
+    @Test public void outputOrder() throws Exception {
+        Graph g = GraphBuilder.create(5)
+                              .add(Element.Carbon, 3)
+                              .add(Element.Carbon, 1)
+                              .add(Element.Carbon, 2)
+                              .add(Element.Carbon, 3)
+                              .add(Element.Carbon, 2)
+                              .add(Element.Carbon, 3)
+                              .add(0, 1)
+                              .add(1, 2)
+                              .add(1, 3)
+                              .add(2, 4)
+                              .add(4, 5)
+                              .build();
+        g.sort();
+        int[] visited = new int[g.order()];
+        assertThat(g.toSmiles(visited), is("[CH3][CH]([CH2][CH2][CH3])[CH3]"));
+        assertThat(visited, is(new int[]{0, 1, 2, 5, 3, 4}));
     }
 
 }
