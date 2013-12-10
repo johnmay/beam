@@ -223,7 +223,6 @@ public final class GraphBuilder {
             } else {
                 BitSet visited = new BitSet();
                 visited.set(v);
-                visited.set(u);
                 invertExistingDirectionalLabels(adjToDb, visited, v, u);
                 if (!checkDirectionalAssignment(first, u, x) ||
                         !checkDirectionalAssignment(second, v, y))
@@ -251,7 +250,7 @@ public final class GraphBuilder {
         visited.set(u);
         for (Edge e : g.edges(u)) {
             int v = e.other(u);
-            if (!visited.get(v) && p != v) {
+            if (adjToDb.get(v) && !visited.get(v) && p != v) {
                 g.replace(e, e.inverse());
                 invertExistingDirectionalLabels(adjToDb, visited, v, u);
             }
