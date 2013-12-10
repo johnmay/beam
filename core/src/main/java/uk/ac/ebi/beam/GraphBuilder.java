@@ -194,6 +194,10 @@ public final class GraphBuilder {
     }
 
     private void assignDirectionalLabels() {
+        
+        // store the vertices which are adjacent to pi bonds with a config
+        BitSet adjToDb = new BitSet();
+        
         for (GeometricBuilder builder : builders) {
             // unspecified only used for getting not setting configuration
             if (builder.c == Configuration.DoubleBond.UNSPECIFIED)
@@ -201,8 +205,8 @@ public final class GraphBuilder {
             checkGeometricBuilder(builder); // check required vertices are adjacent
 
             int u = builder.u, v = builder.v, x = builder.x, y = builder.y;
-
-            Bond first = firstDirectionalLabel(u, x);
+            
+            Bond first  = firstDirectionalLabel(u, x);
             Bond second = builder.c == TOGETHER ? first
                                                 : first.inverse();
 
@@ -217,18 +221,31 @@ public final class GraphBuilder {
                 g.replace(g.edge(u, x), new Edge(u, x, first.inverse()));
                 g.replace(g.edge(v, y), new Edge(v, y, second.inverse()));
             } else {
-                invertExistingDirectionalLabels(new BitSet(), v, u);
+                BitSet visited = new BitSet();
+                visited.set(v);
+                visited.set(u);
+                invertExistingDirectionalLabels(adjToDb, visited, v, u);
                 if (!checkDirectionalAssignment(first, u, x) ||
                         !checkDirectionalAssignment(second, v, y))
                     throw new IllegalArgumentException("cannot assign geometric configuration");
                 g.replace(g.edge(u, x), new Edge(u, x, first));
                 g.replace(g.edge(v, y), new Edge(v, y, second));
             }
+
+
+            adjToDb.set(u);
+            adjToDb.set(v);
+            for (Edge e : g.edges(u))
+                adjToDb.set(e.other(u));
+             for (Edge e : g.edges(v))
+                adjToDb.set(e.other(v));
+                
         }
         builders.clear();
     }
 
-    private void invertExistingDirectionalLabels(BitSet visited,
+    private void invertExistingDirectionalLabels(BitSet adjToDb,
+                                                 BitSet visited,
                                                  int u,
                                                  int p) {
         visited.set(u);
@@ -236,7 +253,7 @@ public final class GraphBuilder {
             int v = e.other(u);
             if (!visited.get(v) && p != v) {
                 g.replace(e, e.inverse());
-                invertExistingDirectionalLabels(visited, v, u);
+                invertExistingDirectionalLabels(adjToDb, visited, v, u);
             }
         }
     }

@@ -235,5 +235,39 @@ public class GraphBuilderTest {
                             .build();
         Assert.assertThat(g.toSmiles(), is("C=1/C=C\\C=C/C=C\\C1"));
     }
+    
+    // example from: CHEBI:27711
+    // C[C@]1(CC(O)=O)[C@H](CCC(O)=O)C2=C/c3[nH]c(Cc4[nH]c(c(CC(O)=O)c4CCC(O)=O)[C@](C)(O)[C@@]45N/C(=C\C1=N\2)[C@@H](CCC(O)=O)[C@]4(C)CC(=O)O5)c(CCC(O)=O)c3CC(O)=O
+    @Test public void correctCyclicDb() {
+        // C\C=C/C1=C(CCC1)\C=C/C
+        // 0 1 2 3  4 567   8 9 0
+        GraphBuilder gb = GraphBuilder.create(5);
+        Graph g = gb.add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(0, 1)
+                    .doubleBond(1, 2)
+                    .add(2, 3)
+                    .doubleBond(3, 4)
+                    .add(4, 5)
+                    .add(5, 6)
+                    .add(6, 7)
+                    .add(7, 3)
+                    .add(4, 8)
+                    .doubleBond(8, 9)
+                    .add(9, 10)
+                    .geometric(1, 2).opposite(0, 3)
+                    .geometric(8, 9).opposite(4, 10)
+                    .geometric(3, 4).opposite(2, 8)
+                    .build();
+    }
 
 }
