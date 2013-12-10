@@ -344,19 +344,19 @@ final class Parser {
                 // to [2H] and [3H].
                 case 'H':
                     if (strict)
-                        throw new InvalidSmilesException("Hydrogens should be specified in square brackets - '[H]'",
+                        throw new InvalidSmilesException("hydrogens should be specified in square brackets - '[H]'",
                                                          buffer);
                     addAtom(AtomImpl.EXPLICIT_HYDROGEN);
                     break;
                 case 'D':
                     if (strict)
-                        throw new InvalidSmilesException("Deuterium should be specified as a hydrogen isotope - '[2H]'",
+                        throw new InvalidSmilesException("deuterium should be specified as a hydrogen isotope - '[2H]'",
                                                          buffer);
                     addAtom(AtomImpl.DEUTERIUM);
                     break;
                 case 'T':
                     if (strict)
-                        throw new InvalidSmilesException("Tritium should be specified as a hydrogen isotope - '[3H]'",
+                        throw new InvalidSmilesException("tritium should be specified as a hydrogen isotope - '[3H]'",
                                                          buffer);
                     addAtom(AtomImpl.TRITIUM);
                     break;
@@ -382,7 +382,7 @@ final class Parser {
                 case '%':
                     int num = buffer.getNumber(2);
                     if (num < 0)
-                        throw new InvalidSmilesException("A number (<digit>+) must follow '%':", buffer);
+                        throw new InvalidSmilesException("a number (<digit>+) must follow '%':", buffer);
                     ring(num, buffer);
                     break;
 
@@ -416,13 +416,13 @@ final class Parser {
                 // branching
                 case '(':
                     if (stack.empty())
-                        throw new InvalidSmilesException("Cannot open branch - there were no previous atoms:",
+                        throw new InvalidSmilesException("cannot open branch - there were no previous atoms:",
                                                          buffer);
                     stack.push(stack.peek());
                     break;
                 case ')':
                     if (stack.size() < 2)
-                        throw new InvalidSmilesException("Closing of an unopened branch:",
+                        throw new InvalidSmilesException("closing of an unopened branch:",
                                                          buffer);
                     stack.pop();
                     break;
@@ -435,7 +435,7 @@ final class Parser {
                     return;
 
                 default:
-                    throw new InvalidSmilesException("Unexpected character:", buffer);
+                    throw new InvalidSmilesException("unexpected character:", buffer);
             }
         }
     }
@@ -462,14 +462,14 @@ final class Parser {
         final Element element = Element.read(buffer);
 
         if (element == null)
-            throw new InvalidSmilesException("Unrecognised element symbol: ", buffer);
+            throw new InvalidSmilesException("unrecognised element symbol: ", buffer);
 
         if (aromatic)
             g.markDelocalised();
         
         // element isn't aromatic as per the OpenSMILES specification
         if (strict && !element.aromatic(Element.AromaticSpecification.OpenSmiles))
-            throw new InvalidSmilesException("Abnormal aromatic element", buffer);
+            throw new InvalidSmilesException("abnormal aromatic element", buffer);
 
         configuration = Configuration.read(buffer);
 
@@ -555,7 +555,7 @@ final class Parser {
         if (buffer.getIf(':')) {
             if (buffer.nextIsDigit())
                 return buffer.getNumber();
-            throw new InvalidSmilesException("Invalid atom class, <digit>+ must follow ':'", buffer);
+            throw new InvalidSmilesException("invalid atom class, <digit>+ must follow ':'", buffer);
         }
         return 0;
     }
@@ -568,7 +568,7 @@ final class Parser {
      */
     private void ring(int rnum, CharBuffer buffer) throws InvalidSmilesException {
         if (bond == Bond.DOT)
-            throw new InvalidSmilesException("A ring bond can not be a 'dot':",
+            throw new InvalidSmilesException("a ring bond can not be a 'dot':",
                                              buffer,
                                              -1);
         if (rings.length <= rnum || rings[rnum] == null) {

@@ -33,8 +33,7 @@ final class Localise {
         // we now use the matching to update these 
         for (int u = subset.nextSetBit(0); u >= 0; u = subset.nextSetBit(u + 1)) {
             if (m.unmatched(u)) {
-                throw new InvalidSmilesException("A valid kekule structure could not be assigned to: " +
-                                                         delocalised.toSmiles());
+                throw new InvalidSmilesException("a valid kekulé structure could not be assigned");
             }
             int v = m.other(u);
             subset.clear(v);
@@ -209,8 +208,7 @@ final class Localise {
         BitSet aromatic = new BitSet();
         BitSet subset   = buildSet(delocalised, aromatic);
         if (hasOddCardinality(subset))
-            throw new InvalidSmilesException("A valid kekule structure could not be assigned to: " +
-                                                     delocalised.toSmiles());
+            throw new InvalidSmilesException("a valid kekulé structure could not be assigned");
         return new Localise(delocalised, subset, aromatic).localised;
     }
 
