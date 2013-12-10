@@ -118,8 +118,10 @@ public final class AtomBuilder {
     public static AtomBuilder aromatic(Element e) {
         if (e == null)
             throw new NullPointerException("no element provided");
+        if (e == Element.Unknown)
+            return new AtomBuilder(e, false);
         if (!e.aromatic(Element.AromaticSpecification.Daylight))
-            throw new IllegalArgumentException(e + " cannot be aromatic by the Daylight specification.");
+            throw new IllegalArgumentException("The element '" + e + "' cannot be aromatic by the Daylight specification.");
         return new AtomBuilder(e, true);
     }
 
