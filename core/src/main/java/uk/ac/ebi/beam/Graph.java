@@ -589,11 +589,11 @@ public final class Graph {
 //                return -1;
 //            if (g.atom(w).element() == Element.Hydrogen)
 //                return +1;
-            if (e.bond().order() < f.bond().order())
-                return +1;
-            else if (e.bond().order() > f.bond().order())
-                return -1;                 
-            else if (v > w)
+//            if (e.bond().order() < f.bond().order())
+//                return +1;
+//            else if (e.bond().order() > f.bond().order())
+//                return -1;                 
+            if (v > w)
                 return +1;
             else if (v < w)
                 return -1;
