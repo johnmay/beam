@@ -61,6 +61,8 @@ public final class GraphBuilder {
     private final Graph g;
 
     private final List<GeometricBuilder> builders = new ArrayList<GeometricBuilder>(2);
+    
+    private int[] valence;
 
     /**
      * Internal constructor.
@@ -69,6 +71,7 @@ public final class GraphBuilder {
      */
     private GraphBuilder(int nAtoms) {
         this.g = new Graph(nAtoms);
+        this.valence = new int[nAtoms];
     }
 
     public static GraphBuilder create(int n) {
@@ -95,6 +98,8 @@ public final class GraphBuilder {
      * @return graph builder for adding more atoms/connections
      */
     public GraphBuilder add(Atom a) {
+        if (g.order() >= valence.length)
+            valence = Arrays.copyOf(valence, valence.length * 2);
         g.addAtom(a);
         return this;
     }
@@ -106,7 +111,16 @@ public final class GraphBuilder {
      * @return graph builder for adding more atoms/connections
      */
     public GraphBuilder add(Edge e) {
+        Bond b = e.bond();
+        int u = e.either();
+        int v = e.other(u);
+        if (b == Bond.SINGLE && (!g.atom(u).aromatic() || !g.atom(v).aromatic()))
+            e.bond(Bond.IMPLICIT);
+        else if (b == Bond.AROMATIC && g.atom(u).aromatic() && g.atom(v).aromatic())
+            e.bond(Bond.IMPLICIT);
         g.addEdge(e);
+        valence[u] += b.order();
+        valence[v] += b.order();
         return this;
     }
 
@@ -323,13 +337,47 @@ public final class GraphBuilder {
         if (db.bond() != Bond.DOUBLE)
             throw new IllegalArgumentException("cannot assign double bond configuration to non-double bond");
     }
+    
+    private void suppress() {
+        for (int v = 0; v < g.order(); v++) {
+            if (g.topologyOf(v).type() == Configuration.Type.None) {
+                Atom atom = g.atom(v);
+                if (suppressible(atom, valence[v])) {
+                    g.setAtom(v, toSubset(atom));    
+                }
+            }
+        }
+    }
+    
+    private Atom toSubset(Atom a) {
+        if (a.aromatic())
+            return AtomImpl.AromaticSubset.ofElement(a.element());
+        else
+            return AtomImpl.AliphaticSubset.ofElement(a.element());
+    }
 
+    private boolean suppressible(Atom a, int v) {
+        if (!a.subset()
+                && a.element().organic()
+                && a.isotope() < 0
+                && a.charge() == 0
+                && a.atomClass() == 0) {
+            int h = a.hydrogens();
+            if (a.aromatic()) 
+                return h == a.element().aromaticImplicitHydrogens(1 + v);
+            else
+                return h == a.element().implicitHydrogens(v);
+        }
+        return false;
+    }
+    
     /**
      * Finalise and build the chemical graph.
      *
      * @return chemical graph instance
      */
     public Graph build() {
+        suppress(); 
         assignDirectionalLabels();
         return g;
     }

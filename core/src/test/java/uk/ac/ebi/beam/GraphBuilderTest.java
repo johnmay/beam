@@ -269,5 +269,22 @@ public class GraphBuilderTest {
                     .geometric(3, 4).opposite(2, 8)
                     .build();
     }
+    
+    @Test public void suppress_benzene() {
+        GraphBuilder gb = GraphBuilder.create(5);
+        Assert.assertThat(gb.add(Element.Carbon, 1)
+                            .add(Element.Carbon, 1)
+                            .add(Element.Carbon, 1)
+                            .add(Element.Carbon, 1)
+                            .add(Element.Carbon, 1)
+                            .add(Element.Carbon, 1)
+                            .add(0, 1)
+                            .add(1, 2, Bond.DOUBLE)
+                            .add(2, 3)
+                            .add(3, 4, Bond.DOUBLE)
+                            .add(4, 5)
+                            .add(5, 0, Bond.DOUBLE).build().toSmiles(),
+                          is("C=1C=CC=CC1"));
+    }
 
 }
