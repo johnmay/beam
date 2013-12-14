@@ -186,7 +186,7 @@ final class Localise {
             }
         }
         
-        Matching m = MaximumMatching.maximise(g.sort(),
+        Matching m = MaximumMatching.maximise(g.sort(new Graph.CanOrderFirst()),
                                               ArbitraryMatching.of(g, subset),
                                               IntSet.fromBitSet(subset));
 

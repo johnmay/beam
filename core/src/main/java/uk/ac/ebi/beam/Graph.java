@@ -38,6 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static uk.ac.ebi.beam.Element.Hydrogen;
+
 /**
  * Defines a labelled graph with atoms as vertex labels and bonds as edge
  * labels. Topological information around atoms can also be stored.
@@ -480,7 +482,7 @@ public final class Graph {
         }
 
         // ensure edges are in sorted order
-        return g.sort();
+        return g.sort(new CanOrderFirst());
     }
 
     /**
@@ -525,27 +527,6 @@ public final class Graph {
         return f.apply(this);
     }
 
-    /**
-     * Sort the edges of each vertex in the chemical graph. Ensures that when
-     * invoking {@link #edges(int)} the connected vertices will be in natural
-     * order. The actual order of atoms does not change. The atom order can be
-     * rearranged using {@link #permute(int[])}.
-     *
-     * <blockquote><pre>
-     * g.edges(5) = {5-1, 5-0, 6-5, 5-2}  // unsorted
-     * g.edges(5) = {5-0, 5-1, 5-2, 6-5}  // sorted
-     * </pre></blockquote>
-     *
-     * @return self-reference for fluent invocation
-     * @see #permute(int[])
-     */
-    Graph sort() {
-        for (int u = 0; u < order; u++) {
-            Collections.sort(edges[u], OldEdgeComparator.forVertex(this, u));
-        }
-        return this;
-    }
-
     void clear() {
         topologies.clear();
         for (int i = 0; i < order; i++) {
@@ -570,34 +551,97 @@ public final class Graph {
         return u;
     }
 
-    private static final class OldEdgeComparator implements Comparator<Edge> {
-        private int u;
-        private Graph g;
-
-        private OldEdgeComparator(Graph g, int u) {
-            this.u = u;
-            this.g = g;
+    /**
+     * Sort the edges of the graph to visit in a specific order. The graph is
+     * modified.
+     * 
+     * @param comparator ordering on edges
+     * @return the graph
+     */
+    public Graph sort(EdgeComparator comparator) {
+        for (int u = 0; u < order; u++) {
+            List<Edge> es = edges[u];
+            
+            // insertion sort as most atoms have small degree <= 4
+            for (int i = 1; i < es.size(); i++) {
+                int j = i - 1;
+                Edge e = es.get(i);
+                while (j >= 0 && comparator.less(this, u, e, es.get(j))) {
+                    es.set(j + 1, es.get(j--));
+                }
+                es.set(j + 1, e);
+            }
         }
+        return this;
+    }
 
-        static OldEdgeComparator forVertex(Graph g, int u) {
-            return new OldEdgeComparator(g, u);
+    /**
+     * Defines a method for arranging the neighbors of an atom.
+     */
+    public static interface EdgeComparator {
+
+        /**
+         * Should the edge, e, be visited before f.
+         * 
+         * @param g graph
+         * @param u the atom we are sorting from
+         * @param e an edge adjacent to u
+         * @param f an edge adjacent to u
+         * @return edge e is less than edge f
+         */
+        boolean less(Graph g, int u, Edge e, Edge f);
+    }
+
+    /**
+     * Sort the neighbors of each atom such that hydrogens are visited first and
+     * deuterium before tritium. 
+     */
+    public static final class VisitHydrogenFirst implements EdgeComparator {
+
+        /**
+         * @inheritDoc
+         */
+        @Override public boolean less(Graph g, int u, Edge e, Edge f) {
+            
+            int v = e.other(u);
+            int w = f.other(u);
+            
+            Element vElem = g.atom(v).element();
+            Element wElem = g.atom(w).element();
+            
+            if (vElem == Hydrogen && wElem != Hydrogen)
+                return true;
+            if (vElem != Hydrogen && wElem == Hydrogen)
+                return false;
+            
+            // sort hydrogens by isotope
+            return vElem == Hydrogen && g.atom(v).isotope() < g.atom(w).isotope();
         }
+    }
 
-        @Override public int compare(Edge e, Edge f) {
-            int v = e.other(u), w = f.other(u);
-//            if (g.atom(u).element() == Element.Hydrogen)
-//                return -1;
-//            if (g.atom(w).element() == Element.Hydrogen)
-//                return +1;
-//            if (e.bond().order() < f.bond().order())
-//                return +1;
-//            else if (e.bond().order() > f.bond().order())
-//                return -1;                 
-            if (v > w)
-                return +1;
-            else if (v < w)
-                return -1;
-            return 0;
+    /**
+     * Visit high order bonds before low order bonds.
+     */
+    public static final class VisitHighOrderFirst implements EdgeComparator {
+        
+        /**
+         * @inheritDoc
+         */
+        @Override public boolean less(Graph g, int u, Edge e, Edge f) {
+            return e.bond().order() > f.bond().order();
+        }
+    }
+
+    /**
+     * Arrange neighbors in canonical order.
+     */
+    static final class CanOrderFirst implements EdgeComparator {
+
+        /**
+         * @inheritDoc
+         */
+        @Override public boolean less(Graph g, int u, Edge e, Edge f) {
+            return e.other(u) < f.other(u);
         }
     }
 }

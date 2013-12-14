@@ -123,7 +123,7 @@ final class AllCycles {
                                                      true));
             }
         }
-        return cpy;
+        return cpy.sort(new Graph.CanOrderFirst());
     }
 
     private void add(PathEdge e) {

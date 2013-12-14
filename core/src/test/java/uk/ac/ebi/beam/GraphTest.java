@@ -364,7 +364,7 @@ public class GraphTest {
         assertThat(g.edges(3), CoreMatchers
                 .<List<Edge>>is(Arrays.asList(new Edge(3, 2, Bond.IMPLICIT),
                                               new Edge(3, 0, Bond.IMPLICIT))));
-        g.sort();
+        g.sort(new Graph.CanOrderFirst());
         assertThat(g.edges(0), CoreMatchers
                 .<List<Edge>>is(Arrays.asList(new Edge(0, 1, Bond.IMPLICIT),
                                               new Edge(0, 3, Bond.IMPLICIT))));
@@ -465,9 +465,9 @@ public class GraphTest {
                               .add(2, 4)
                               .add(4, 5)
                               .build();
-        g.sort();
+        g.sort(new Graph.CanOrderFirst());
         int[] visited = new int[g.order()];
-        assertThat(g.toSmiles(visited), is("[CH3][CH]([CH2][CH2][CH3])[CH3]"));
+        assertThat(g.toSmiles(visited), is("CC(CCC)C"));
         assertThat(visited, is(new int[]{0, 1, 2, 5, 3, 4}));
     }
     
@@ -502,5 +502,36 @@ public class GraphTest {
         Graph g = Graph.fromSmiles("C1=CC=C=CC=C1");
         assertThat(g.toSmiles(), is("C1=CC=C=CC=C1"));
         assertThat(g.resonate().toSmiles(), is("C1=CC=C=CC=C1"));
+    }
+    
+    @Test public void sortH() throws Exception {
+        Graph g = Graph.fromSmiles("C(C(C)[H])[H]");
+        g.sort(new Graph.VisitHydrogenFirst());
+        assertThat(g.toSmiles(), is("C([H])C([H])C"));
+    }
+
+    @Test public void sortHIsotopes() throws Exception {
+        Graph g = Graph.fromSmiles("C([3H])([2H])[H]");
+        g.sort(new Graph.VisitHydrogenFirst());
+        assertThat(g.toSmiles(), is("C([H])([2H])[3H]"));
+    }
+    
+    @Test public void hiBondOrderFirst() throws Exception {
+        Graph g = Graph.fromSmiles("C=1C=CC=CC1");
+        g.sort(new Graph.VisitHighOrderFirst());
+        assertThat(g.toSmiles(), is("C1=CC=CC=C1"));
+    }
+
+    @Test public void hiBondOrderFirst2() throws Exception {
+        Graph g = Graph.fromSmiles("P(=C)#N");
+        g.sort(new Graph.VisitHighOrderFirst());
+        assertThat(g.toSmiles(), is("P(#N)=C"));
+    }
+    
+    @Test public void stableSort() throws Exception {
+        Graph g = Graph.fromSmiles("C=1(C(=C(C(=C(C1[H])[H])[H])[H])[H])[H]");
+        g.sort(new Graph.VisitHighOrderFirst());
+        g.sort(new Graph.VisitHydrogenFirst());
+        assertThat(g.toSmiles(), is("C1([H])=C([H])C([H])=C([H])C([H])=C1[H]"));
     }
 }
