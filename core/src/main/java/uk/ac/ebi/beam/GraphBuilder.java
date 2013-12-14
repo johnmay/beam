@@ -30,6 +30,7 @@
 package uk.ac.ebi.beam;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
@@ -141,7 +142,9 @@ public final class GraphBuilder {
      * @return graph builder for adding more atoms/connections
      */
     public GraphBuilder singleBond(int u, int v) {
-        return add(u, v, Bond.SINGLE);
+        if (g.atom(u).aromatic() && g.atom(v).aromatic())
+            return add(u, v, Bond.SINGLE);
+        return add(u, v, Bond.IMPLICIT);
     }
 
     /**
@@ -152,6 +155,8 @@ public final class GraphBuilder {
      * @return graph builder for adding more atoms/connections
      */
     public GraphBuilder aromaticBond(int u, int v) {
+        if (g.atom(u).aromatic() && g.atom(v).aromatic())
+            return add(u, v, Bond.IMPLICIT);
         return add(u, v, Bond.AROMATIC);
     }
 
