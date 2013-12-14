@@ -541,7 +541,7 @@ public final class Graph {
      */
     Graph sort() {
         for (int u = 0; u < order; u++) {
-            Collections.sort(edges[u], EdgeComparator.forVertex(this, u));
+            Collections.sort(edges[u], OldEdgeComparator.forVertex(this, u));
         }
         return this;
     }
@@ -570,17 +570,17 @@ public final class Graph {
         return u;
     }
 
-    private static final class EdgeComparator implements Comparator<Edge> {
+    private static final class OldEdgeComparator implements Comparator<Edge> {
         private int u;
         private Graph g;
 
-        private EdgeComparator(Graph g, int u) {
+        private OldEdgeComparator(Graph g, int u) {
             this.u = u;
             this.g = g;
         }
 
-        static EdgeComparator forVertex(Graph g, int u) {
-            return new EdgeComparator(g, u);
+        static OldEdgeComparator forVertex(Graph g, int u) {
+            return new OldEdgeComparator(g, u);
         }
 
         @Override public int compare(Edge e, Edge f) {
