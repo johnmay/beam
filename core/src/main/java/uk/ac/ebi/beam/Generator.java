@@ -29,6 +29,7 @@
 
 package uk.ac.ebi.beam;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -57,7 +58,7 @@ final class Generator {
      *
      * @param g chemical graph
      */
-    Generator(Graph g, RingNumbering rnums) {
+    Generator(Graph g, RingNumbering rnums) throws IOException {
         this(g, new int[g.order()], rnums);    
     }
     
@@ -67,7 +68,7 @@ final class Generator {
      * @param g chemical graph
      * @param visitedAt the index of the atom in the output         
      */
-    Generator(Graph g, int[] visitedAt, RingNumbering rnums) {
+    Generator(Graph g, int[] visitedAt, RingNumbering rnums) throws IOException {
         this.g = g;
         this.rnums = rnums;
         this.sb = new StringBuilder(g.order() * 2);
@@ -134,7 +135,7 @@ final class Generator {
      * @param p previous vertex
      * @param b the bond from the previous vertex to this vertex
      */
-    void write(int u, int p, Bond b) {
+    void write(int u, int p, Bond b) throws IOException {
         visitedAt[u] = i++;
 
         int remaining = g.degree(u);
@@ -247,7 +248,7 @@ final class Generator {
      * @param g the graph to generate the SMILE for
      * @return SMILES gor the provided chemical graph
      */
-    static String generate(final Graph g) {
+    static String generate(final Graph g) throws IOException {
         return new Generator(g, new IterativeRingNumbering(1)).string();
     }
 
@@ -259,7 +260,7 @@ final class Generator {
      * @param visitedAt store when each atom was visited
      * @return SMILES gor the provided chemical graph
      */
-    static String generate(final Graph g, int[] visitedAt) {
+    static String generate(final Graph g, int[] visitedAt) throws IOException {
         return new Generator(g, visitedAt, new IterativeRingNumbering(1)).string();
     }
 
@@ -411,7 +412,7 @@ final class Generator {
          *
          * @return ring number
          */
-        int next();
+        int next() throws IOException;
 
         /**
          * Mark the specified ring number as used.
@@ -438,13 +439,13 @@ final class Generator {
             this.offset = first;
         }
 
-        @Override public int next() {
+        @Override public int next() throws IOException {
             for (int i = offset; i < used.length; i++) {
                 if (!used[i]) {
                     return i;
                 }
             }
-            throw new IllegalArgumentException("no available ring numbers");
+            throw new IOException("no available ring numbers");
         }
 
         @Override public void use(int rnum) {
@@ -471,7 +472,7 @@ final class Generator {
             this.pos = offset;
         }
 
-        @Override public int next() {
+        @Override public int next() throws IOException {
             while (pos < 100 && used[pos])
                 pos++;
             if (pos < 100)
@@ -482,7 +483,7 @@ final class Generator {
             if (pos < 100)
                 return pos;
             else
-                throw new IllegalArgumentException("no more ring numbers can be assigned");
+                throw new IOException("no more ring numbers can be assigned");
         }
 
         @Override public void use(int rnum) {

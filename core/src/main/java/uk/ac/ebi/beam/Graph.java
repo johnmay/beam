@@ -349,8 +349,9 @@ public final class Graph {
      * of the molecule.
      *
      * @return the SMILES string for the molecule.
+     * @throws IOException a SMILES string could not be generated
      */
-    public String toSmiles() {
+    public String toSmiles() throws IOException {
         return Generator.generate(this);
     }
 
@@ -361,8 +362,9 @@ public final class Graph {
      * 
      * @param visitedAt vector to be filled with the output order
      * @return the SMILES string
+     * @throws IOException a SMILES string could not be generated
      */
-    public String toSmiles(int[] visitedAt) {
+    public String toSmiles(int[] visitedAt) throws IOException {
         return Generator.generate(this, visitedAt);
     }
 
