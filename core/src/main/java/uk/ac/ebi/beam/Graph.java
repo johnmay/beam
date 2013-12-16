@@ -338,7 +338,7 @@ public final class Graph {
      *                                parsing the SMILES.
      */
     public static Graph fromSmiles(String smi) throws
-                                               IOException {
+                                               InvalidSmilesException {
         if (smi == null)
             throw new NullPointerException("no SMILES provided");
         return Parser.parse(smi);
@@ -351,7 +351,7 @@ public final class Graph {
      * @return the SMILES string for the molecule.
      * @throws IOException a SMILES string could not be generated
      */
-    public String toSmiles() throws IOException {
+    public String toSmiles() throws InvalidSmilesException {
         return Generator.generate(this);
     }
 
@@ -364,7 +364,7 @@ public final class Graph {
      * @return the SMILES string
      * @throws IOException a SMILES string could not be generated
      */
-    public String toSmiles(int[] visitedAt) throws IOException {
+    public String toSmiles(int[] visitedAt) throws InvalidSmilesException {
         return Generator.generate(this, visitedAt);
     }
 

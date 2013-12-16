@@ -172,7 +172,7 @@ public class GeneratorTest {
         roundTrip("CCCC.OOOO.C[CH]C.CNO");
     }
 
-    @Test public void reusingNumbering() {
+    @Test public void reusingNumbering() throws InvalidSmilesException {
         Generator.RingNumbering rnums = new Generator.ReuseRingNumbering(0);
         for (int i = 0; i < 50; i++) {
             int rnum = rnums.next();
@@ -195,7 +195,7 @@ public class GeneratorTest {
         }
     }
 
-    @Test public void iterativeNumbering() {
+    @Test public void iterativeNumbering() throws InvalidSmilesException {
         Generator.RingNumbering rnums = new Generator.IterativeRingNumbering(0);
         for (int i = 0; i < 50; i++) {
             int rnum = rnums.next();
@@ -228,7 +228,7 @@ public class GeneratorTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void maxRingNumbers() {
+    public void maxRingNumbers() throws InvalidSmilesException {
         Generator.RingNumbering rnums = new Generator.IterativeRingNumbering(0);
         for (int i = 0; i < 101; i++) {
             int rnum = rnums.next();

@@ -38,7 +38,7 @@ import static org.hamcrest.CoreMatchers.is;
 public class GraphBuilderTest {
 
     @Test
-    public void clockwise_parity() {
+    public void clockwise_parity() throws InvalidSmilesException{
 
         GraphBuilder gb = GraphBuilder.create(5);
         Graph g = gb.add(AtomBuilder.aliphatic("C").build())
@@ -60,7 +60,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void anticlockwise_parity() {
+    public void anticlockwise_parity() throws InvalidSmilesException {
 
         GraphBuilder gb = GraphBuilder.create(5);
         Graph g = gb.add(AtomBuilder.aliphatic("C").build())
@@ -82,7 +82,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void e_1_2_difluroethene() {
+    public void e_1_2_difluroethene() throws InvalidSmilesException {
         GraphBuilder gb = GraphBuilder.create(5);
         Graph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
                             .add(AtomImpl.AliphaticSubset.Carbon)
@@ -97,7 +97,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void z_1_2_difluroethene() {
+    public void z_1_2_difluroethene() throws InvalidSmilesException {
         GraphBuilder gb = GraphBuilder.create(5);
         Graph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
                             .add(AtomImpl.AliphaticSubset.Carbon)
@@ -113,7 +113,7 @@ public class GraphBuilderTest {
 
 
     @Test
-    public void conjugated_consider_existing() {
+    public void conjugated_consider_existing() throws InvalidSmilesException {
         // the second configuration considers the existing configuration
         GraphBuilder gb = GraphBuilder.create(5);
         Graph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
@@ -134,7 +134,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void conjugated_resolve_conflict() {
+    public void conjugated_resolve_conflict() throws InvalidSmilesException {
         // assigning the second one first means we have to consider this
         // on the first one
         GraphBuilder gb = GraphBuilder.create(5);
@@ -156,7 +156,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void conjugated_resolve_conflict2() {
+    public void conjugated_resolve_conflict2() throws InvalidSmilesException {
         // we assign the first, third then second - the second one cause
         // a conflict and we must flip one of the others
         GraphBuilder gb = GraphBuilder.create(5);
@@ -183,7 +183,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void all_trans_octatetraene() {
+    public void all_trans_octatetraene() throws InvalidSmilesException {
         GraphBuilder gb = GraphBuilder.create(5);
         Graph g = gb.add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
@@ -210,7 +210,7 @@ public class GraphBuilderTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void impossible_octatetraene() {
+    public void impossible_octatetraene() throws InvalidSmilesException {
         GraphBuilder gb = GraphBuilder.create(5);
         Graph g = gb.add(AtomImpl.AliphaticSubset.Carbon)
                             .add(AtomImpl.AliphaticSubset.Carbon)
@@ -270,7 +270,7 @@ public class GraphBuilderTest {
                     .build();
     }
     
-    @Test public void suppress_benzene() {
+    @Test public void suppress_benzene() throws InvalidSmilesException {
         GraphBuilder gb = GraphBuilder.create(5);
         Assert.assertThat(gb.add(Element.Carbon, 1)
                             .add(Element.Carbon, 1)
