@@ -224,38 +224,48 @@ public final class GraphBuilder {
             checkGeometricBuilder(builder); // check required vertices are adjacent
 
             int u = builder.u, v = builder.v, x = builder.x, y = builder.y;
-            
-            Bond first  = firstDirectionalLabel(u, x);
+           
+            Bond first  = firstDirectionalLabel(u, x, adjToDb);
             Bond second = builder.c == TOGETHER ? first
                                                 : first.inverse();
 
             // check if the second label would cause a conflict
-            if (checkDirectionalAssignment(second, v, y)) {
+            if (checkDirectionalAssignment(second, v, y, adjToDb)) {
                 // okay to assign the labels as they are
                 g.replace(g.edge(u, x), new Edge(u, x, first));
                 g.replace(g.edge(v, y), new Edge(v, y, second));
             }
             // there will be a conflict - check if we invert the first one...
-            else if (checkDirectionalAssignment(first.inverse(), u, x)) {
-                g.replace(g.edge(u, x), new Edge(u, x, first.inverse()));
-                g.replace(g.edge(v, y), new Edge(v, y, second.inverse()));
+            else if (checkDirectionalAssignment(first.inverse(), u, x, adjToDb)) {
+                g.replace(g.edge(u, x), new Edge(u, x, (first = first.inverse())));
+                g.replace(g.edge(v, y), new Edge(v, y, (second = second.inverse())));
             } else {
                 BitSet visited = new BitSet();
                 visited.set(v);
                 invertExistingDirectionalLabels(adjToDb, visited, v, u);
-                if (!checkDirectionalAssignment(first, u, x) ||
-                        !checkDirectionalAssignment(second, v, y))
+                if (!checkDirectionalAssignment(first, u, x, adjToDb) ||
+                        !checkDirectionalAssignment(second, v, y, adjToDb))
                     throw new IllegalArgumentException("cannot assign geometric configuration");
                 g.replace(g.edge(u, x), new Edge(u, x, first));
                 g.replace(g.edge(v, y), new Edge(v, y, second));
             }
 
+            // propagate bond directions to other adjacent bonds
+            for (Edge e : g.edges(u))
+                if (e.bond() != Bond.DOUBLE && !e.bond().directional()) {
+                    e.bond(e.either() == u ? first.inverse() : first);
+                }
+            for (Edge e : g.edges(v))
+                if (e.bond() != Bond.DOUBLE && !e.bond().directional()) {
+                    e.bond(e.either() == v ? second.inverse() : second);
+                }
+        
 
             adjToDb.set(u);
             adjToDb.set(v);
             for (Edge e : g.edges(u))
                 adjToDb.set(e.other(u));
-             for (Edge e : g.edges(v))
+            for (Edge e : g.edges(v))
                 adjToDb.set(e.other(v));
                 
         }
@@ -276,46 +286,54 @@ public final class GraphBuilder {
         }
     }
 
-    private Bond firstDirectionalLabel(int u, int x) {
-        if (g.degree(u) == 2) {
-            Edge e = g.edge(u, x);
-            Bond b = e.bond(u);
-            if (b.directional())
-                return b;
-            else
-                return Bond.DOWN;
-        }
-        // consider existing labels
-        else {
-            Bond target = null, other = null;
-            for (Edge e : g.edges(u)) {
-                if (e.other(u) == x)
-                    target = e.bond(u);
-                else if (e.bond() != Bond.DOUBLE)
-                    other = e.bond(u);
+    private Bond firstDirectionalLabel(int u, int x, BitSet adjToDb) {
+
+        Edge e = g.edge(u, x);
+        Bond b = e.bond(u);
+        
+        // the edge is next to another double bond configuration, we
+        // need to consider its assignment
+        if (adjToDb.get(x) && g.degree(x) > 2) {
+            for (Edge f : g.edges(x)) {
+                if (f.other(x) != u && f.bond() != Bond.DOUBLE && f.bond().directional())
+                    return f.bond(x);    
             }
-            if (other == null)
-                throw new IllegalArgumentException("invalid geometric configuration - > 1 double bond");
-            if (other.directional()) {
-                return other.inverse();
-            } else {
-                return target.directional() ? target : Bond.DOWN;
-            }
+        } 
+        // consider other labels on this double-bond
+        if (g.degree(u) > 2) {
+            for (Edge f : g.edges(u)) {
+                if (f.other(u) != x && f.bond() != Bond.DOUBLE && f.bond().directional())
+                    return f.bond(u).inverse();
+            }                                                     
         }
+        return b.directional() ? b : Bond.DOWN;
     }
 
-    private boolean checkDirectionalAssignment(Bond b, int u, int v) {
+    private boolean checkDirectionalAssignment(Bond b, int u, int v, BitSet adjToDb) {
+        
         for (Edge e : g.edges(u)) {
+            int x = e.other(u);
             Bond existing = e.bond(u);
             if (existing.directional()) {
                 // if there is already a directional label on a different edge
                 // and they are equal this produces a conflict
-                if (e.other(u) != v) {
+                if (x != v) {
                     if (existing == b)
                         return false;
                 } else {
                     if (existing != b)
                         return false;
+                }
+            }
+            // check double-bond configuration adjacent to this configuration 
+            else if (existing != Bond.DOUBLE && adjToDb.get(x)) {
+                for (Edge f : g.edges(x)) {
+                    existing = f.bond(x);
+                    if (existing.directional() && f.other(x) != u) {
+                        if (existing != b) {
+                            return false;
+                        }
+                    }                    
                 }
             }
         }
