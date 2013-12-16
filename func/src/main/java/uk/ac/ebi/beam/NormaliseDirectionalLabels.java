@@ -42,7 +42,7 @@ final class NormaliseDirectionalLabels
             }
         }
 
-        return h;
+        return h.sort(new Graph.CanOrderFirst());
     }
 
     private static final class Traversal {
