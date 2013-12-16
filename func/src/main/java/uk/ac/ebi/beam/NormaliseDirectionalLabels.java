@@ -1,8 +1,10 @@
 package uk.ac.ebi.beam;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,7 +53,7 @@ final class NormaliseDirectionalLabels
         private       int       i;
         private Map<Edge, Edge> acc = new HashMap<Edge, Edge>();
 
-        private Set<Edge>    doubleBonds = new HashSet<Edge>();
+        private List<Edge>   doubleBonds = new ArrayList<Edge>();
         private Set<Integer> adj         = new HashSet<Integer>();
 
         private Traversal(Graph g) {
@@ -59,29 +61,34 @@ final class NormaliseDirectionalLabels
             this.visited = new boolean[g.order()];
             this.ordering = new int[g.order()];
 
+            BitSet dbAtoms = new BitSet();
             for (int u = 0; u < g.order(); u++) {
                 if (!visited[u])
-                    visit(u, u);
+                    dbAtoms.or(visit(u, u));
             }
+
             for (Edge e : doubleBonds) {
-                flip(g, e, acc);
+                flip(g, e, dbAtoms);
             }
         }
 
-        private void visit(int p, int u) {
+        private BitSet visit(int p, int u) {
             visited[u] = true;
             ordering[u] = i++;
+            BitSet dbAtoms = new BitSet();
             for (Edge e : g.edges(u)) {
-                int v = e.other(u);
-
+                int v = e.other(u);                             
+              
                 if (!visited[v]) {
                     if (e.bond() == Bond.DOUBLE && hasAdjDirectionalLabels(g, e)) {
 
+                        dbAtoms.set(u);
+                        dbAtoms.set(v);
+                        
                         // only the first bond we encounter in an isolated system
                         // is marked - if we need to flip the other we propagate
                         // this down the chain
-                        if (!adj.contains(u) && !adj.contains(v))
-                            doubleBonds.add(e);
+                        boolean newSystem = !adj.contains(u) && !adj.contains(v);                               
 
                         // to stop adding other we mark all vertices adjacent to the
                         // double bond
@@ -89,10 +96,15 @@ final class NormaliseDirectionalLabels
                             adj.add(f.other(u));
                         for (Edge f : g.edges(v))
                             adj.add(f.other(v));
+
+                        if (newSystem)
+                            doubleBonds.add(e);
                     }
-                    visit(u, v);
+                    dbAtoms.or(visit(u, v));
                 }
             }
+            
+            return dbAtoms;
         }
 
         private boolean hasAdjDirectionalLabels(Graph g, Edge e) {
@@ -100,16 +112,16 @@ final class NormaliseDirectionalLabels
             int v = e.other(u);
 
             for (Edge f : g.edges(u))
-                if (f.bond() == Bond.UP || f.bond() == Bond.DOWN)
+                if (f.bond().directional())
                     return true;
             for (Edge f : g.edges(v))
-                if (f.bond() == Bond.UP || f.bond() == Bond.DOWN)
+                if (f.bond().directional())
                     return true;
 
             return false;
         }
 
-        private void flip(Graph g, Edge e, Map<Edge, Edge> acc) {
+        private void flip(Graph g, Edge e, BitSet dbAtoms) {
 
             int u = e.either();
             int v = e.other(u);
@@ -117,35 +129,36 @@ final class NormaliseDirectionalLabels
             if (ordering[u] < ordering[v]) {
                 Edge first = firstDirectionalLabel(g, u);
                 if (first != null) {
-                    flip(first, u);
+                    flip(first, u, dbAtoms);
                 } else {
                     first = firstDirectionalLabel(g, v);
-                    flip(first, v);
+                    flip(first, v, dbAtoms);
                 }
             } else {
                 Edge first = firstDirectionalLabel(g, v);
                 if (first != null) {
-                    flip(first, v);
+                    flip(first, v, dbAtoms);
                 } else {
                     first = firstDirectionalLabel(g, u);
-                    flip(first, u);
+                    flip(first, u, dbAtoms);
                 }
             }
-
         }
 
-        private void flip(Edge first, int u) {
+        private void flip(Edge first, int u, BitSet dbAtoms) {
             if (ordering[first.other(u)] < ordering[u]) {
                 if (first.bond(u) == Bond.UP)
                     invertExistingDirectionalLabels(g,
                                                     new BitSet(),
                                                     acc,
+                                                    dbAtoms,
                                                     u);
             } else {
                 if (first.bond(u) == Bond.DOWN)
                     invertExistingDirectionalLabels(g,
                                                     new BitSet(),
                                                     acc,
+                                                    dbAtoms,
                                                     u);
             }
         }
@@ -165,6 +178,7 @@ final class NormaliseDirectionalLabels
         private void invertExistingDirectionalLabels(Graph g,
                                                      BitSet visited,
                                                      Map<Edge, Edge> replacement,
+                                                     BitSet dbAtoms,
                                                      int u) {
             visited.set(u);
             for (Edge e : g.edges(u)) {
@@ -178,7 +192,8 @@ final class NormaliseDirectionalLabels
                         replacement.put(e,
                                         e.inverse());
                     }
-                    invertExistingDirectionalLabels(g, visited, replacement, v);
+                    if (dbAtoms.get(v))
+                        invertExistingDirectionalLabels(g, visited, replacement, dbAtoms, v);
                 }
             }
         }

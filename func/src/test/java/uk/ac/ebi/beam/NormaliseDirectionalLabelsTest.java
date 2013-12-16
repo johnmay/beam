@@ -36,6 +36,13 @@ public class NormaliseDirectionalLabelsTest {
         transform("F\\C=C(\\F)/C(/F)=C\\F",
                   "F/C=C(/F)\\C(\\F)=C/F");
     }
+    
+    @Test public void cyclic() throws InvalidSmilesException {
+        transform("C/C=C\\1/C\\C(=C\\C)\\C1",
+                  "C/C=C\\1/C/C(=C/C)/C1");
+        transform("C/C=C\\1/C/C(=C/C)/C1",
+                  "C/C=C\\1/C/C(=C/C)/C1");
+    }
 
     static void transform(String smi, String exp) throws
                                                   InvalidSmilesException {
