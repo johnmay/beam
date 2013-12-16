@@ -110,14 +110,13 @@ final class NormaliseDirectionalLabels
         private boolean hasAdjDirectionalLabels(Graph g, Edge e) {
             int u = e.either();
             int v = e.other(u);
-
+            return hasAdjDirectionalLabels(g, u) && hasAdjDirectionalLabels(g, v);
+        }
+        
+        private boolean hasAdjDirectionalLabels(Graph g, int u) {           
             for (Edge f : g.edges(u))
                 if (f.bond().directional())
-                    return true;
-            for (Edge f : g.edges(v))
-                if (f.bond().directional())
-                    return true;
-
+                    return true;               
             return false;
         }
 

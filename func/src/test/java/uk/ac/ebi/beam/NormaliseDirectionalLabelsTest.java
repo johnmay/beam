@@ -43,6 +43,14 @@ public class NormaliseDirectionalLabelsTest {
         transform("C/C=C\\1/C/C(=C/C)/C1",
                   "C/C=C\\1/C/C(=C/C)/C1");
     }
+    
+    @Test public void chebi15617() throws InvalidSmilesException {
+        transform("C/C=C\\1/[C@@H](C)C(=O)N/C1=C\\C/2=N/C(=C\\C3=C(CCC(=O)O)C(=C(\\C=C/4\\C(=C(CC)C(=O)N4)C)N3)C)/C(=C2C)CCC(=O)O",
+                  "C/C=C\\1/[C@@H](C)C(=O)N/C1=C\\C/2=N/C(=C\\C3=C(CCC(=O)O)C(=C(/C=C\\4/C(=C(CC)C(=O)N4)C)N3)C)/C(=C2C)CCC(=O)O");
+        transform("C/C=C\\1/[C@@H](C)C(=O)N/C1=C\\C/2=N/C(=C\\C3=C(CCC(=O)O)C(=C(/C=C\\4/C(=C(CC)C(=O)N4)C)N3)C)/C(=C2C)CCC(=O)O",
+                  "C/C=C\\1/[C@@H](C)C(=O)N/C1=C\\C/2=N/C(=C\\C3=C(CCC(=O)O)C(=C(/C=C\\4/C(=C(CC)C(=O)N4)C)N3)C)/C(=C2C)CCC(=O)O");
+    }
+    
 
     static void transform(String smi, String exp) throws
                                                   InvalidSmilesException {
