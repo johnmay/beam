@@ -168,6 +168,8 @@ final class Localise {
             if (e.bond() == Bond.DOUBLE) {
                 int u = e.either();
                 int v = e.other(u);
+                if (hasAdjDirectionalLabels(g, e))
+                    continue;
                 if (cyclic.get(u) && cyclic.get(v)) {
                     count[u]++;
                     count[v]++;
@@ -197,6 +199,19 @@ final class Localise {
         }
         
         return g;
+    }
+
+    private static boolean hasAdjDirectionalLabels(Graph g, Edge e) {
+        int u = e.either();
+        int v = e.other(u);
+        return hasAdjDirectionalLabels(g, u) && hasAdjDirectionalLabels(g, v);
+    }
+
+    private static boolean hasAdjDirectionalLabels(Graph g, int u) {
+        for (Edge f : g.edges(u))
+            if (f.bond().directional())
+                return true;
+        return false;
     }
 
     static Graph localise(Graph delocalised) throws InvalidSmilesException {
