@@ -24,7 +24,7 @@ public class NormaliseDirectionalLabelsTest {
 
     @Test public void partial() throws InvalidSmilesException {
         transform("FC=C(\\F)/C=C/F",
-                  "FC=C(/F)\\C=C\\F");
+                  "FC=C(\\F)/C=C/F");
     }
 
     @Test public void partial2() throws InvalidSmilesException {
