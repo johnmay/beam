@@ -227,7 +227,7 @@ public class GeneratorTest {
         rnums.use(40);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = InvalidSmilesException.class)
     public void maxRingNumbers() throws InvalidSmilesException {
         Generator.RingNumbering rnums = new Generator.IterativeRingNumbering(0);
         for (int i = 0; i < 101; i++) {
