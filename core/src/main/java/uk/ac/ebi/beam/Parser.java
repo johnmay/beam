@@ -29,18 +29,13 @@
 
 package uk.ac.ebi.beam;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.Map.Entry;
 
@@ -457,19 +452,27 @@ final class Parser {
      */
     Atom readBracketAtom(final CharBuffer buffer) throws
                                                   InvalidSmilesException {
+        int start = buffer.position;
+
+        boolean arbitraryLabel = false;
+
         final int isotope = buffer.getNumber();
         final boolean aromatic = buffer.next() >= 'a' && buffer.next() <= 'z';
         final Element element = Element.read(buffer);
 
-        if (element == null)
+        if (strict && element == null)
             throw new InvalidSmilesException("unrecognised element symbol: ", buffer);
 
-        if (aromatic)
+        if (element != null && aromatic)
             g.markDelocalised();
-        
+
         // element isn't aromatic as per the OpenSMILES specification
         if (strict && !element.aromatic(Element.AromaticSpecification.OpenSmiles))
             throw new InvalidSmilesException("abnormal aromatic element", buffer);
+
+        if (element == null) {
+            arbitraryLabel = true;
+        }
 
         configuration = Configuration.read(buffer);
 
@@ -477,8 +480,23 @@ final class Parser {
         int charge = readCharge(buffer);
         int atomClass = readClass(buffer);
 
-        if (!buffer.getIf(']'))
-            throw InvalidSmilesException.invalidBracketAtom(buffer);
+        if (!arbitraryLabel && !buffer.getIf(']')) {
+            if (strict) {
+                throw InvalidSmilesException.invalidBracketAtom(buffer);
+            }
+            else {
+                arbitraryLabel = true;
+            }
+        }
+
+        if (arbitraryLabel) {
+            int end = buffer.position;
+            while (buffer.get() != ']') {
+                end++;
+            }
+            String label = buffer.substr(start, end);
+            return new AtomImpl.BracketAtom(Element.Unknown, 0, 0);
+        }
 
         return new AtomImpl.BracketAtom(isotope,
                                         element,

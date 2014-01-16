@@ -152,4 +152,13 @@ public class ParserTest {
     @Test public void largeRnum() throws Exception {
         Graph g = Parser.parse("C%99CCCC%99");
     }
+    
+    // not part of spec
+    @Test public void r_label() throws InvalidSmilesException {
+        Graph g = Parser.parse("CC(C)C[R]");
+    }
+
+    @Test public void random_label() throws InvalidSmilesException {
+        Graph g = Parser.parse("CC(C)C[Really?]");
+    }
 }

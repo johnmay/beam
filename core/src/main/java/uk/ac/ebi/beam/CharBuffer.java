@@ -29,6 +29,8 @@
 
 package uk.ac.ebi.beam;
 
+import java.util.Arrays;
+
 /**
  * A character buffer with utilities for sequential processing of characters.
  *
@@ -185,6 +187,10 @@ final class CharBuffer {
         while (--nDigits > 0 && nextIsDigit())
             num = (num * 10) + getAsDigit();
         return num;
+    }
+    
+    String substr(int from, int to) {
+        return new String(Arrays.copyOfRange(cs, from, to));
     }
 
     /**
