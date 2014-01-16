@@ -495,7 +495,7 @@ final class Parser {
                 end++;
             }
             String label = buffer.substr(start, end);
-            return new AtomImpl.BracketAtom(Element.Unknown, 0, 0);
+            return new AtomImpl.BracketAtom(label);
         }
 
         return new AtomImpl.BracketAtom(isotope,

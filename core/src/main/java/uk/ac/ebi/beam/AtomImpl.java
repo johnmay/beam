@@ -67,6 +67,8 @@ final class AtomImpl {
             this.element = element;
             this.token = new Generator.SubsetToken(element.symbol());
         }
+        
+        
 
         @Override public int isotope() {
             return -1;
@@ -74,6 +76,10 @@ final class AtomImpl {
 
         @Override public Element element() {
             return element;
+        }
+
+        @Override public String label() {
+            return element.symbol();
         }
 
         @Override public boolean aromatic() {
@@ -148,6 +154,10 @@ final class AtomImpl {
                                                           .toLowerCase(Locale.ENGLISH));
         }
 
+        @Override public String label() {
+            return element.symbol();
+        }
+
         @Override public int isotope() {
             return -1;
         }
@@ -217,9 +227,15 @@ final class AtomImpl {
         private final Element element;
         private final int     hCount, charge, atomClass, isotope;
         private final boolean aromatic;
+        private final String  label;
 
         public BracketAtom(int isotope, Element element, int hCount, int charge, int atomClass, boolean aromatic) {
+            this(isotope, element, element.symbol(), hCount, charge, atomClass, aromatic);
+        }
+        
+        public BracketAtom(int isotope, Element element, String label, int hCount, int charge, int atomClass, boolean aromatic) {
             this.element = element;
+            this.label  = label;
             this.hCount = hCount;
             this.charge = charge;
             this.atomClass = atomClass;
@@ -229,6 +245,10 @@ final class AtomImpl {
 
         public BracketAtom(Element element, int hCount, int charge) {
             this(-1, element, hCount, charge, 0, false);
+        }
+
+        public BracketAtom(String label) {
+            this(-1, Element.Unknown, label, 0, 0, 0, false);
         }
 
         @Override public int isotope() {
@@ -245,6 +265,10 @@ final class AtomImpl {
 
         @Override public int charge() {
             return charge;
+        }
+
+        @Override public String label() {
+            return label;
         }
 
         @Override public int hydrogens() {
@@ -271,6 +295,7 @@ final class AtomImpl {
             return aromatic || !element.aromatic() ? this
                                                    : new BracketAtom(isotope,
                                                                      element,
+                                                                     label,
                                                                      hCount,
                                                                      charge,
                                                                      atomClass,
@@ -281,6 +306,7 @@ final class AtomImpl {
             return !aromatic ? this 
                              : new BracketAtom(isotope,
                                                element,
+                                               label,
                                                hCount,
                                                charge,
                                                atomClass,
@@ -300,6 +326,7 @@ final class AtomImpl {
             if (hCount != that.hCount) return false;
             if (isotope != that.isotope) return false;
             if (element != that.element) return false;
+            if (!label.equals(that.label)) return false;
 
             return true;
         }
@@ -317,7 +344,7 @@ final class AtomImpl {
 
         @Override public String toString() {
             return "[" + isotope + element.symbol() + "H" + hCount + (
-                    charge != 0 ? charge : "") + ":" + atomClass + "]";
+                    charge != 0 ? charge : "") + ":" + atomClass + "]" + (!label.equals(element.symbol()) ? "(" + label + ")" : "");
         }
     }
 

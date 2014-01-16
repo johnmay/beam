@@ -54,6 +54,16 @@ public interface Atom {
     Element element();
 
     /**
+     * An label attached to an element (input only). Although invalid via the
+     * specification 'CCC[R]' etc can occur in the 'wild'. If found the parser
+     * provides an 'Unknown' element and a specified label. Not the labels are
+     * never written. By default the label is the element symbol.
+     * 
+     * @return the label in a bracket atom
+     */
+    String label();
+
+    /**
      * Whether this atom is aromatic.
      *
      * @return atom is aromatic (true) or aliphatic (false)

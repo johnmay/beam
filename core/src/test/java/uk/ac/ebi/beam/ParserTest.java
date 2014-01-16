@@ -156,9 +156,11 @@ public class ParserTest {
     // not part of spec
     @Test public void r_label() throws InvalidSmilesException {
         Graph g = Parser.parse("CC(C)C[R]");
+        assertThat(g.atom(4).label(), is("R"));
     }
 
     @Test public void random_label() throws InvalidSmilesException {
         Graph g = Parser.parse("CC(C)C[Really?]");
+        assertThat(g.atom(4).label(), is("Really?"));
     }
 }
