@@ -29,7 +29,6 @@
 
 package uk.ac.ebi.beam;
 
-import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -104,7 +103,7 @@ public class ParserTest {
             assertThat(e.bond(), is(Bond.AROMATIC));
         }
     }
-    
+
     @Test public void hydrogen() throws IOException {
         Graph g = Parser.losse("HH");
         assertThat(g.order(), is(2));
@@ -115,7 +114,7 @@ public class ParserTest {
     public void hydrogen_strict() throws IOException {
         Graph g = Parser.strict("HH");
     }
-    
+
     @Test public void deuterium() throws IOException {
         Graph g = Parser.losse("DD");
         assertThat(g.order(), is(2));
@@ -126,33 +125,33 @@ public class ParserTest {
     public void deuterium_strict() throws IOException {
         Graph g = Parser.strict("DD");
     }
-    
+
     @Test public void tritium() throws IOException {
         Graph g = Parser.losse("TT");
         assertThat(g.order(), is(2));
         assertThat(g.toSmiles(), is("[3H][3H]"));
     }
-    
+
     @Test(expected = InvalidSmilesException.class)
     public void tritium_strict() throws IOException {
         Graph g = Parser.strict("TT");
     }
-    
-    @Test public void tellurium() throws IOException{
+
+    @Test public void tellurium() throws IOException {
         Graph g = Parser.losse("[te]");
         assertTrue(g.atom(0).aromatic());
         assertThat(g.atom(0).element(), is(Element.Tellurium));
     }
-    
+
     @Test(expected = InvalidSmilesException.class)
-    public void tellurium_strict() throws IOException{
+    public void tellurium_strict() throws IOException {
         Graph g = Parser.strict("[te]");
-    }    
-    
+    }
+
     @Test public void largeRnum() throws Exception {
         Graph g = Parser.parse("C%99CCCC%99");
     }
-    
+
     // not part of spec
     @Test public void r_label() throws InvalidSmilesException {
         Graph g = Parser.parse("CC(C)C[R]");
@@ -162,5 +161,11 @@ public class ParserTest {
     @Test public void random_label() throws InvalidSmilesException {
         Graph g = Parser.parse("CC(C)C[Really?]");
         assertThat(g.atom(4).label(), is("Really?"));
+    }
+
+    // ek! what a difficult one - this example is from MetaCyc
+    @Test public void nested_label() throws InvalidSmilesException {
+        Graph g = Parser.parse("CCCCCCC=CCCCCCCCC=CC(=O)[a holo-[acyl-carrier protein]]");
+        assertThat(g.atom(g.order() - 1).label(), is("a holo-[acyl-carrier protein]"));
     }
 }

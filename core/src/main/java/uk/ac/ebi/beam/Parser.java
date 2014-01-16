@@ -491,7 +491,16 @@ final class Parser {
 
         if (arbitraryLabel) {
             int end = buffer.position;
-            while (buffer.get() != ']') {
+            int depth = 0;
+            while (buffer.hasRemaining()) {
+                char c = buffer.get();
+                if (c == '[')
+                    depth++;
+                else if (c == ']') {
+                    if (depth == 0)
+                        break;
+                    depth--;
+                }
                 end++;
             }
             String label = buffer.substr(start, end);

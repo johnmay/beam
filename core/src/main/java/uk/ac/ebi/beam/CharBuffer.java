@@ -188,7 +188,14 @@ final class CharBuffer {
             num = (num * 10) + getAsDigit();
         return num;
     }
-    
+
+    /**
+     * Obtain the string of characters 'from' - 'to' the specified indices.
+     *
+     * @param from start index
+     * @param to   end index
+     * @return the string between the indices
+     */
     String substr(int from, int to) {
         return new String(Arrays.copyOfRange(cs, from, to));
     }
