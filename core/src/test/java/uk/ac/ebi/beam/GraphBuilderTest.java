@@ -152,7 +152,7 @@ public class GraphBuilderTest {
                             .geometric(3, 4).together(2, 5)
                             .geometric(1, 2).together(0, 3)
                             .build();
-        Assert.assertThat(g.toSmiles(), is("F\\C=C/C=C\\F"));
+        Assert.assertThat(g.toSmiles(), is("F/C=C\\C=C/F"));
     }
 
     @Test
@@ -206,7 +206,7 @@ public class GraphBuilderTest {
                             .geometric(5, 6).together(4, 7)
                             .geometric(7, 0).together(6, 1)
                             .build();
-        Assert.assertThat(g.toSmiles(), is("C=1/C=C\\C=C/C=C\\C1"));
+        Assert.assertThat(g.toSmiles(), is("C=1\\C=C/C=C\\C=C/C1"));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -233,6 +233,7 @@ public class GraphBuilderTest {
                             .geometric(5, 6).together(4, 7)
                             .geometric(7, 0).together(6, 1)
                             .build();
+        System.out.println(g.toSmiles());
         Assert.assertThat(g.toSmiles(), is("C=1/C=C\\C=C/C=C\\C1"));
     }
     

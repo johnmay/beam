@@ -535,13 +535,13 @@ public class OpenSMILESSpecificationTest {
     @Test(expected = InvalidSmilesException.class)
     public void write_atom_properties_in_order_1() throws
                                                    IOException {
-        Graph.fromSmiles("[C-H3]");   // this is accepted by daylight but doesn't match OpenSMILES grammar
+        Parser.strict("[C-H3]");    // this is accepted by daylight but doesn't match OpenSMILES grammar
     }
 
     @Test(expected = InvalidSmilesException.class)
     public void write_atom_properties_in_order_2() throws
                                                    IOException {
-        Graph.fromSmiles("C[CH@](Br)Cl");  // this is accepted by daylight but doesn't match OpenSMILES grammar
+        Parser.strict("C[CH@](Br)Cl");  // this is accepted by daylight but doesn't match OpenSMILES grammar
     }
 
     @Test public void methanide_wrong() {

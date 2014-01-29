@@ -32,6 +32,8 @@ package uk.ac.ebi.beam;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static uk.ac.ebi.beam.Configuration.DoubleBond.TOGETHER;
@@ -216,6 +218,24 @@ public final class GraphBuilder {
         
         // store the vertices which are adjacent to pi bonds with a config
         BitSet adjToDb = new BitSet();
+
+        Collections.sort(builders, new Comparator<GeometricBuilder>() {
+            @Override public int compare(GeometricBuilder a, GeometricBuilder b) {
+                int aMin = Math.min(a.u, a.v);
+                int bMin = Math.min(b.u, b.v);
+                int aMax = Math.max(a.u, a.v);
+                int bMax = Math.max(b.u, b.v);
+                if (aMin > bMin)
+                    return +1;
+                if (aMin < bMin)
+                    return -1;
+                if (aMax > bMax)
+                    return +1;
+                if (aMax < bMax)
+                    return -1;
+                return 0;
+            }
+        });
         
         for (GeometricBuilder builder : builders) {
             // unspecified only used for getting not setting configuration
@@ -239,7 +259,7 @@ public final class GraphBuilder {
             else if (checkDirectionalAssignment(first.inverse(), u, x, adjToDb)) {
                 g.replace(g.edge(u, x), new Edge(u, x, (first = first.inverse())));
                 g.replace(g.edge(v, y), new Edge(v, y, (second = second.inverse())));
-            } else {
+            } else {                                   
                 BitSet visited = new BitSet();
                 visited.set(v);
                 invertExistingDirectionalLabels(adjToDb, visited, v, u);
@@ -318,14 +338,16 @@ public final class GraphBuilder {
                 // if there is already a directional label on a different edge
                 // and they are equal this produces a conflict
                 if (x != v) {
-                    if (existing == b)
+                    if (existing == b) {
                         return false;
+                    }
                 } else {
-                    if (existing != b)
+                    if (existing != b) {
                         return false;
+                    }
                 }
             }
-            // check double-bond configuration adjacent to this configuration 
+            // check double-bond configuration adjacent to this configuration
             else if (existing != Bond.DOUBLE && adjToDb.get(x)) {
                 for (Edge f : g.edges(x)) {
                     existing = f.bond(x);
@@ -556,6 +578,10 @@ public final class GraphBuilder {
             this.c = c;
             gb.builders.add(this);
             return gb;
+        }
+
+        @Override public String toString() {
+            return x + "/" + u + "=" + v + (c == TOGETHER ? "\\" : "/") + y;
         }
     }
 }
