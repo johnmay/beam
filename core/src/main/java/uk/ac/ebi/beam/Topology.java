@@ -47,6 +47,7 @@ import static uk.ac.ebi.beam.Configuration.TH2;
 import static uk.ac.ebi.beam.Configuration.Type.DoubleBond;
 import static uk.ac.ebi.beam.Configuration.Type.Implicit;
 import static uk.ac.ebi.beam.Configuration.Type.Tetrahedral;
+import static uk.ac.ebi.beam.Configuration.UNKNOWN;
 
 /**
  * Defines the relative topology around a vertex (atom).
@@ -243,16 +244,23 @@ abstract class Topology {
         // atoms (todo)
         else if (valence == 3) {
 
-            // XXX: sulfoxide special case... would be better to compute
+            // XXX: sulfoxide and selenium special case... would be better to compute
             // hybridization don't really like doing this here but is sufficient
             // for now
-            if (g.atom(u).element() == Element.Sulfur) {
+            if (g.atom(u).element() == Element.Sulfur || g.atom(u).element() == Element.Selenium) {
+                int sb = 0, db = 0;
                 for (Edge e : g.edges(u)) {
-                    if (e.bond() == Bond.DOUBLE
-                            && g.atom(e.other(u)).element() == Element.Oxygen) {
-                        return c == ANTI_CLOCKWISE ? TH1 : TH2;
-                    }
+                    if (e.bond().order() == 1)
+                        sb++;
+                    else if (e.bond().order() == 2)
+                        db++;
+                    else return Configuration.UNKNOWN;
                 }
+                int q = g.atom(u).charge();
+                if ((q == 0 && sb == 2 && db == 1) || (q == 1 && sb == 3))
+                    return c == ANTI_CLOCKWISE ? TH1 : TH2;
+                else
+                    return Configuration.UNKNOWN;
             }
 
             // for the atom centric double bond configuration check there is

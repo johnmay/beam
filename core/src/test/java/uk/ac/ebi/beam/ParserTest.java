@@ -168,4 +168,12 @@ public class ParserTest {
         Graph g = Parser.parse("CCCCCCC=CCCCCCCCC=CC(=O)[a holo-[acyl-carrier protein]]");
         assertThat(g.atom(g.order() - 1).label(), is("a holo-[acyl-carrier protein]"));
     }
+    
+    @Test public void seleniumTh() throws Exception {
+        assertThat(Parser.parse("[Se@](=O)(C)CC").toSmiles(), is("[Se@](=O)(C)CC"));
+    }
+    
+    @Test public void sulphurIonTh() throws Exception {
+        assertThat(Parser.parse("[S@+]([O-])(C)CC").toSmiles(), is("[S@+]([O-])(C)CC"));   
+    }
 }
