@@ -33,6 +33,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
+import static uk.ac.ebi.beam.Configuration.DoubleBond.OPPOSITE;
 
 /** @author John May */
 public class GraphBuilderTest {
@@ -152,7 +153,7 @@ public class GraphBuilderTest {
                             .geometric(3, 4).together(2, 5)
                             .geometric(1, 2).together(0, 3)
                             .build();
-        Assert.assertThat(g.toSmiles(), is("F/C=C\\C=C/F"));
+        Assert.assertThat(g.toSmiles(), is("F\\C=C/C=C\\F"));
     }
 
     @Test
@@ -182,6 +183,32 @@ public class GraphBuilderTest {
         Assert.assertThat(g.toSmiles(), is("F/C=C/C=C\\C=C/F"));
     }
 
+    @Test public void resolveConflict3() throws Exception {
+        GraphBuilder gb = GraphBuilder.create(5);
+        Graph g = gb.add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(AtomImpl.AliphaticSubset.Carbon)
+                    .add(0, 1)
+                    .doubleBond(1, 2)
+                    .add(2, 3)
+                    .doubleBond(3, 4)
+                    .add(4, 5)
+                    .add(3, 6)
+                    .doubleBond(6, 7)
+                    .add(7, 8)
+                    .geometric(1, 2).configure(0, 3, OPPOSITE)
+                    .geometric(7, 6).configure(8, 3, OPPOSITE)
+                    .geometric(3, 4).configure(2, 5, OPPOSITE)
+                    .build();
+        System.out.println(g.toSmiles());
+    }
+    
     @Test
     public void all_trans_octatetraene() throws InvalidSmilesException {
         GraphBuilder gb = GraphBuilder.create(5);
@@ -206,7 +233,7 @@ public class GraphBuilderTest {
                             .geometric(5, 6).together(4, 7)
                             .geometric(7, 0).together(6, 1)
                             .build();
-        Assert.assertThat(g.toSmiles(), is("C=1\\C=C/C=C\\C=C/C1"));
+        Assert.assertThat(g.toSmiles(), is("C=1/C=C\\C=C/C=C\\C1"));
     }
 
     @Test(expected = IllegalArgumentException.class)
