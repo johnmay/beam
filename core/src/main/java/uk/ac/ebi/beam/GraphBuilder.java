@@ -218,25 +218,7 @@ public final class GraphBuilder {
         
         // store the vertices which are adjacent to pi bonds with a config
         BitSet adjToDb = new BitSet();
-
-        Collections.sort(builders, new Comparator<GeometricBuilder>() {
-            @Override public int compare(GeometricBuilder a, GeometricBuilder b) {
-                int aMin = Math.min(a.u, a.v);
-                int bMin = Math.min(b.u, b.v);
-                int aMax = Math.max(a.u, a.v);
-                int bMax = Math.max(b.u, b.v);
-                if (aMin > bMin)
-                    return +1;
-                if (aMin < bMin)
-                    return -1;
-                if (aMax > bMax)
-                    return +1;
-                if (aMax < bMax)
-                    return -1;
-                return 0;
-            }
-        });
-        
+       
         for (GeometricBuilder builder : builders) {
             // unspecified only used for getting not setting configuration
             if (builder.c == Configuration.DoubleBond.UNSPECIFIED)
@@ -245,6 +227,9 @@ public final class GraphBuilder {
 
             int u = builder.u, v = builder.v, x = builder.x, y = builder.y;
            
+            fix(g, u, v, adjToDb);
+            fix(g, v, u, adjToDb);
+            
             Bond first  = firstDirectionalLabel(u, x, adjToDb);
             Bond second = builder.c == TOGETHER ? first
                                                 : first.inverse();
@@ -283,15 +268,27 @@ public final class GraphBuilder {
 
             adjToDb.set(u);
             adjToDb.set(v);
-            for (Edge e : g.edges(u))
-                adjToDb.set(e.other(u));
-            for (Edge e : g.edges(v))
-                adjToDb.set(e.other(v));
                 
         }
         builders.clear();
     }
 
+    private void fix(Graph g, int u, int p, BitSet adjToDb) {
+        Bond other = null;
+        for (Edge e : g.edges(u)) {
+            Bond bond = e.bond(u);
+            if (bond.directional()) {
+                if (other != null && other == bond) {
+                    BitSet visited = new BitSet();
+                    visited.set(p);
+                    visited.set(e.other(u));
+                    invertExistingDirectionalLabels(adjToDb, visited, u, p);
+                }
+                other = bond;
+            }
+        }
+    }
+    
     private void invertExistingDirectionalLabels(BitSet adjToDb,
                                                  BitSet visited,
                                                  int u,
@@ -299,9 +296,10 @@ public final class GraphBuilder {
         visited.set(u);
         for (Edge e : g.edges(u)) {
             int v = e.other(u);
-            if (adjToDb.get(v) && !visited.get(v) && p != v) {
+            if (!visited.get(v) && p != v) {
                 g.replace(e, e.inverse());
-                invertExistingDirectionalLabels(adjToDb, visited, v, u);
+                if (adjToDb.get(v))
+                    invertExistingDirectionalLabels(adjToDb, visited, v, u);
             }
         }
     }
@@ -345,17 +343,6 @@ public final class GraphBuilder {
                     if (existing != b) {
                         return false;
                     }
-                }
-            }
-            // check double-bond configuration adjacent to this configuration
-            else if (existing != Bond.DOUBLE && adjToDb.get(x)) {
-                for (Edge f : g.edges(x)) {
-                    existing = f.bond(x);
-                    if (existing.directional() && f.other(x) != u) {
-                        if (existing != b) {
-                            return false;
-                        }
-                    }                    
                 }
             }
         }
