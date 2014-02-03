@@ -491,18 +491,22 @@ final class Parser {
 
         if (arbitraryLabel) {
             int end = buffer.position;
-            int depth = 0;
+            int depth = 1;
             while (buffer.hasRemaining()) {
                 char c = buffer.get();
                 if (c == '[')
                     depth++;
                 else if (c == ']') {
+                    depth--;
                     if (depth == 0)
                         break;
-                    depth--;
                 }
                 end++;
             }
+            if (depth != 0)
+                throw new InvalidSmilesException("unparsable label in bracket atom",
+                                                 buffer,
+                                                 buffer.position - 1);
             String label = buffer.substr(start, end);
             return new AtomImpl.BracketAtom(label);
         }

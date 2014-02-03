@@ -162,6 +162,14 @@ public class ParserTest {
         Graph g = Parser.parse("CC(C)C[Really?]");
         assertThat(g.atom(4).label(), is("Really?"));
     }
+    
+    @Test(expected = InvalidSmilesException.class) public void bad_label() throws Exception {
+        Parser.parse("[Nope-[not]-[ok]");
+    }
+    
+    @Test(expected = InvalidSmilesException.class) public void bad_label2() throws Exception {
+        Parser.parse("[this-[is-not-okay]");
+    }
 
     // ek! what a difficult one - this example is from MetaCyc
     @Test public void nested_label() throws InvalidSmilesException {
