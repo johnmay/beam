@@ -314,5 +314,23 @@ public class GraphBuilderTest {
                             .add(5, 0, Bond.DOUBLE).build().toSmiles(),
                           is("C=1C=CC=CC1"));
     }
+    
+    @Test public void buildExtendedTetrahedral() throws InvalidSmilesException {
+        GraphBuilder gb = GraphBuilder.create(4);
+        gb = gb.add(Element.Carbon, 3)
+               .add(Element.Carbon, 1)
+               .add(Element.Carbon, 0)
+               .add(Element.Carbon, 1)
+               .add(Element.Carbon, 3)
+               .singleBond(0, 1)
+               .doubleBond(1, 2)
+               .doubleBond(2, 3)
+               .singleBond(3, 4)
+               .extendedTetrahedral(2).lookingFrom(1)
+                                      .neighbors(2, 3, 4)
+                                      .winding(Configuration.AL1)
+                                      .build();
+        System.out.println(gb.build().toSmiles());
+    }
 
 }
