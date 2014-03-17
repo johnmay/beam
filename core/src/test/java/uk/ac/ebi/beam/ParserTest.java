@@ -171,6 +171,16 @@ public class ParserTest {
         Parser.parse("[this-[is-not-okay]");
     }
 
+    @Test public void parseCLockwiseExtendedTetrahedral() throws Exception {
+        Graph g = Graph.fromSmiles("C(C)=[C@@]=CC");
+        assertThat(g.topologyOf(2).configuration(), is(Configuration.AL2));
+    }
+
+    @Test public void parseAnticlockwiseExtendedTetrahedral() throws Exception {
+        Graph g = Graph.fromSmiles("C(C)=[C@]=CC");
+        assertThat(g.topologyOf(2).configuration(), is(Configuration.AL1));
+    }
+    
     // ek! what a difficult one - this example is from MetaCyc
     @Test public void nested_label() throws InvalidSmilesException {
         Graph g = Parser.parse("CCCCCCC=CCCCCCCCC=CC(=O)[a holo-[acyl-carrier protein]]");

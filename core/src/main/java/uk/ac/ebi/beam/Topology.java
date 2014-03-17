@@ -45,6 +45,7 @@ import static uk.ac.ebi.beam.Configuration.TB2;
 import static uk.ac.ebi.beam.Configuration.TH1;
 import static uk.ac.ebi.beam.Configuration.TH2;
 import static uk.ac.ebi.beam.Configuration.Type.DoubleBond;
+import static uk.ac.ebi.beam.Configuration.Type.ExtendedTetrahedral;
 import static uk.ac.ebi.beam.Configuration.Type.Implicit;
 import static uk.ac.ebi.beam.Configuration.Type.Tetrahedral;
 import static uk.ac.ebi.beam.Configuration.UNKNOWN;
@@ -178,6 +179,20 @@ abstract class Topology {
                                Arrays.copyOf(vs, vs.length),
                                p);
     }
+    
+    static Topology extendedTetrahedral(int u, int[] vs, Configuration configuration) {
+
+        if (configuration.type() != Implicit
+                && configuration.type() != ExtendedTetrahedral)
+            throw new IllegalArgumentException(configuration.type()
+                                                       + "invalid extended tetrahedral configuration");
+
+        int p = configuration.shorthand() == CLOCKWISE ? 1 : -1;
+
+        return new ExtendedTetrahedral(u,
+                                       Arrays.copyOf(vs, vs.length),
+                                       p);
+    }
 
     /**
      * Define trigonal topology of the given configuration.
@@ -310,6 +325,8 @@ abstract class Topology {
             return tetrahedral(u, vs, c);
         } else if (c.type() == DoubleBond) {
             return trigonal(u, vs, c);
+        } else if (c.type() == ExtendedTetrahedral) {
+            return extendedTetrahedral(u, vs, c);
         }
 
         return unknown();
@@ -370,6 +387,50 @@ abstract class Topology {
             for (int i = 0; i < vs.length; i++)
                 ws[i] = mapping[vs[i]];
             return new Tetrahedral(mapping[u], ws, p);
+        }
+
+        public String toString() {
+            return u + " " + Arrays.toString(vs) + ":" + p;
+        }
+    }
+    
+    private static final class ExtendedTetrahedral extends Topology {
+
+        private final int   u;
+        private final int[] vs;
+        private final int   p;
+
+        private ExtendedTetrahedral(int u, int[] vs, int p) {
+            if (vs.length != 4)
+                throw new IllegalArgumentException("Tetrahedral topology requires 4 vertices - use the 'centre' vertex to mark implicit verticies");
+            this.u = u;
+            this.vs = vs;
+            this.p = p;
+        }
+
+        /** @inheritDoc */
+        @Override int atom() {
+            return u;
+        }
+
+        /** @inheritDoc */
+        @Override Configuration configuration() {
+            return p < 0 ? Configuration.AL1 : Configuration.AL2;
+        }
+
+        /** @inheritDoc */
+        @Override Topology orderBy(int[] rank) {
+            return new ExtendedTetrahedral(u,
+                                           sort(vs, rank),
+                                           p * parity(vs, rank));
+        }
+
+        /** @inheritDoc */
+        @Override Topology transform(final int[] mapping) {
+            int[] ws = new int[vs.length];
+            for (int i = 0; i < vs.length; i++)
+                ws[i] = mapping[vs[i]];
+            return new ExtendedTetrahedral(mapping[u], ws, p);
         }
 
         public String toString() {

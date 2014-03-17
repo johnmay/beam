@@ -171,6 +171,45 @@ public class GeneratorTest {
     @Test public void disconnected() throws InvalidSmilesException {
         roundTrip("CCCC.OOOO.C[CH]C.CNO");
     }
+    
+    @Test public void extendedTetrhedral_al1() throws Exception {
+        Graph g = Graph.fromSmiles("CC=[C]=CC");
+        g.addTopology(Topology.extendedTetrahedral(2, new int[]{0, 1, 3, 4}, Configuration.AL1));
+        assertThat(g.toSmiles(), is("CC=[C@]=CC"));
+    }
+
+    @Test public void extendedTetrhedral_al2() throws Exception {
+        Graph g = Graph.fromSmiles("CC=[C]=CC");
+        g.addTopology(Topology.extendedTetrahedral(2, new int[]{0, 1, 3, 4}, Configuration.AL2));
+        assertThat(g.toSmiles(), is("CC=[C@@]=CC"));
+    }
+
+    @Test public void extendedTetrhedral_al1_permute_1() throws Exception {
+        Graph g = Graph.fromSmiles("CC=[C]=CC");
+        g.addTopology(Topology.extendedTetrahedral(2, new int[]{0, 1, 3, 4}, Configuration.AL1));
+        g = g.permute(new int[]{1, 0, 2, 3, 4});
+        assertThat(g.toSmiles(), is("C(C)=[C@@]=CC"));
+    }
+
+    @Test public void extendedTetrhedral_al1_inv_permute_1() throws Exception {
+        Graph g = Graph.fromSmiles("C(C)=[C]=CC");
+        g = g.permute(new int[]{1, 0, 2, 3, 4});
+        assertThat(g.toSmiles(), is("CC=[C@]=CC"));
+    }
+
+    @Test public void extendedTetrhedral_al1_permute_2() throws Exception {
+        Graph g = Graph.fromSmiles("CC=[C]=CC");
+        g.addTopology(Topology.extendedTetrahedral(2, new int[]{0, 1, 3, 4}, Configuration.AL1));
+        g = g.permute(new int[]{4, 3, 2, 1, 0});
+        assertThat(g.toSmiles(), is("CC=[C@]=CC"));
+    }
+
+    @Test public void extendedTetrhedral_al1_permute_3() throws Exception {
+        Graph g = Graph.fromSmiles("CC=[C]=CC");
+        g.addTopology(Topology.extendedTetrahedral(2, new int[]{0, 1, 3, 4}, Configuration.AL1));
+        g = g.permute(new int[]{4, 3, 2, 0, 1});
+        assertThat(g.toSmiles(), is("C(C)=[C@@]=CC"));
+    }
 
     @Test public void reusingNumbering() throws InvalidSmilesException {
         Generator.RingNumbering rnums = new Generator.ReuseRingNumbering(0);

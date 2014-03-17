@@ -191,17 +191,42 @@ final class Parser {
             g.addTopology(Topology.create(u, vs, es, c));
         }
         else {
-            int[] vs = new int[g.degree(u)];
+            int[] us = new int[g.degree(u)];
             List<Edge> es = g.edges(u);
-            for (int i = 0; i < vs.length; i++)
-                vs[i] = es.get(i).other(u);
+            for (int i = 0; i < us.length; i++)
+                us[i] = es.get(i).other(u);
 
-            if (c.type() == Configuration.Type.Tetrahedral)
-                vs = insertThImplicitRef(u, vs); // XXX: temp fix
-            else if (c.type() == Configuration.Type.DoubleBond)
-                vs = insertDbImplicitRef(u, vs); // XXX: temp fix
+            if (c.type() == Configuration.Type.Tetrahedral) {
+                us = insertThImplicitRef(u, us); // XXX: temp fix
+            } else if (c.type() == Configuration.Type.DoubleBond) {
+                us = insertDbImplicitRef(u, us); // XXX: temp fix
+            } else if (c.type() == Configuration.Type.ExtendedTetrahedral) {
+                // Extended tetrahedral is a little more complicated, note
+                // following presumes the end atoms are not in ring closures
+                int v = es.get(0).other(u);
+                int w = es.get(1).other(u);
+                List<Edge> vs = g.edges(v);
+                List<Edge> ws = g.edges(w);
+                us = new int[]{-1, v, -1, w};
+                int i = 0;
+                for (Edge e : vs) {
+                    int x = e.other(v);
+                    if (e.bond().order() == 1) us[i++] = x;
+                }
+                
+                i = 2;
+                for (Edge e : ws) {
+                    int x = e.other(w);
+                    if (e.bond().order() == 1) us[i++] = x;
+                }
 
-            g.addTopology(Topology.create(u, vs, es, c));
+                if (us[0] < 0 || us[2] < 0)
+                    return;
+                
+                Arrays.sort(us);
+            }
+
+            g.addTopology(Topology.create(u, us, es, c));
         }
     }
 

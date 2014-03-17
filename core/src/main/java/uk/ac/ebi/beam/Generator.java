@@ -79,9 +79,20 @@ final class Generator {
         // prepare ring closures and topologies
         int visited = 0;
         Arrays.fill(visitedAt, -1);
+        boolean uncofiguredStereo = false; 
         for (int u = 0; u < g.order() && visited < g.order(); u++) {
             if (visitedAt[u] < 0)
-                prepare(u, u, u == 0 ? Bond.IMPLICIT : Bond.DOT);
+                uncofiguredStereo = prepare(u, u, u == 0 ? Bond.IMPLICIT : Bond.DOT) || uncofiguredStereo;
+        }
+
+        if (uncofiguredStereo) {
+            for (int u = 0; u < g.order(); u++) {
+                if (g.topologyOf(u).configuration().type() == Configuration.Type.ExtendedTetrahedral) {
+                    tokens[u].configure(g.topologyOf(u)
+                                         .orderBy(visitedAt)
+                                         .configuration());
+                }
+            }
         }
 
         // write notation
@@ -102,21 +113,26 @@ final class Generator {
      * @param p parent vertex (where we came from)
      * @param b bond type
      */
-    void prepare(int u, int p, Bond b) {
+    boolean prepare(int u, int p, Bond b) {
         visitedAt[u] = i++;
         tokens[u] = g.atom(u).token();
 
+        boolean uncofiguredStereo = false;
+        
         for (Edge e : g.edges(u)) {
             int v = e.other(u);
             if (visitedAt[v] < 0) {
-                prepare(v, u, e.bond(u));
+                uncofiguredStereo = prepare(v, u, e.bond(u)) || uncofiguredStereo;
             } else if (v != p && visitedAt[v] < visitedAt[u]) {
                 cyclicEdge(v, u, e.bond(v));
             }
         }
 
         // Configure the topology using the traversal order
-        // XXX: need a better approach for extended tetrahedral (@AL1/@AL2)
+        // extended tetrahedral (@AL1/@AL2) doesn't have all neighbors visited 
+        // until the end
+        if (g.topologyOf(u).configuration().type() == Configuration.Type.ExtendedTetrahedral)
+            return true;
         if (rings.containsKey(u)) {
             tokens[u].configure(g.topologyOf(u)
                                  .orderBy(localRank(u, p))
@@ -126,6 +142,8 @@ final class Generator {
                                  .orderBy(visitedAt)
                                  .configuration());
         }
+        
+        return uncofiguredStereo;
     }
 
     /**
