@@ -309,7 +309,7 @@ public class TopologyTest {
                 .<Edge>emptyList(), Configuration.OH1), is(Topology.unknown()));
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void create_al() {
         assertThat(Topology.create(0, new int[0], Collections
                 .<Edge>emptyList(), Configuration.AL1), is(Topology.unknown()));
