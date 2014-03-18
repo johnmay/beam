@@ -193,8 +193,9 @@ public class GeneratorTest {
 
     @Test public void extendedTetrhedral_al1_inv_permute_1() throws Exception {
         Graph g = Graph.fromSmiles("C(C)=[C]=CC");
+        g.addTopology(Topology.extendedTetrahedral(2, new int[]{0, 1, 3, 4}, Configuration.AL1));
         g = g.permute(new int[]{1, 0, 2, 3, 4});
-        assertThat(g.toSmiles(), is("CC=[C@]=CC"));
+        assertThat(g.toSmiles(), is("CC=[C@@]=CC"));
     }
 
     @Test public void extendedTetrhedral_al1_permute_2() throws Exception {
