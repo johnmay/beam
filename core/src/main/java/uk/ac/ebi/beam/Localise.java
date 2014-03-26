@@ -122,15 +122,15 @@ final class Localise {
                 return (q == 1 || q == -1) && deg == 3;
             case Silicon:
             case Germanium:
-                return q < 0 ? true : false;
+                return q < 0;
             case Nitrogen:
             case Phosphorus:
             case Arsenic:
             case Antimony:
                 if (q == 0)
-                    return deg == 3 ? true : false;
+                    return deg == 3 || deg > 4;
                 else if (q == 1)
-                    return deg == 3 ? false : true;
+                    return deg > 3;
                 else
                     return true;
             case Oxygen:
@@ -138,9 +138,9 @@ final class Localise {
             case Selenium:
             case Tellurium:
                 if (q == 0)
-                    return deg == 2 ? true : false;
+                    return deg == 2 || deg == 4 || deg > 5;
                 else if (q < 0)
-                    return true;
+                    return deg == 3 || deg == 5 || deg > 6;
                 else
                     return false;
         }
