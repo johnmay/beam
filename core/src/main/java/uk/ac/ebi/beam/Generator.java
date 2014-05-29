@@ -100,8 +100,14 @@ final class Generator {
         i = 0;
         Arrays.fill(visitedAt, -1);
         for (int u = 0; u < g.order() && visited < g.order(); u++) {
-            if (visitedAt[u] < 0)
-                write(u, u, u == 0 ? Bond.IMPLICIT : Bond.DOT);
+            if (visitedAt[u] < 0) {
+                if (u > 0) {
+                    rnums.reset();
+                    write(u, u, Bond.DOT);
+                } else {
+                    write(u, u, Bond.IMPLICIT);
+                }
+            }
         }
     }
 
@@ -445,6 +451,9 @@ final class Generator {
          * @param rnum ring number
          */
         void free(int rnum);
+        
+        /** Reset ring number usage */
+        void reset();
     }
 
     /** Labelling of ring opening/closures always using the lowest ring number. */
@@ -472,6 +481,10 @@ final class Generator {
 
         @Override public void free(int rnum) {
             used[rnum] = false;
+        }
+
+        @Override public void reset() {
+            // do nothing 
         }
     }
 
@@ -510,6 +523,10 @@ final class Generator {
 
         @Override public void free(int rnum) {
             used[rnum] = false;
+        }
+
+        @Override public void reset() {
+            pos = 1;
         }
     }
 }
