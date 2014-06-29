@@ -480,6 +480,9 @@ final class Parser {
         int start = buffer.position;
 
         boolean arbitraryLabel = false;
+        
+        if (!buffer.hasRemaining())
+            throw new InvalidSmilesException("Unclosed bracket atom", buffer);
 
         final int isotope = buffer.getNumber();
         final boolean aromatic = buffer.next() >= 'a' && buffer.next() <= 'z';

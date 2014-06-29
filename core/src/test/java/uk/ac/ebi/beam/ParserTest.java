@@ -194,4 +194,9 @@ public class ParserTest {
     @Test public void sulphurIonTh() throws Exception {
         assertThat(Parser.parse("[S@+]([O-])(C)CC").toSmiles(), is("[S@+]([O-])(C)CC"));   
     }
+
+    @Test(expected = InvalidSmilesException.class) 
+    public void openBracketIsInvalid() throws Exception {
+        Parser.parse("[");
+    }
 }
