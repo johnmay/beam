@@ -212,6 +212,18 @@ public class GeneratorTest {
         assertThat(g.toSmiles(), is("C(C)=[C@@]=CC"));
     }
 
+    @Test public void resetRingNumbersBetweenComponents1() throws Exception {
+        Graph g = Graph.fromSmiles("C1CC1.C1CC1");
+        assertThat(new Generator(g, new Generator.ReuseRingNumbering(1)).string(),
+                   is("C1CC1.C1CC1"));
+    }
+
+    @Test public void resetRingNumbersBetweenComponents2() throws Exception {
+        Graph g = Graph.fromSmiles("C1CC1.C1CC1");
+        assertThat(new Generator(g, new Generator.IterativeRingNumbering(1)).string(),
+                   is("C1CC1.C1CC1"));
+    }
+
     @Test public void reusingNumbering() throws InvalidSmilesException {
         Generator.RingNumbering rnums = new Generator.ReuseRingNumbering(0);
         for (int i = 0; i < 50; i++) {
