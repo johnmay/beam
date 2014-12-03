@@ -7,7 +7,7 @@
     <groupId>uk.ac.ebi.beam</groupId>
     <artifactId>beam</artifactId>
     <packaging>pom</packaging>
-    <version>0.7</version>
+    <version>0.8-SNAPSHOT</version>
     <modules>
         <module>core</module>
         <module>func</module>
