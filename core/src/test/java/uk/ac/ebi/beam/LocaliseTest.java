@@ -2,13 +2,6 @@ package uk.ac.ebi.beam;
 
 import org.junit.Test;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.zip.GZIPInputStream;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
