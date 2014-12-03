@@ -34,6 +34,12 @@ public class FunctionsTest {
                    is("F/C=C/F"));
     }
 
+    @Test public void ensureAlleneStereoDoesntBreakConversion() throws Exception {
+        Graph g = Graph.fromSmiles("CC=[C@]=CC");
+        assertThat(Functions.bondBasedDBStereo(g).toSmiles(),
+                   is("CC=[C@]=CC"));
+    }
+
     @Test public void canoncalise() throws IOException {
         Graph g = Graph.fromSmiles("CCOCC");
         Graph h = Functions.canonicalize(g,
