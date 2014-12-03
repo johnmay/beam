@@ -139,7 +139,7 @@ final class Localise {
             case Tellurium:
                 if (q == 0)
                     return deg == 2 || deg == 4 || deg > 5;
-                else if (q < 0)
+                else if (q == -1 || q == +1)
                     return deg == 3 || deg == 5 || deg > 6;
                 else
                     return false;
