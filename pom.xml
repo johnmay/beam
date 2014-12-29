@@ -30,11 +30,11 @@
 
     <distributionManagement>
         <repository>
-            <id>OSSRH Staging</id>
+            <id>ossrh-staging</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
         <snapshotRepository>
-            <id>OSSRH Snaphots</id>
+            <id>ossrh-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
