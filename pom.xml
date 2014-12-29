@@ -6,21 +6,36 @@
 
     <groupId>uk.ac.ebi.beam</groupId>
     <artifactId>beam</artifactId>
+    <name>beam</name>
+    <description>SMILES parsing and generation library for cheminformatics</description>
+    <url>http://www.github.com/johnmay/beam/</url>
+    
     <packaging>pom</packaging>
     <version>0.8-SNAPSHOT</version>
     <modules>
         <module>core</module>
         <module>func</module>
     </modules>
+    
+    <scm>
+        <url>https://github.com/johnmay/beam</url>
+        <connection>scm:git:git://github.com/johnmay/beam.git</connection>
+        <developerConnection>scm:git:git@github.com:johnmay/beam.git</developerConnection>
+    </scm>
+
+    <issueManagement>
+        <url>https://github.com/johnmay/beam/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
 
     <distributionManagement>
         <repository>
-            <id>ebi-repo</id>
-            <url>${ebi.repo.nexus.url}</url>
+            <id>OSSRH Staging</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
         <snapshotRepository>
-            <id>ebi-repo-snapshots</id>
-            <url>${ebi.repo.snapshots.nexus.url}</url>
+            <id>OSSRH Snaphots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -35,10 +50,18 @@
         </license>
     </licenses>
 
+    <prerequisites>
+        <maven>3.0</maven>
+    </prerequisites>
+
     <developers>
         <developer>
             <name>John May</name>
+            <email>https://github.com/johnmay</email>
+            <url>http://www.github.com/johnmay/</url>
             <organization>EMBL-EBI</organization>
+            <organizationUrl>http://ebi.ac.uk</organizationUrl>
+            <timezone>GMT</timezone>
         </developer>
     </developers>
 
