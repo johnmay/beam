@@ -206,7 +206,6 @@ public class GraphBuilderTest {
                     .geometric(7, 6).configure(8, 3, OPPOSITE)
                     .geometric(3, 4).configure(2, 5, OPPOSITE)
                     .build();
-        System.out.println(g.toSmiles());
     }
     
     @Test
@@ -260,7 +259,6 @@ public class GraphBuilderTest {
                             .geometric(5, 6).together(4, 7)
                             .geometric(7, 0).together(6, 1)
                             .build();
-        System.out.println(g.toSmiles());
         Assert.assertThat(g.toSmiles(), is("C=1/C=C\\C=C/C=C\\C1"));
     }
     
@@ -330,7 +328,6 @@ public class GraphBuilderTest {
                                       .neighbors(2, 3, 4)
                                       .winding(Configuration.AL1)
                                       .build();
-        System.out.println(gb.build().toSmiles());
     }
 
 }

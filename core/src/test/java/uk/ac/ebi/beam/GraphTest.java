@@ -534,10 +534,4 @@ public class GraphTest {
         g.sort(new Graph.VisitHydrogenFirst());
         assertThat(g.toSmiles(), is("C1([H])=C([H])C([H])=C([H])C([H])=C1[H]"));
     }
-    
-    @Test public void hiBondOrderFirst3() throws Exception {
-        Graph g = Graph.fromSmiles("C(F)(F)(F)S([O-])(=O)=O");
-        System.out.println(g.toSmiles());
-        System.out.println(g.sort(new Graph.VisitHighOrderFirst()).toSmiles());
-    }
 }
