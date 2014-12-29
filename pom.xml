@@ -11,7 +11,7 @@
     <url>http://www.github.com/johnmay/beam/</url>
     
     <packaging>pom</packaging>
-    <version>0.8</version>
+    <version>0.9-SNAPSHOT</version>
     <modules>
         <module>core</module>
         <module>func</module>
