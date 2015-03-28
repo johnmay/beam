@@ -702,6 +702,8 @@ final class Parser {
         bond = Bond.IMPLICIT;
         // adjust the arrangement replacing where this ring number was openned
         arrangement.get(rbond.u).replace(-rnum, stack.peek());
+        if (arrangement.containsKey(v))
+            arrangement.get(v).add(rbond.u);
         openRings--;
     }
 
