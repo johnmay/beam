@@ -493,7 +493,8 @@ final class Parser {
                     bond = Bond.UP;
                     break;
                 case '\\':
-                    if (bond != Bond.IMPLICIT)
+                    // we allow C\\C=C/C since it could be an escaping error
+                    if (bond != Bond.IMPLICIT && bond != Bond.DOWN)
                         throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.DOWN;
                     break;
