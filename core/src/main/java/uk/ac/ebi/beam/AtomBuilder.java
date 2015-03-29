@@ -84,6 +84,16 @@ public final class AtomBuilder {
         this.aromatic = aromatic;
     }
 
+    public static AtomBuilder fromExisting(Atom a) {
+        if (a == null)
+            throw new NullPointerException("no atom provided");
+        return new AtomBuilder(a.element(), a.aromatic())
+                .charge(a.charge())
+                .hydrogens(a.hydrogens())
+                .isotope(a.isotope())
+                .atomClass(a.atomClass());
+    }
+
     /**
      * Start building an aliphatic atom of the given element.
      *
