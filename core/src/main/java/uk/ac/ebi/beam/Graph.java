@@ -469,7 +469,7 @@ public final class Graph {
 
         for (int u = 0; u < order; u++) {
             g.atoms[p[u]] = atoms[u];
-            g.addTopology(topologyOf(u).transform(p));
+            g.addTopology(topologyOf(u).orderBy(p).transform(p));
         }
 
         for (int u = 0; u < order; u++) {
