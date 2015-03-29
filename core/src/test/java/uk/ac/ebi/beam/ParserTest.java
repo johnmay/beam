@@ -201,6 +201,21 @@ public class ParserTest {
         Parser.parse("C\\=C");
     }
 
+    @Test(expected = InvalidSmilesException.class)
+    public void rejectMultipleUpBonds() throws Exception {
+        Parser.parse("C/C=C(/C)/C");
+    }
+
+    @Test
+    public void acceptMultipleBonds() throws Exception {
+        Parser.parse("C/C=C/C\\C=C/C");
+    }
+    
+    @Test(expected = InvalidSmilesException.class)
+    public void rejectInvalidDbs() throws Exception {
+        Parser.parse("c1c(ccc(c1)F)c2/c3n/c(c(\\c4[nH]c(/c(c/5\\nc(/c(c/6\\s\\c2\\cc6)/c7ccc(cc7)F)C=C5)/c8ccc(cc8)S(=O)(=O)[O-])cc4)/c9ccc(cc9)S(=O)(=O)[O-])/C=C3.[Na+].[Na+] CHEMBL345045");
+    }
+
     @Test(expected = InvalidSmilesException.class) 
     public void openBracketIsInvalid() throws Exception {
         Parser.parse("[");

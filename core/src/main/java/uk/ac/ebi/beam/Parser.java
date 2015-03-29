@@ -31,6 +31,7 @@ package uk.ac.ebi.beam;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +90,8 @@ final class Parser {
     /** Strict parsing. */
     private final boolean strict;
 
+    private BitSet checkDirectionalBonds = new BitSet();
+    
     /**
      * Create a new parser for the specified buffer.
      *
@@ -104,7 +107,7 @@ final class Parser {
         if (stack.size() > 1)
             throw new InvalidSmilesException("Unclosed branch detected:", buffer);
         start.add(0); // always include first vertex as start
-        createTopologies();
+        createTopologies(buffer);
     }
 
     /**
@@ -156,11 +159,55 @@ final class Parser {
      * Create the topologies (stereo configurations) for the chemical graph. The
      * topologies define spacial arrangement around atoms.
      */
-    private void createTopologies() throws InvalidSmilesException {
+    private void createTopologies(CharBuffer buffer) throws InvalidSmilesException {
         // create topologies (stereo configurations)
         for (Entry<Integer, Configuration> e : configurations.entrySet())
             addTopology(e.getKey(),
                         Topology.toExplicit(g, e.getKey(), e.getValue()));
+        
+        for (int v = checkDirectionalBonds.nextSetBit(0); v >= 0; v = checkDirectionalBonds.nextSetBit(v+1)) {
+            int nUpV   = 0;
+            int nDownV = 0;
+            int nUpW   = 0;
+            int nDownW = 0;
+            int w      = -1;
+            
+            for (Edge e : g.edges(v)) {
+                Bond bond = e.bond(v);
+                if (bond == Bond.UP)
+                    nUpV++;
+                else if (bond == Bond.DOWN)
+                    nDownV++;
+                else if (bond == Bond.DOUBLE)
+                    w = e.other(v);    
+            }
+            
+            if (w < 0)
+                continue;
+            
+            checkDirectionalBonds.clear(w);
+
+            for (Edge e : g.edges(w)) {
+                Bond bond = e.bond(w);
+                if (bond == Bond.UP)
+                    nUpW++;
+                else if (bond == Bond.DOWN)
+                    nDownW++;
+            }
+
+            if (nUpV + nDownV == 0 || nUpW + nDownW == 0) {
+                continue;
+            }
+            
+            if (nUpV > 1)
+                throw new InvalidSmilesException("Multiple directional bonds on atom " + v, buffer);
+            if (nDownV > 1)
+                throw new InvalidSmilesException("Multiple directional bonds on atom " + v, buffer);
+            if (nUpW > 1)
+                throw new InvalidSmilesException("Multiple directional bonds on atom " + w, buffer);
+            if (nDownW > 1)
+                throw new InvalidSmilesException("Multiple directional bonds on atom " + w, buffer);
+        }
     }
 
     /**
@@ -262,14 +309,21 @@ final class Parser {
      *
      * @param a an atom to add
      */
-    private void addAtom(Atom a) {
+    private void addAtom(Atom a, CharBuffer buffer) throws InvalidSmilesException {
         int v = g.addAtom(a);
         if (!stack.empty()) {
             int u = stack.pop();
-            if (bond != Bond.DOT)
+            if (bond != Bond.DOT) {
+                if (bond.directional()) {
+                    if (a.aromatic() && g.atom(u).aromatic())
+                        throw new InvalidSmilesException("Directional bond between aromatic atoms", buffer);
+                    checkDirectionalBonds.set(u);
+                    checkDirectionalBonds.set(v);
+                }
                 g.addEdge(new Edge(u, v, bond));
-            else
+            } else {
                 start.add(v); // start of a new run
+            }
             if (arrangement.containsKey(u))
                 arrangement.get(u).add(v);
 
@@ -299,62 +353,62 @@ final class Parser {
 
                 // aliphatic subset
                 case '*':
-                    addAtom(AtomImpl.AliphaticSubset.Unknown);
+                    addAtom(AtomImpl.AliphaticSubset.Unknown, buffer);
                     break;
                 case 'B':
                     if (buffer.getIf('r'))
-                        addAtom(AtomImpl.AliphaticSubset.Bromine);
+                        addAtom(AtomImpl.AliphaticSubset.Bromine, buffer);
                     else
-                        addAtom(AtomImpl.AliphaticSubset.Boron);
+                        addAtom(AtomImpl.AliphaticSubset.Boron, buffer);
                     break;
                 case 'C':
                     if (buffer.getIf('l'))
-                        addAtom(AtomImpl.AliphaticSubset.Chlorine);
+                        addAtom(AtomImpl.AliphaticSubset.Chlorine, buffer);
                     else
-                        addAtom(AtomImpl.AliphaticSubset.Carbon);
+                        addAtom(AtomImpl.AliphaticSubset.Carbon, buffer);
                     break;
                 case 'N':
-                    addAtom(AtomImpl.AliphaticSubset.Nitrogen);
+                    addAtom(AtomImpl.AliphaticSubset.Nitrogen, buffer);
                     break;
                 case 'O':
-                    addAtom(AtomImpl.AliphaticSubset.Oxygen);
+                    addAtom(AtomImpl.AliphaticSubset.Oxygen, buffer);
                     break;
                 case 'P':
-                    addAtom(AtomImpl.AliphaticSubset.Phosphorus);
+                    addAtom(AtomImpl.AliphaticSubset.Phosphorus, buffer);
                     break;
                 case 'S':
-                    addAtom(AtomImpl.AliphaticSubset.Sulfur);
+                    addAtom(AtomImpl.AliphaticSubset.Sulfur, buffer);
                     break;
                 case 'F':
-                    addAtom(AtomImpl.AliphaticSubset.Fluorine);
+                    addAtom(AtomImpl.AliphaticSubset.Fluorine, buffer);
                     break;
                 case 'I':
-                    addAtom(AtomImpl.AliphaticSubset.Iodine);
+                    addAtom(AtomImpl.AliphaticSubset.Iodine, buffer);
                     break;
 
                 // aromatic subset
                 case 'b':
-                    addAtom(AtomImpl.AromaticSubset.Boron);
+                    addAtom(AtomImpl.AromaticSubset.Boron, buffer);
                     g.markDelocalised();
                     break;
                 case 'c':
-                    addAtom(AtomImpl.AromaticSubset.Carbon);
+                    addAtom(AtomImpl.AromaticSubset.Carbon, buffer);
                     g.markDelocalised();
                     break;
                 case 'n':
-                    addAtom(AtomImpl.AromaticSubset.Nitrogen);
+                    addAtom(AtomImpl.AromaticSubset.Nitrogen, buffer);
                     g.markDelocalised();
                     break;
                 case 'o':
-                    addAtom(AtomImpl.AromaticSubset.Oxygen);
+                    addAtom(AtomImpl.AromaticSubset.Oxygen, buffer);
                     g.markDelocalised();
                     break;
                 case 'p':
-                    addAtom(AtomImpl.AromaticSubset.Phosphorus);
+                    addAtom(AtomImpl.AromaticSubset.Phosphorus, buffer);
                     g.markDelocalised();
                     break;
                 case 's':
-                    addAtom(AtomImpl.AromaticSubset.Sulfur);
+                    addAtom(AtomImpl.AromaticSubset.Sulfur, buffer);
                     g.markDelocalised();
                     break;
 
@@ -366,24 +420,24 @@ final class Parser {
                     if (strict)
                         throw new InvalidSmilesException("hydrogens should be specified in square brackets - '[H]'",
                                                          buffer);
-                    addAtom(AtomImpl.EXPLICIT_HYDROGEN);
+                    addAtom(AtomImpl.EXPLICIT_HYDROGEN, buffer);
                     break;
                 case 'D':
                     if (strict)
                         throw new InvalidSmilesException("deuterium should be specified as a hydrogen isotope - '[2H]'",
                                                          buffer);
-                    addAtom(AtomImpl.DEUTERIUM);
+                    addAtom(AtomImpl.DEUTERIUM, buffer);
                     break;
                 case 'T':
                     if (strict)
                         throw new InvalidSmilesException("tritium should be specified as a hydrogen isotope - '[3H]'",
                                                          buffer);
-                    addAtom(AtomImpl.TRITIUM);
+                    addAtom(AtomImpl.TRITIUM, buffer);
                     break;
 
                 // bracket atom
                 case '[':
-                    addAtom(readBracketAtom(buffer));
+                    addAtom(readBracketAtom(buffer), buffer);
                     break;
 
                 // ring bonds
@@ -713,8 +767,14 @@ final class Parser {
             throw new InvalidSmilesException("Endpoints of ringbond are already connected - multi-edges are not allowed",
                                              buffer);
 
-        g.addEdge(new Edge(u, v,
-                           decideBond(rbond.bond, bond.inverse(), buffer)));
+        bond = decideBond(rbond.bond, bond.inverse(), buffer);
+        
+        if (bond.directional()) {
+            checkDirectionalBonds.set(u);
+            checkDirectionalBonds.set(v);
+        }
+        
+        g.addEdge(new Edge(u, v, bond));
         bond = Bond.IMPLICIT;
         // adjust the arrangement replacing where this ring number was openned
         arrangement.get(rbond.u).replace(-rnum, stack.peek());
