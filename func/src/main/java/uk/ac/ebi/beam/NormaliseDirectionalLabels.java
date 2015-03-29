@@ -9,9 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Normalise directional labels such that the first label is always a '/'. Given
- * a molecule with directional bonds {@code F\C=C\F} the labels are normalised
- * to be {@code F/C=C/F}.
+ * Normalise directional labels such that the first label is always a '/'. Given a molecule with
+ * directional bonds {@code F\C=C\F} the labels are normalised to be {@code F/C=C/F}.
  *
  * @author John May
  */
@@ -35,7 +34,8 @@ final class NormaliseDirectionalLabels
                 if (e.other(u) > u) {
                     if (traversal.acc.containsKey(e)) {
                         h.addEdge(traversal.acc.get(e));
-                    } else {
+                    }
+                    else {
                         h.addEdge(e);
                     }
                 }
@@ -77,33 +77,33 @@ final class NormaliseDirectionalLabels
             ordering[u] = i++;
             BitSet dbAtoms = new BitSet();
             for (Edge e : g.edges(u)) {
-                int v = e.other(u);                             
-              
+                int v = e.other(u);
+
+                if (e.bond() == Bond.DOUBLE && hasAdjDirectionalLabels(g, e)) {
+
+                    dbAtoms.set(u);
+                    dbAtoms.set(v);
+
+                    // only the first bond we encounter in an isolated system
+                    // is marked - if we need to flip the other we propagate
+                    // this down the chain
+                    boolean newSystem = !adj.contains(u) && !adj.contains(v);
+
+                    // to stop adding other we mark all vertices adjacent to the
+                    // double bond
+                    for (Edge f : g.edges(u))
+                        adj.add(f.other(u));
+                    for (Edge f : g.edges(v))
+                        adj.add(f.other(v));
+
+                    if (newSystem)
+                        doubleBonds.add(e);
+                }
                 if (!visited[v]) {
-                    if (e.bond() == Bond.DOUBLE && hasAdjDirectionalLabels(g, e)) {
-
-                        dbAtoms.set(u);
-                        dbAtoms.set(v);
-                        
-                        // only the first bond we encounter in an isolated system
-                        // is marked - if we need to flip the other we propagate
-                        // this down the chain
-                        boolean newSystem = !adj.contains(u) && !adj.contains(v);                               
-
-                        // to stop adding other we mark all vertices adjacent to the
-                        // double bond
-                        for (Edge f : g.edges(u))
-                            adj.add(f.other(u));
-                        for (Edge f : g.edges(v))
-                            adj.add(f.other(v));
-
-                        if (newSystem)
-                            doubleBonds.add(e);
-                    }
                     dbAtoms.or(visit(u, v));
                 }
             }
-            
+
             return dbAtoms;
         }
 
@@ -112,11 +112,11 @@ final class NormaliseDirectionalLabels
             int v = e.other(u);
             return hasAdjDirectionalLabels(g, u) && hasAdjDirectionalLabels(g, v);
         }
-        
-        private boolean hasAdjDirectionalLabels(Graph g, int u) {           
+
+        private boolean hasAdjDirectionalLabels(Graph g, int u) {
             for (Edge f : g.edges(u))
                 if (f.bond().directional())
-                    return true;               
+                    return true;
             return false;
         }
 
@@ -129,15 +129,18 @@ final class NormaliseDirectionalLabels
                 Edge first = firstDirectionalLabel(g, u);
                 if (first != null) {
                     flip(first, u, dbAtoms);
-                } else {
+                }
+                else {
                     first = firstDirectionalLabel(g, v);
                     flip(first, v, dbAtoms);
                 }
-            } else {
+            }
+            else {
                 Edge first = firstDirectionalLabel(g, v);
                 if (first != null) {
                     flip(first, v, dbAtoms);
-                } else {
+                }
+                else {
                     first = firstDirectionalLabel(g, u);
                     flip(first, u, dbAtoms);
                 }
@@ -152,7 +155,8 @@ final class NormaliseDirectionalLabels
                                                     acc,
                                                     dbAtoms,
                                                     u);
-            } else {
+            }
+            else {
                 if (first.bond(u) == Bond.DOWN)
                     invertExistingDirectionalLabels(g,
                                                     new BitSet(),
@@ -187,7 +191,8 @@ final class NormaliseDirectionalLabels
                     if (f != null) {
                         replacement.put(e,
                                         f.inverse());
-                    } else {
+                    }
+                    else {
                         replacement.put(e,
                                         e.inverse());
                     }
