@@ -195,6 +195,12 @@ public class ParserTest {
         assertThat(Parser.parse("[S@+]([O-])(C)CC").toSmiles(), is("[S@+]([O-])(C)CC"));   
     }
 
+    // chembl has some of these odditites, not sure which tool produced them
+    @Test(expected = InvalidSmilesException.class)
+    public void rejectChEMBLBadBonds() throws Exception {
+        Parser.parse("C\\=C");
+    }
+
     @Test(expected = InvalidSmilesException.class) 
     public void openBracketIsInvalid() throws Exception {
         Parser.parse("[");

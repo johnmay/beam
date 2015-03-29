@@ -408,28 +408,44 @@ final class Parser {
 
                 // bond/dot
                 case '-':
+                    if (bond != Bond.IMPLICIT)
+                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);    
                     bond = Bond.SINGLE;
                     break;
                 case '=':
+                    if (bond != Bond.IMPLICIT)
+                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.DOUBLE;
                     break;
                 case '#':
+                    if (bond != Bond.IMPLICIT)
+                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.TRIPLE;
                     break;
                 case '$':
+                    if (bond != Bond.IMPLICIT)
+                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.QUADRUPLE;
                     break;
                 case ':':
+                    if (bond != Bond.IMPLICIT)
+                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     g.markDelocalised();
                     bond = Bond.AROMATIC;
                     break;
                 case '/':
+                    if (bond != Bond.IMPLICIT)
+                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.UP;
                     break;
                 case '\\':
+                    if (bond != Bond.IMPLICIT)
+                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.DOWN;
                     break;
                 case '.':
+                    if (bond != Bond.IMPLICIT)
+                        throw new InvalidSmilesException("Bond specified before disconnection:", buffer);
                     bond = Bond.DOT;
                     break;
 
