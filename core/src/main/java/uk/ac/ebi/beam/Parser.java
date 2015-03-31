@@ -315,8 +315,6 @@ final class Parser {
             int u = stack.pop();
             if (bond != Bond.DOT) {
                 if (bond.directional()) {
-                    if (a.aromatic() && g.atom(u).aromatic())
-                        throw new InvalidSmilesException("Directional bond between aromatic atoms", buffer);
                     checkDirectionalBonds.set(u);
                     checkDirectionalBonds.set(v);
                 }
