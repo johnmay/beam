@@ -1,7 +1,10 @@
 package uk.ac.ebi.beam;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -67,7 +70,27 @@ final class NormaliseDirectionalLabels
                     dbAtoms.or(visit(u, u));
             }
 
+            Collections.sort(doubleBonds, new Comparator<Edge>() {
+                @Override public int compare(Edge e, Edge f) {
+                    int u1 = e.either();
+                    int v1 = e.other(u1);
+
+                    int u2 = f.either();
+                    int v2 = f.other(u2);
+
+                    int min1 = Math.min(ordering[u1], ordering[v1]);
+                    int min2 = Math.min(ordering[u2], ordering[v2]);
+                    int cmp = min1 - min2;
+                    if (cmp != 0) return cmp;
+                    int max1 = Math.max(ordering[u1], ordering[v1]);
+                    int max2 = Math.max(ordering[u2], ordering[v2]);
+                    return max1 - max2;
+                }
+            });
+
             for (Edge e : doubleBonds) {
+                if (acc.containsKey(e))
+                    continue;
                 flip(g, e, dbAtoms);
             }
         }
@@ -78,7 +101,8 @@ final class NormaliseDirectionalLabels
             BitSet dbAtoms = new BitSet();
             for (Edge e : g.edges(u)) {
                 int v = e.other(u);
-
+                if (v == p)
+                    continue;
                 if (e.bond() == Bond.DOUBLE && hasAdjDirectionalLabels(g, e)) {
 
                     dbAtoms.set(u);
@@ -95,15 +119,11 @@ final class NormaliseDirectionalLabels
                         adj.add(f.other(u));
                     for (Edge f : g.edges(v))
                         adj.add(f.other(v));
-
-                    if (newSystem)
-                        doubleBonds.add(e);
+                    doubleBonds.add(e);
                 }
-                if (!visited[v]) {
+                if (!visited[v])
                     dbAtoms.or(visit(u, v));
-                }
             }
-
             return dbAtoms;
         }
 
@@ -151,18 +171,34 @@ final class NormaliseDirectionalLabels
             if (ordering[first.other(u)] < ordering[u]) {
                 if (first.bond(u) == Bond.UP)
                     invertExistingDirectionalLabels(g,
+                                                    u,
                                                     new BitSet(),
                                                     acc,
                                                     dbAtoms,
                                                     u);
+                else
+                    markExistingDirectionalLabels(g,
+                                                  u,
+                                                  new BitSet(),
+                                                  acc,
+                                                  dbAtoms,
+                                                  u);
             }
             else {
                 if (first.bond(u) == Bond.DOWN)
                     invertExistingDirectionalLabels(g,
+                                                    u,
                                                     new BitSet(),
                                                     acc,
                                                     dbAtoms,
                                                     u);
+                else
+                    markExistingDirectionalLabels(g,
+                                                  u,
+                                                  new BitSet(),
+                                                  acc,
+                                                  dbAtoms,
+                                                  u);
             }
         }
 
@@ -179,6 +215,7 @@ final class NormaliseDirectionalLabels
         }
 
         private void invertExistingDirectionalLabels(Graph g,
+                                                     int prev,
                                                      BitSet visited,
                                                      Map<Edge, Edge> replacement,
                                                      BitSet dbAtoms,
@@ -186,18 +223,37 @@ final class NormaliseDirectionalLabels
             visited.set(u);
             for (Edge e : g.edges(u)) {
                 int v = e.other(u);
-                if (!visited.get(v)) {
-                    Edge f = replacement.get(e);
-                    if (f != null) {
-                        replacement.put(e,
-                                        f.inverse());
+                if (v == prev)
+                    continue;
+                Edge f = replacement.get(e);
+                if (f == null) {
+                    replacement.put(e, e.inverse());
+                    if (!visited.get(v)) {
+                        if (dbAtoms.get(v))
+                            invertExistingDirectionalLabels(g, u, visited, replacement, dbAtoms, v);
                     }
-                    else {
-                        replacement.put(e,
-                                        e.inverse());
+                }
+            }
+        }
+
+        private void markExistingDirectionalLabels(Graph g,
+                                                   int prev,
+                                                   BitSet visited,
+                                                   Map<Edge, Edge> replacement,
+                                                   BitSet dbAtoms,
+                                                   int u) {
+            visited.set(u);
+            for (Edge e : g.edges(u)) {
+                int v = e.other(u);
+                if (v == prev)
+                    continue;
+                Edge f = replacement.get(e);
+                if (f == null) {
+                    replacement.put(e, e);
+                    if (!visited.get(v)) {
+                        if (dbAtoms.get(v))
+                            markExistingDirectionalLabels(g, u, visited, replacement, dbAtoms, v);
                     }
-                    if (dbAtoms.get(v))
-                        invertExistingDirectionalLabels(g, visited, replacement, dbAtoms, v);
                 }
             }
         }

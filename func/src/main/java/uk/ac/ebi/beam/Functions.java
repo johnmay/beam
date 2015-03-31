@@ -31,6 +31,8 @@ public final class Functions {
 
     // normalise directional labels
     private static final NormaliseDirectionalLabels ndl = new NormaliseDirectionalLabels();
+    
+    private static final AddDirectionalLabels adl = new AddDirectionalLabels();
 
     /// non-instantiable
     private Functions() {
@@ -104,8 +106,8 @@ public final class Functions {
         return eti.apply(tsa.apply(ite.apply(g)));
     }
 
-    public static Graph normaliseDirectionalLabels(Graph g) {
-        return ndl.apply(g);
+    public static Graph normaliseDirectionalLabels(Graph g) throws InvalidSmilesException {
+        return ndl.apply(adl.apply(g));
     }
 
     private static int[] ident(int n) {
