@@ -51,7 +51,13 @@ public final class Graph {
     /**
      * Indicate the graph has one or aromatic atoms.
      */
-    public static final int HAS_AROM = 0x1;
+    public static final int HAS_AROM     = 0x1;
+    
+    public static final int HAS_ATM_STRO = 0x3;
+
+    public static final int HAS_BND_STRO = 0x5;
+
+    public static final int HAS_STRO = HAS_ATM_STRO | HAS_BND_STRO;
 
     /** The vertex labels, atoms. */
     private Atom[] atoms;

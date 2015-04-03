@@ -331,6 +331,7 @@ final class Parser {
 
         // configurations used to create topologies after parsing
         if (configuration != Configuration.UNKNOWN) {
+            g.addFlags(Graph.HAS_ATM_STRO);
             configurations.put(v, configuration);
             configuration = Configuration.UNKNOWN;
         }
@@ -489,12 +490,14 @@ final class Parser {
                     if (bond != Bond.IMPLICIT)
                         throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.UP;
+                    g.addFlags(Graph.HAS_BND_STRO);
                     break;
                 case '\\':
                     // we allow C\\C=C/C since it could be an escaping error
                     if (bond != Bond.IMPLICIT && bond != Bond.DOWN)
                         throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.DOWN;
+                    g.addFlags(Graph.HAS_BND_STRO);
                     break;
                 case '.':
                     if (bond != Bond.IMPLICIT)

@@ -222,15 +222,25 @@ public final class GraphBuilder {
      * @param t the topology to add
      */
     void topology(int u, Topology t) {
-        g.addTopology(t);
+        if (g.addTopology(t))
+            g.addFlags(Graph.HAS_ATM_STRO);
     }
 
+    private void assignLeftOverFlags() {
+        for (int v = 0; v < g.order(); v++) {
+            if (g.atom(v).aromatic())
+                g.addFlags(Graph.HAS_AROM);
+        }
+    }
+    
     private void assignDirectionalLabels() {
         
         // store the vertices which are adjacent to pi bonds with a config
         BitSet adjToDb = new BitSet();
        
         for (GeometricBuilder builder : builders) {
+            g.addFlags(Graph.HAS_BND_STRO);
+            
             // unspecified only used for getting not setting configuration
             if (builder.c == Configuration.DoubleBond.UNSPECIFIED)
                 continue;

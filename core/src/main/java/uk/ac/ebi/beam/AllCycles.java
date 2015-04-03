@@ -91,9 +91,14 @@ final class AllCycles {
 
     public Graph aromaticForm() {
         Graph cpy = new Graph(org.order());
+        
         for (int i = 0; i < org.order(); i++) {
-            cpy.addAtom(aromatic[i] ? org.atom(i).toAromatic()
-                                    : org.atom(i));
+            if (aromatic[i]) {
+                cpy.addAtom(org.atom(i).toAromatic());
+                cpy.addFlags(Graph.HAS_AROM);
+            } else {
+                cpy.addAtom(org.atom(i));
+            }
             cpy.addTopology(org.topologyOf(i));
         }
 
