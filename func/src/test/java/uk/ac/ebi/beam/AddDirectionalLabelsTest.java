@@ -175,6 +175,19 @@ public class AddDirectionalLabelsTest {
         transform("F/C=C(/F)C(/F)=C/F",
                   "F/C=C(/F)\\C(\\F)=C\\F");
     }
+    
+    // ensure we don't add more then needed
+    @Test
+    public void cleanup() throws Exception {
+        transform("C\\C=C(/C)C(C)=C(C)O",
+                  "C\\C=C(/C)\\C(C)=C(C)O");
+    }
+    
+    @Test
+    public void cleanup2() throws Exception {
+        transform("CCO\\N=C(/CC)\\C1=C(O)CC(CC1=O)c2ccc(cc2)C3CC(=C(\\C(=N\\OCC)\\CC)C(=O)C3)O CHEMBL1210088",
+                  "CCO\\N=C(/CC)\\C1=C(O)CC(CC1=O)c2ccc(cc2)C3CC(=C(\\C(=N\\OCC)\\CC)C(=O)C3)O");    
+    }
 
     /**
      * One double bond has an end point with no directional bonds. Fully
@@ -191,6 +204,11 @@ public class AddDirectionalLabelsTest {
     @Test public void middle() throws InvalidSmilesException {
         transform("C(\\[H])(=C(\\C)[H])C(=C(/C)[H])/[H]",
                   "C(\\[H])(=C(\\C)/[H])/C(=C(/C)\\[H])/[H]");
+    }
+    
+    @Test public void chembl503865() throws InvalidSmilesException {
+        transform("O(C(=O)C)[C@H]1\\C(=C/[C@@H]2OC(=O)[C@]3([C@]2([C@H](OC(=O)C)[C@@H]4[C@](C)(C=C[C@@H](O)[C@]4(O)C)[C@H]([C@@H]1OC(C)=O)OC(=O)C)O3)C)\\C CHEMBL503865",
+                  "O(C(=O)C)[C@H]1\\C(=C/[C@@H]2OC(=O)[C@]3([C@]2([C@H](OC(=O)C)[C@@H]4[C@](C)(C=C[C@@H](O)[C@]4(O)C)[C@H]([C@@H]1OC(C)=O)OC(=O)C)O3)C)\\C");
     }
 
     static void transform(String smi, String exp) throws
