@@ -87,7 +87,7 @@ final class NormaliseDirectionalLabels
                     return max1 - max2;
                 }
             });
-
+            
             for (Edge e : doubleBonds) {
                 if (acc.containsKey(e))
                     continue;
@@ -206,8 +206,7 @@ final class NormaliseDirectionalLabels
             Edge first = null;
             for (Edge f : g.edges(u)) {
                 if (f.bond() == Bond.UP || f.bond() == Bond.DOWN) {
-                    if (first == null || ordering[f.other(u)] < ordering[first
-                            .other(u)])
+                    if (first == null || ordering[f.other(u)] < ordering[first.other(u)])
                         first = f;
                 }
             }
