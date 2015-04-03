@@ -110,7 +110,7 @@ abstract class ElectronDonation {
             int sum = 0;
             for (final Edge e : g.edges(u)) {
                 sum += e.bond().order();
-                if (e.bond() == Bond.DOUBLE) {
+                if (e.bond().order() == 2) {
                     if (!cyclic.get(e.other(u))) {
                         nAcyclic++;
                         acyclic = e;
