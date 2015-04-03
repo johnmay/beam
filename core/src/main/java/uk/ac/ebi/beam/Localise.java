@@ -216,8 +216,8 @@ final class Localise {
 
     static Graph localise(Graph delocalised) throws InvalidSmilesException {
 
-        // nothing to do
-        if (!delocalised.isDelocalised())
+        // nothing to do, return fast
+        if (delocalised.getFlags(Graph.HAS_AROM) == 0)
             return delocalised;
 
         BitSet aromatic = new BitSet();

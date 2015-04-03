@@ -48,6 +48,11 @@ import static uk.ac.ebi.beam.Element.Hydrogen;
  */
 public final class Graph {
 
+    /**
+     * Indicate the graph has one or aromatic atoms.
+     */
+    public static final int HAS_AROM = 0x1;
+
     /** The vertex labels, atoms. */
     private Atom[] atoms;
 
@@ -61,7 +66,7 @@ public final class Graph {
     private int order, size;
 
     /** Indicates at least part of the molecule is delocalised. */
-    private boolean delocalised;
+    private int flags = 0;
 
     /**
      * Create a new chemical graph with expected size.
@@ -539,12 +544,12 @@ public final class Graph {
         size = 0;
     }
 
-    void markDelocalised() {
-        delocalised = true;
+    int getFlags(final int mask) {
+        return flags & mask;
     }
 
-    boolean isDelocalised() {
-        return delocalised;
+    void addFlags(final int mask) {
+        flags = flags | mask;
     }
 
     private int checkRange(int u) {

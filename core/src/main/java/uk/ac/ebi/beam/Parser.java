@@ -387,27 +387,27 @@ final class Parser {
                 // aromatic subset
                 case 'b':
                     addAtom(AtomImpl.AromaticSubset.Boron, buffer);
-                    g.markDelocalised();
+                    g.addFlags(Graph.HAS_AROM);
                     break;
                 case 'c':
                     addAtom(AtomImpl.AromaticSubset.Carbon, buffer);
-                    g.markDelocalised();
+                    g.addFlags(Graph.HAS_AROM);
                     break;
                 case 'n':
                     addAtom(AtomImpl.AromaticSubset.Nitrogen, buffer);
-                    g.markDelocalised();
+                    g.addFlags(Graph.HAS_AROM);
                     break;
                 case 'o':
                     addAtom(AtomImpl.AromaticSubset.Oxygen, buffer);
-                    g.markDelocalised();
+                    g.addFlags(Graph.HAS_AROM);
                     break;
                 case 'p':
                     addAtom(AtomImpl.AromaticSubset.Phosphorus, buffer);
-                    g.markDelocalised();
+                    g.addFlags(Graph.HAS_AROM);
                     break;
                 case 's':
                     addAtom(AtomImpl.AromaticSubset.Sulfur, buffer);
-                    g.markDelocalised();
+                    g.addFlags(Graph.HAS_AROM);
                     break;
 
 
@@ -482,7 +482,7 @@ final class Parser {
                 case ':':
                     if (bond != Bond.IMPLICIT)
                         throw new InvalidSmilesException("Multiple bonds specified:", buffer);
-                    g.markDelocalised();
+                    g.addFlags(Graph.HAS_AROM);
                     bond = Bond.AROMATIC;
                     break;
                 case '/':
@@ -561,7 +561,7 @@ final class Parser {
             throw new InvalidSmilesException("unrecognised element symbol: ", buffer);
 
         if (element != null && aromatic)
-            g.markDelocalised();
+            g.addFlags(Graph.HAS_AROM);
 
         // element isn't aromatic as per the OpenSMILES specification
         if (strict && !element.aromatic(Element.AromaticSpecification.OpenSmiles))

@@ -111,7 +111,6 @@ final class ElectronAssignment {
      * @return electrons could be assigned to delocalised structure
      */
     static boolean verify(Graph g) {
-        return !g.isDelocalised()
-                || !containsOddCardinalitySubgraph(g, Localise.buildSet(g, new BitSet()));
+        return g.getFlags(Graph.HAS_AROM) == 0 || !containsOddCardinalitySubgraph(g, Localise.buildSet(g, new BitSet()));
     }
 }
