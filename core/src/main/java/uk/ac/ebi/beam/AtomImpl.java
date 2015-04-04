@@ -67,8 +67,6 @@ final class AtomImpl {
             this.element = element;
             this.token = new Generator.SubsetToken(element.symbol());
         }
-        
-        
 
         @Override public int isotope() {
             return -1;
@@ -115,7 +113,7 @@ final class AtomImpl {
             for (final Edge e : g.edges(u)) {
                 sum += e.bond().order();
             }
-            return element.implicitHydrogens(sum);
+            return Element.implicitHydrogenCount(element, sum);
         }
 
         @Override public Generator.AtomToken token() {
@@ -211,7 +209,7 @@ final class AtomImpl {
                 sum++;
             
             // only check first valence
-            return element.aromaticImplicitHydrogens(sum);
+            return Element.implicitHydrogenCount(element, sum);
         }
 
 

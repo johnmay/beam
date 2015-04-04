@@ -337,32 +337,21 @@ public enum Element {
      * elements (B, C, N, O, P, S, F, Cl, Br and I) are defined in the
      * OpenSMILES specification.
      *
-     * @param sum bond order sum
+     * @param v bonded valence
      * @return the number of implied hydrogens
-     * @throws IllegalArgumentException the element was not a member of the
-     *                                  organic subset and did not have default
-     *                                  valence information
+     * @deprecated delegates to #implicitHydrogenCount                                   
      */
-    int implicitHydrogens(int sum) {
-        if (!organic())
-            throw new IllegalArgumentException("inorganic atom, no preset valence: " + this);
-
-        for (final int v : valence)
-            if (sum <= v) return v - sum;
-
-        // bond order sum exceeds or equals maximum valance
-        return 0;
+    @Deprecated
+    int implicitHydrogens(int v) {
+        return implicitHydrogenCount(this, v);
     }
 
-    int aromaticImplicitHydrogens(int sum) {
-        if (!organic())
-            throw new IllegalArgumentException("inorganic atom, no preset valence: " + this);
-
-        if (sum <= valence[0])
-            return valence[0] - sum;
-
-        // bond order sum exceeds or equals maximum valance
-        return 0;
+    /**
+     * @deprecated delegates to #implicitHydrogenCount
+     */
+    @Deprecated
+    int aromaticImplicitHydrogens(int v) {
+        return implicitHydrogenCount(this, v);
     }
 
     /**
@@ -725,5 +714,47 @@ public enum Element {
         boolean contains(Element e) {
             return elements.contains(e);
         }
+    }
+
+    /**
+     * Determine the implicit hydrogen count of an organic subset atom
+     * given its bonded valence. The number of implied hydrogens an 
+     * organic (or aromatic) subset atom has is based on it's bonded
+     * valence. The valances for the organic elements (B, C, N, O, P,
+     * S, F, Cl, Br and I) are defined in the OpenSMILES specification.
+     *
+     * @param elem Element
+     * @param v    bonded valence
+     * @return hydrogen count >= 0
+     */
+    static int implicitHydrogenCount(final Element elem, final int v) {
+        switch (elem) {
+            case Boron:
+                if (v < 3)  return v - 3;
+                break;
+            case Carbon:
+                if (v < 4)  return v - 4;
+                break;
+            case Nitrogen:
+            case Phosphorus:
+                if (v <= 3) return v - 3;
+                if (v <  5) return v - 5;
+                break;
+            case Oxygen:
+                if (v < 2)  return v - 2;
+                break;
+            case Sulfur:
+                if (v <= 2) return v - 2;
+                if (v <= 4) return v - 4;
+                if (v <  6) return v - 6;
+                break;
+            case Chlorine:
+            case Bromine:
+            case Iodine:
+            case Fluorine:
+                if (v < 1)  return 1;
+                break;
+        }
+        return 0;
     }
 }
