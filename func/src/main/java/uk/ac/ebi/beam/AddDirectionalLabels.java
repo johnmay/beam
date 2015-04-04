@@ -85,14 +85,6 @@ final class AddDirectionalLabels
         if (doublebonds.isEmpty())
             return g;
 
-        Graph h = new Graph(g.order());
-
-        // copy atom/topology information this is unchanged
-        for (int u = 0; u < g.order(); u++) {
-            h.addAtom(g.atom(u));
-            h.addTopology(g.topologyOf(u));
-        }
-
         final Set<Edge>       remain       = new HashSet<Edge>(doublebonds);
         final Map<Edge, Edge> replacements = new HashMap<Edge, Edge>();
 
@@ -109,8 +101,9 @@ final class AddDirectionalLabels
             }
             remain.removeAll(completed);
             completed.clear();
-        } while (altered && !doublebonds.isEmpty());
+        } while (altered && !remain.isEmpty());
         
+        // completed bonds, we can't do anything
         if (remain.size() == doublebonds.size())
             return g;
         
@@ -130,11 +123,20 @@ final class AddDirectionalLabels
                                      new Edge(v, f.other(v), Bond.IMPLICIT));
             }
         }
+
+        Graph h = new Graph(g.order());
+        h.addFlags(g.getFlags(0xffffffff));
+
+        // copy atom/topology information this is unchanged
+        for (int u = 0; u < g.order(); u++) {
+            h.addAtom(g.atom(u));
+            h.addTopology(g.topologyOf(u));
+        }
         
         // append the edges, replacing any which need to be changed
         for (int u = 0; u < g.order(); u++) {
             for (Edge e : g.edges(u)) {
-                if (e.other(u) > u) {
+                if (e.other(u) < u) {
                     Edge replacement = replacements.get(e);
                     if (replacement != null)
                         e = replacement;
@@ -143,7 +145,7 @@ final class AddDirectionalLabels
             }
         }
 
-        return h;
+        return h.sort(new Graph.CanOrderFirst());
     }
 
     private boolean isDirectional(Edge f, Map<Edge,Edge> replacements) {
@@ -155,7 +157,7 @@ final class AddDirectionalLabels
 
     boolean safeToClean(Graph g, int v, Map<Edge,Edge> replacements) {
         for (Edge e : g.edges(v)) {
-            if (e.bond() == Bond.DOUBLE) {
+            if (e.bond().order() == 2) {
                 int w = e.other(v);
                 for (Edge f : g.edges(w)) {
                     if (isDirectional(f, replacements))
@@ -216,11 +218,13 @@ final class AddDirectionalLabels
             switch (f2.bond(u)) {
                 case SINGLE:
                 case IMPLICIT:
+                case IMPLICIT_AROMATIC:
                     if (implicit != null)
                         return Status.WAITING;
                     implicit = f;
                     break;
                 case DOUBLE:
+                case DOUBLE_AROMATIC:
                     if (!f.equals(e))
                         return Status.COMPLETED;
                     break;

@@ -3,7 +3,9 @@ package uk.ac.ebi.beam;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /** @author John May */
 public class LocaliseTest {
@@ -322,6 +324,26 @@ public class LocaliseTest {
     @Test public void nitrogenRadical() throws Exception {
         test("c1cc(c([n+]c1)N)[N+](=O)[O-]",
              "C1=CC(=C([N+]=C1)N)[N+](=O)[O-]");
+    }
+    
+    @Test public void smallRingTest_5() throws Exception {
+        Graph g = Graph.fromSmiles("C1CCCC1");
+        assertTrue(Localise.inSmallRing(g, g.edge(0, 1)));
+    }
+
+    @Test public void smallRingTest_7() throws Exception {
+        Graph g = Graph.fromSmiles("C1CCCCCC1");
+        assertTrue(Localise.inSmallRing(g, g.edge(0, 1)));
+    }
+
+    @Test public void smallRingTest_8() throws Exception {
+        Graph g = Graph.fromSmiles("C1CCCCCCC1");
+        assertFalse(Localise.inSmallRing(g, g.edge(0, 1)));
+    }
+
+    @Test public void smallRingTest_linked() throws Exception {
+        Graph g = Graph.fromSmiles("C1CCC(CC1)=C1CCCCC1");
+        assertFalse(Localise.inSmallRing(g, g.edge(3, 6)));
     }
 
     static void test(String delocalised, String localised) throws Exception {

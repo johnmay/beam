@@ -23,13 +23,13 @@ final class NormaliseDirectionalLabels
     @Override public Graph apply(Graph g) {
         Traversal traversal = new Traversal(g);
         Graph h = new Graph(g.order());
+        h.addFlags(g.getFlags(0xffffffff));
 
         // copy atom/topology information this is unchanged
         for (int u = 0; u < g.order(); u++) {
             h.addAtom(g.atom(u));
             h.addTopology(g.topologyOf(u));
         }
-
 
         // change edges (only changed added to replacement)
         for (int u = 0; u < g.order(); u++) {
@@ -103,7 +103,7 @@ final class NormaliseDirectionalLabels
                 int v = e.other(u);
                 if (v == p)
                     continue;
-                if (e.bond() == Bond.DOUBLE && hasAdjDirectionalLabels(g, e)) {
+                if (e.bond().order() == 2 && hasAdjDirectionalLabels(g, e)) {
 
                     dbAtoms.set(u);
                     dbAtoms.set(v);

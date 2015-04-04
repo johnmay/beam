@@ -22,6 +22,7 @@ final class Localise {
         this.delocalised = delocalised;
         this.localised = new Graph(delocalised.order());
         this.subset = subset;
+        this.localised.addFlags(delocalised.getFlags(0xffffffff) & ~Graph.HAS_AROM);
 
         // make initial matching - then improve it
         Matching m = MaximumMatching.maximise(delocalised,
@@ -148,12 +149,34 @@ final class Localise {
         return false;
     }
 
+    static boolean inSmallRing(Graph g, Edge e) {
+        BitSet visit = new BitSet();
+        return inSmallRing(g, e.either(), e.other(e.either()), e.other(e.either()), 1, new BitSet());
+    }
+
+    static boolean inSmallRing(Graph g, int v, int prev, int t, int d, BitSet visit) {
+        if (d > 7)
+            return false;
+        if (v == t)
+            return true;
+        if (visit.get(v))
+            return false;
+        visit.set(v);
+        for (Edge e : g.edges(v)) {
+            int w = e.other(v);
+            if (w == prev) continue;
+            if (inSmallRing(g, w, v, t, d+1, visit)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
-     * Resonate double bonds in a cyclic system such that given a molecule
-     * with the same ordering produces the same resonance assignment. This 
-     * procedure provides a canonical kekulué representation for conjugated
-     * rings. 
-     * 
+     * Resonate double bonds in a cyclic system such that given a molecule with the same ordering
+     * produces the same resonance assignment. This procedure provides a canonical kekulué
+     * representation for conjugated rings.
+     *
      * @param g graph
      * @return the input graph (same reference)
      */
@@ -161,15 +184,18 @@ final class Localise {
 
         BitSet cyclic = new BiconnectedComponents(g).cyclic();
         BitSet subset = new BitSet();
-        int[]  count  = new int[g.order()];
-        
+        int[] count = new int[g.order()];
+
         List<Edge> edges = new ArrayList<Edge>();
         for (Edge e : g.edges()) {
-            if (e.bond() == Bond.DOUBLE) {
+            if (e.bond().order() == 2) {
                 int u = e.either();
                 int v = e.other(u);
-                if (hasAdjDirectionalLabels(g, e))
-                    continue;
+                if (hasAdjDirectionalLabels(g, e, cyclic)) {
+                    // need to check ring size > 7
+                    if (!inSmallRing(g, e))
+                        continue;
+                }
                 if (cyclic.get(u) && cyclic.get(v)) {
                     count[u]++;
                     count[v]++;
@@ -187,8 +213,9 @@ final class Localise {
                 subset.set(v);
             }
         }
-        
-        Matching m = MaximumMatching.maximise(g.sort(new Graph.CanOrderFirst()),
+        g = g.sort(new Graph.CanOrderFirst());
+
+        Matching m = MaximumMatching.maximise(g,
                                               ArbitraryMatching.of(g, subset),
                                               IntSet.fromBitSet(subset));
 
@@ -197,20 +224,23 @@ final class Localise {
             subset.clear(w);
             g.edge(v, w).bond(Bond.DOUBLE);
         }
-        
+
         return g;
     }
 
-    private static boolean hasAdjDirectionalLabels(Graph g, Edge e) {
+    private static boolean hasAdjDirectionalLabels(Graph g, Edge e, BitSet cyclic) {
         int u = e.either();
         int v = e.other(u);
-        return hasAdjDirectionalLabels(g, u) && hasAdjDirectionalLabels(g, v);
+        return hasAdjDirectionalLabels(g, u, cyclic) && hasAdjDirectionalLabels(g, v, cyclic);
     }
 
-    private static boolean hasAdjDirectionalLabels(Graph g, int u) {
-        for (Edge f : g.edges(u))
-            if (f.bond().directional())
+    private static boolean hasAdjDirectionalLabels(Graph g, int u, BitSet cyclic) {
+        for (Edge f : g.edges(u)) {
+            final int v = f.other(u);
+            if (f.bond().directional() && cyclic.get(v)) {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -221,7 +251,7 @@ final class Localise {
             return delocalised;
 
         BitSet aromatic = new BitSet();
-        BitSet subset   = buildSet(delocalised, aromatic);
+        BitSet subset = buildSet(delocalised, aromatic);
         if (hasOddCardinality(subset))
             throw new InvalidSmilesException("a valid kekulé structure could not be assigned");
         return new Localise(delocalised, subset, aromatic).localised;

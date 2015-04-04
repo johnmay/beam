@@ -107,6 +107,8 @@ public final class Functions {
     }
 
     public static Graph normaliseDirectionalLabels(Graph g) throws InvalidSmilesException {
+        if (g.getFlags(Graph.HAS_BND_STRO) == 0)
+            return g;
         return ndl.apply(adl.apply(g));
     }
 

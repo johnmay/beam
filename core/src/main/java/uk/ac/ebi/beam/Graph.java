@@ -71,7 +71,7 @@ public final class Graph {
     /** Vertex and edge counts. */
     private int order, size;
 
-    /** Indicates at least part of the molecule is delocalised. */
+    /** Molecule flags. */
     private int flags = 0;
 
     /**
@@ -475,6 +475,7 @@ public final class Graph {
             throw new IllegalArgumentException("permuation size should equal |V| (order)");
 
         Graph g = new Graph(order);
+        g.flags = flags;
         g.order = order;
         g.size = size;
 

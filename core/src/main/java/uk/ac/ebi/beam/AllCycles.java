@@ -91,6 +91,7 @@ final class AllCycles {
 
     public Graph aromaticForm() {
         Graph cpy = new Graph(org.order());
+        cpy.addFlags(org.getFlags(0xffffffff));
         
         for (int i = 0; i < org.order(); i++) {
             if (aromatic[i]) {
