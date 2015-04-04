@@ -107,7 +107,9 @@ final class Parser {
         if (stack.size() > 1)
             throw new InvalidSmilesException("Unclosed branch detected:", buffer);
         start.add(0); // always include first vertex as start
-        createTopologies(buffer);
+        if (g.getFlags(Graph.HAS_STRO) != 0) {
+            createTopologies(buffer);
+        }
     }
 
     /**
