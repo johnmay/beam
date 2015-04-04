@@ -209,7 +209,7 @@ final class AtomImpl {
                 sum++;
             
             // only check first valence
-            return Element.implicitHydrogenCount(element, sum);
+            return Element.implicitAromHydrogenCount(element, sum);
         }
 
 

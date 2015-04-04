@@ -757,4 +757,38 @@ public enum Element {
         }
         return 0;
     }
+
+    /**
+     * Determine the implicit hydrogen count of an organic subset atom
+     * given its bonded valence. The number of implied hydrogens an 
+     * organic (or aromatic) subset atom has is based on it's bonded
+     * valence. The valances for the organic elements (B, C, N, O, P,
+     * S, F, Cl, Br and I) are defined in the OpenSMILES specification.
+     * For aromatic atoms we only check the first level.
+     *
+     * @param elem Element
+     * @param v    bonded valence
+     * @return hydrogen count >= 0
+     */
+    static int implicitAromHydrogenCount(final Element elem, final int v) {
+        switch (elem) {
+            case Boron: // arom?
+                if (v < 3) return v - 3;
+                break;
+            case Carbon:
+                if (v < 4) return v - 4;
+                break;
+            case Nitrogen:
+            case Phosphorus:
+                if (v < 3) return v - 3;
+                break;
+            case Oxygen:
+                if (v < 2) return v - 2;
+                break;
+            case Sulfur:
+                if (v < 2) return v - 2;
+                break;
+        }
+        return 0;
+    }
 }
