@@ -351,7 +351,7 @@ public enum Element {
      */
     @Deprecated
     int aromaticImplicitHydrogens(int v) {
-        return implicitHydrogenCount(this, v);
+        return implicitAromHydrogenCount(this, v);
     }
 
     /**
@@ -730,23 +730,23 @@ public enum Element {
     static int implicitHydrogenCount(final Element elem, final int v) {
         switch (elem) {
             case Boron:
-                if (v < 3)  return v - 3;
+                if (v < 3)  return 3-v;
                 break;
             case Carbon:
-                if (v < 4)  return v - 4;
+                if (v < 4)  return 4-v;
                 break;
             case Nitrogen:
             case Phosphorus:
-                if (v <= 3) return v - 3;
-                if (v <  5) return v - 5;
+                if (v <= 3) return 3-v;
+                if (v <  5) return 5-v;
                 break;
             case Oxygen:
-                if (v < 2)  return v - 2;
+                if (v < 2)  return 2-v;
                 break;
             case Sulfur:
-                if (v <= 2) return v - 2;
-                if (v <= 4) return v - 4;
-                if (v <  6) return v - 6;
+                if (v <= 2) return 2-v;
+                if (v <= 4) return 4-v;
+                if (v <  6) return 6-v;
                 break;
             case Chlorine:
             case Bromine:
@@ -773,20 +773,20 @@ public enum Element {
     static int implicitAromHydrogenCount(final Element elem, final int v) {
         switch (elem) {
             case Boron: // arom?
-                if (v < 3) return v - 3;
+                if (v < 3) return 3-v;
                 break;
             case Carbon:
-                if (v < 4) return v - 4;
+                if (v < 4) return 4-v;
                 break;
             case Nitrogen:
             case Phosphorus:
-                if (v < 3) return v - 3;
+                if (v < 3) return 3-v;
                 break;
             case Oxygen:
-                if (v < 2) return v - 2;
+                if (v < 2) return 2-v;
                 break;
             case Sulfur:
-                if (v < 2) return v - 2;
+                if (v < 2) return 2-v;
                 break;
         }
         return 0;

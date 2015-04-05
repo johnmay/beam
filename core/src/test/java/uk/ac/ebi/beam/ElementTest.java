@@ -29,6 +29,7 @@
 
 package uk.ac.ebi.beam;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -127,7 +128,7 @@ public class ElementTest {
         assertThat(Unknown.implicitHydrogens(4), is(0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Ignore("now deprecated")
     public void inorganicHydrogens() {
         Calcium.implicitHydrogens(0);
     }
