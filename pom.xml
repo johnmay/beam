@@ -11,6 +11,7 @@
     <modules>
         <module>core</module>
         <module>func</module>
+        <module>exec</module>
     </modules>
     <scm>
         <url>https://github.com/johnmay/beam</url>
