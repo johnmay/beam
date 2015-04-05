@@ -50,7 +50,7 @@ public abstract class PipingCmdLnModule implements CmdLnModule {
         try {
             optparser.printHelpOn(sw);
         } catch (IOException e) {
-            throw new InternalError(e);
+            throw new InternalError(e.getMessage());
         }
         return sw.toString();
     }
