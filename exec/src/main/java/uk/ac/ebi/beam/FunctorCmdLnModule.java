@@ -16,9 +16,8 @@ import java.util.Set;
 import java.util.concurrent.*;
 
 /**
- * An abstract class for mapping one-to-one between input and
- * output of a piping module. Functionality is implemented using
- * the {@link #createFunctor(joptsimple.OptionSet)} method.
+ * An abstract class for mapping one-to-one between input and output of a piping module.
+ * Functionality is implemented using the {@link #createFunctor(joptsimple.OptionSet)} method.
  *
  * By default the functor is mapped over multiple threads.
  */
@@ -38,9 +37,8 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
     }
 
     /**
-     * Create a new functor for mapping some input (consumed) to an
-     * output (produced). The function will be shared between threads
-     * and should not hold modify state during mapping.
+     * Create a new functor for mapping some input (consumed) to an output (produced). The function
+     * will be shared between threads and should not hold modify state during mapping.
      *
      * @param optionSet options
      * @return the functor
@@ -55,8 +53,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
      * @param optset options for the module
      * @throws IOException
      */
-    @Override
-    void process(BufferedReader brdr, BufferedWriter bwtr, OptionSet optset) throws IOException {
+    @Override void process(BufferedReader brdr, BufferedWriter bwtr, InputCounter inputCounter, OptionSet optset) throws IOException {
 
         final int numThreads = (Integer) optset.valueOf("t");
 
@@ -64,13 +61,15 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
             report("num_threads: %d\n", numThreads);
 
         if (numThreads > 1) {
-            processMultiThreaded(brdr, bwtr, optset, numThreads);
-        } else {
-            processSingle(brdr, bwtr, optset);
+            processMultiThreaded(brdr, bwtr, inputCounter, optset, numThreads);
+        }
+        else {
+            processSingle(brdr, bwtr, inputCounter, optset);
         }
     }
 
-    private void processSingle(BufferedReader brdr, BufferedWriter bwtr, OptionSet optset) throws IOException {
+    private void processSingle(BufferedReader brdr, BufferedWriter bwtr, InputCounter inputCounter, OptionSet optset) throws IOException {
+        final long tStart = System.nanoTime();
         final boolean progress = !optset.has("prog-off");
 
         final Functor functor = createFunctor(optset);
@@ -82,43 +81,58 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
                 bwtr.write(functor.map(line));
                 bwtr.newLine();
                 if (progress && ++cnt % 2500 == 0) {
-                    report("%d", cnt);
+                    report("%d " + makeProgStr(inputCounter.count(),
+                                               inputCounter.total(),
+                                               elapsedMilli(tStart)), cnt);
                 }
             } catch (InvalidSmilesException e) {
-                e.printStackTrace();
+                report("error, " + e.getMessage() + "\nline:" + line + "\n");
+                if (progress)
+                    report("%d " + makeProgStr(inputCounter.count(),
+                                               inputCounter.total(),
+                                               elapsedMilli(tStart)), cnt);
             }
         }
         if (progress)
-            report("%d\n", cnt);
+            report("%d " + makeProgStr(inputCounter.count(), inputCounter.total(), elapsedMilli(tStart)) + "\n", cnt);
     }
 
-    private void processMultiThreaded(BufferedReader brdr, BufferedWriter bwtr, OptionSet optset,
-                              int numThreads) throws IOException {
+    private void processMultiThreaded(BufferedReader brdr, BufferedWriter bwtr,
+                                      InputCounter inputCounter, OptionSet optset,
+                                      int numThreads) throws IOException {
 
+        final long tStart = System.nanoTime();
         final boolean showProgress = !optset.has("prog-off");
 
         final ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
         // collect first workable unit
-        List<String>                     lines     = nextLines(brdr);
-        final Set<Future<List<String>>>  running   = new HashSet<>();
-        final List<Future<List<String>>> completed = new ArrayList<>();
+        long currInputCount = inputCounter.count();
+        List<String> lines = nextLines(brdr);
+        currInputCount = inputCounter.count() - currInputCount;
+        final Set<Future<Result>> running = new HashSet<>();
+        final List<Future<Result>> completed = new ArrayList<>();
 
         final Functor functor = createFunctor(optset);
 
         int cnt = 0;
+        long inputCount = 0;
 
         while (!lines.isEmpty()) {
 
-            running.add(executor.submit(new CallableFunctor(functor, lines)));
+            running.add(executor.submit(new CallableFunctor(functor, lines, currInputCount)));
 
             // spin round while all threads are occupied
             for (; running.size() >= numThreads; ) {
 
-                for (Future<List<String>> future : running) {
+                for (Future<Result> future : running) {
                     if (future.isDone()) {
                         cnt += output(bwtr, future);
-                        if (showProgress) report("%d", cnt);
+                        inputCount = undateInputCount(inputCount, future);
+                        if (showProgress)
+                            report("%d " + makeProgStr(inputCount,
+                                                       inputCounter.total(),
+                                                       elapsedMilli(tStart)), cnt);
                         completed.add(future);
                     }
                 }
@@ -127,15 +141,19 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
             }
 
             // get more lines
+            currInputCount = inputCounter.count();
             lines = nextLines(brdr);
+            currInputCount = inputCounter.count() - currInputCount;
         }
 
         // wait for running threads to finish
         for (; !running.isEmpty(); ) {
-            for (Future<List<String>> future : running) {
+            for (Future<Result> future : running) {
                 if (future.isDone()) {
                     cnt += output(bwtr, future);
-                    if (showProgress) report("%d", cnt);
+                    inputCount = undateInputCount(inputCount, future);
+                    if (showProgress)
+                        report("%d " + makeProgStr(inputCount, inputCounter.total(), elapsedMilli(tStart)), cnt);
                     completed.add(future);
                 }
             }
@@ -144,15 +162,28 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
         }
 
         if (showProgress)
-            report("%d\n", cnt);
+            report("%d " + makeProgStr(inputCount, inputCounter.total(), elapsedMilli(tStart)) + "\n", cnt);
 
         executor.shutdown();
     }
 
-    private int output(BufferedWriter bwtr, Future<List<String>> future) {
+    private long elapsedMilli(long tStart) {
+        return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - tStart);
+    }
+
+    private long undateInputCount(long inputCount, Future<Result> future) {
+        try {
+            inputCount += future.get().inputSize;
+        } catch (InterruptedException | ExecutionException e) {
+            System.err.println(e.getMessage());
+        }
+        return inputCount;
+    }
+
+    private int output(BufferedWriter bwtr, Future<Result> future) {
         try {
             int cnt = 0;
-            for (String str : future.get()) {
+            for (String str : future.get().lines) {
                 if (str == null) continue;
                 bwtr.write(str);
                 bwtr.newLine();
@@ -174,18 +205,30 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
         return lines;
     }
 
-    final class CallableFunctor implements Callable<List<String>> {
+    private final class Result {
+        List<String> lines;
+        long         inputSize;
+
+        public Result(List<String> lines, long inputSize) {
+            this.lines = lines;
+            this.inputSize = inputSize;
+        }
+    }
+
+    final class CallableFunctor implements Callable<Result> {
 
         private final Functor      functor;
         private final List<String> lines;
+        private final long         inputSize;
 
-        public CallableFunctor(Functor functor, List<String> lines) {
+        public CallableFunctor(Functor functor, List<String> lines, long inputSize) {
             this.functor = functor;
             this.lines = lines;
+            this.inputSize = inputSize;
         }
 
         @Override
-        public List<String> call() {
+        public Result call() {
             int n = lines.size();
             for (int i = 0; i < n; i++) {
                 String line = lines.get(i);
@@ -193,11 +236,12 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
                     lines.set(i,
                               functor.map(line));
                 } catch (InvalidSmilesException e) {
-                    // e.printStackTrace(); handle
+                    report("\nerror, " + e.getMessage() + "\nline:" + lines.get(i) + "\n");
                     lines.set(i, null);
+
                 }
             }
-            return lines;
+            return new Result(lines, inputSize);
         }
     }
 

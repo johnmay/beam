@@ -25,7 +25,7 @@ public class Shuffle extends PipingCmdLnModule {
     }
 
     @Override
-    void process(BufferedReader brdr, BufferedWriter bwtr, OptionSet optset) throws IOException {
+    void process(BufferedReader brdr, BufferedWriter bwtr, InputCounter counter, OptionSet optset) throws IOException {
 
         final int num = (Integer) optset.valueOf("n");
         final int max = (Integer) optset.valueOf("m");
