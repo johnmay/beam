@@ -218,7 +218,7 @@ public class LocaliseTest {
 
     @Test public void bo_25756() throws Exception {
         test("Nc1c2c3ccccc3c4cccc(cc1)c24",
-             "NC1=C2C3=CC=CC=C3C4=CC=CC(C=C1)=C24");
+             "NC1=C2C3=CC=CC=C3C=4C=CC=C(C=C1)C24");
     }
     
     /* Examples from http://www.daylight.com/dayhtml_tutorials/languages/smiles/smiles_examples.html */

@@ -297,7 +297,7 @@ final class Localise {
         BitSet subset   = buildSet(delocalised, aromatic);
         if (hasOddCardinality(subset))
             throw new InvalidSmilesException("a valid kekulé structure could not be assigned");
-        return Localise.generateKekuleForm(delocalised, subset, aromatic, true);
+        return Localise.generateKekuleForm(delocalised, subset, aromatic, false);
     }
 
     static Graph localiseInPlace(Graph delocalised) throws InvalidSmilesException {
