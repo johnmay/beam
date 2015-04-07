@@ -85,8 +85,8 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
                                                inputCounter.total(),
                                                elapsedMilli(tStart)), cnt);
                 }
-            } catch (InvalidSmilesException e) {
-                report("error, " + e.getMessage() + "\nline:" + line + "\n");
+            } catch (Exception e) {
+                report("error, " + e.getMessage() + "\nline:" + escapeForPrintf(line) + "\n");
                 if (progress)
                     report("%d " + makeProgStr(inputCounter.count(),
                                                inputCounter.total(),
@@ -235,14 +235,18 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
                 try {
                     lines.set(i,
                               functor.map(line));
-                } catch (InvalidSmilesException e) {
-                    report("\nerror, " + e.getMessage() + "\nline:" + lines.get(i) + "\n");
+                } catch (Exception e) {
+                    report("\nerror, " + e.getMessage() + "\nline:" + escapeForPrintf(lines.get(i)) + "\n");
                     lines.set(i, null);
 
                 }
             }
             return new Result(lines, inputSize);
         }
+    }
+    
+    static String escapeForPrintf(String str) {
+        return str.replaceAll("%", "%%");
     }
 
     abstract class Functor {
