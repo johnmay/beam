@@ -13,15 +13,16 @@ final class ArbitraryMatching {
 
     /**
      * Create an arbitrary matching on the subset of vertices ('s') of provided
-     * graph.
+     * graph. The provided matching should be empty.  
      *
      * @param g graph to match
+     * @param m empty matching (presumed)
      * @param s subset of vertices
-     * @return non-maximal matching
+     * @return number of vertices matched
      */
-    static Matching of(final Graph g, final BitSet s) {
+    static int initial(final Graph g, Matching m, final BitSet s) {
 
-        final Matching m = Matching.empty(g);
+        int nMatched = 0;
         
         for (int v = s.nextSetBit(0); v >= 0; v = s.nextSetBit(v + 1)) {
 
@@ -32,13 +33,14 @@ final class ArbitraryMatching {
             // find a single edge which is not matched and match it
             for (final Edge e : g.edges(v)) {
                 int w = e.other(v);
-                if (m.unmatched(w) && s.get(w))
+                if (m.unmatched(w) && s.get(w)) {
                     m.match(v, w);
-                break;
+                    nMatched += 2;
+                    break;
+                }
             }
         }
 
-        return m;
+        return nMatched;
     }
-
 }

@@ -22,7 +22,7 @@ public class MaximumMatchingTest {
         m.match(7, 8);
         m.match(9, 10);
 
-        MaximumMatching.maximise(g, m);
+        MaximumMatching.maximise(g, m, 10);
 
         // once maximised the matching has been augmented such that there
         // are now six disjoint edges (only possibly by contracting blossom)
@@ -49,7 +49,7 @@ public class MaximumMatchingTest {
         Graph g = Graph.fromSmiles("cccc");
         Matching m = Matching.empty(g);
         m.match(1, 2);
-        MaximumMatching.maximise(g, m);
+        MaximumMatching.maximise(g, m, 2);
         assertThat(m.matches(),
                    hasItems(Tuple.of(0, 1),
                             Tuple.of(2, 3)));
@@ -60,7 +60,7 @@ public class MaximumMatchingTest {
         Matching m = Matching.empty(g);
         m.match(1, 2);
         // no vertex '3' matching can not be improved
-        MaximumMatching.maximise(g, m, IntSet.allOf(0, 1, 2));
+        MaximumMatching.maximise(g, m, 2, IntSet.allOf(0, 1, 2));
         assertThat(m.matches(),
                    hasItems(Tuple.of(1, 2)));
     }
@@ -68,7 +68,8 @@ public class MaximumMatchingTest {
     @Test public void furan() throws Exception {
         Graph g = Graph.fromSmiles("o1cccc1");
         IntSet s = IntSet.allOf(1, 2, 3, 4); // exclude the oxygen
-        Matching m = MaximumMatching.maximise(g, Matching.empty(g), s);
+        Matching m = Matching.empty(g);
+        MaximumMatching.maximise(g, m, 0, s);
         assertThat(m.matches(), hasItems(Tuple.of(1, 2),
                                          Tuple.of(3, 4)));
     }
@@ -78,7 +79,7 @@ public class MaximumMatchingTest {
         IntSet s = IntSet.allOf(1, 2, 3, 4); // exclude the oxygen
         Matching m = Matching.empty(g);
         m.match(2, 3);
-        MaximumMatching.maximise(g, m, s);
+        MaximumMatching.maximise(g, m, 2, s);
         assertThat(m.matches(), hasItems(Tuple.of(1, 2),
                                          Tuple.of(3, 4)));
     }
@@ -98,7 +99,7 @@ public class MaximumMatchingTest {
         // therefore don't include those of the adjacent carbons in the vertex
         // subset to be matched
         Matching m = Matching.empty(g);
-        MaximumMatching.maximise(g, m, IntSet.allOf(2, 3, 6, 7));
+        MaximumMatching.maximise(g, m, 0, IntSet.allOf(2, 3, 6, 7));
         assertThat(m.matches(), hasItems(Tuple.of(2, 3),
                                          Tuple.of(6, 7)));
     }
@@ -110,38 +111,42 @@ public class MaximumMatchingTest {
         m.match(3, 4);
         m.match(6, 7);
         m.match(8, 9);
-        MaximumMatching.maximise(g, m);                
+        MaximumMatching.maximise(g, m, 8);
         assertThat(m.matches(), hasItems(Tuple.of(0, 1),
                                          Tuple.of(2, 3),
                                          Tuple.of(4, 5),
                                          Tuple.of(6, 7),
                                          Tuple.of(8, 9)));
     }
-    
+
     @Test public void azulene() throws Exception {
         Graph g = Graph.fromSmiles("C1CC2CCCCCC2C1");
-        Matching m = MaximumMatching.maximal(g);       
+        Matching m = MaximumMatching.maximal(g);
         assertThat(m.matches(), hasItems(Tuple.of(0, 1),
                                          Tuple.of(2, 3),
                                          Tuple.of(4, 5),
                                          Tuple.of(6, 7),
                                          Tuple.of(8, 9)));
     }
-    
+
     @Test public void imidazole() throws Exception {
-        Graph g = Graph.fromSmiles("[nH]1ccnc1");       
-        Matching m = MaximumMatching.maximise(g,
-                                              Matching.empty(g),
-                                              IntSet.allOf(1, 2, 3, 4)); // not the 'nH'
+        Graph g = Graph.fromSmiles("[nH]1ccnc1");
+        Matching m = Matching.empty(g);
+        MaximumMatching.maximise(g,
+                                 m,
+                                 0,
+                                 IntSet.allOf(1, 2, 3, 4)); // not the 'nH'
         assertThat(m.matches(), hasItems(Tuple.of(1, 2),
                                          Tuple.of(3, 4)));
     }
 
-    @Test public void benzimidazole() throws Exception {         
+    @Test public void benzimidazole() throws Exception {
         Graph g = Graph.fromSmiles("c1nc2ccccc2[nH]1");
-        Matching m = MaximumMatching.maximise(g,
-                                              Matching.empty(g),
-                                              IntSet.noneOf(8)); // not the 'nH'
+        Matching m = Matching.empty(g);
+        MaximumMatching.maximise(g,
+                                 m,
+                                 0,
+                                 IntSet.noneOf(8)); // not the 'nH'
         assertThat(m.matches(), hasItems(Tuple.of(0, 1),
                                          Tuple.of(2, 3),
                                          Tuple.of(4, 5),

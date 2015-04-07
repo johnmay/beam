@@ -13,15 +13,24 @@ import java.util.Map;
  */
 final class Localise {
 
-    private static Graph genKekuleForm(Graph delocalised, BitSet subset, BitSet aromatic) throws InvalidSmilesException {
-        // make initial matching - then improve it
-        Matching m = MaximumMatching.maximise(delocalised,
-                                              ArbitraryMatching.of(delocalised, subset),
-                                              IntSet.fromBitSet(subset));
+    private static Graph genKekuleForm(Graph g, BitSet subset, BitSet aromatic) throws InvalidSmilesException {
+        
+        // make initial (empty) matching - then improve it, first
+        // by matching the first edges we find, most of time this
+        // gives us a perfect matching if not we maximise it
+        // with Edmonds' algorithm
+        
+        final Matching m = Matching.empty(g);
+        final int      n = subset.cardinality();
+        if (ArbitraryMatching.initial(g, m, subset) < n) {
+            if (MaximumMatching.maximise(g, m, n, IntSet.fromBitSet(subset)) < n)
+                throw new InvalidSmilesException("Could not Kekulise");
+        }
 
-        return copyAndAssign(delocalised, subset, aromatic, m);
+        return copyAndAssign(g, subset, aromatic, m);
     }
 
+    // invariant, m is a perfect matching
     private static Graph copyAndAssign(Graph delocalised, BitSet subset, BitSet aromatic, Matching m) throws InvalidSmilesException {
         Graph localised = new Graph(delocalised.order());
         localised.setFlags(delocalised.getFlags() & ~Graph.HAS_AROM);
@@ -30,9 +39,6 @@ final class Localise {
         // the edge assignments have all aromatic bonds going to single bonds
         // we now use the matching to update these 
         for (int u = subset.nextSetBit(0); u >= 0; u = subset.nextSetBit(u + 1)) {
-            if (m.unmatched(u)) {
-                throw new InvalidSmilesException("a valid kekule structure could not be assigned");
-            }
             int v = m.other(u);
             subset.clear(v);
             edgeAssignments.put(delocalised.edge(u, v),
@@ -213,10 +219,13 @@ final class Localise {
             }
         }
         g = g.sort(new Graph.CanOrderFirst());
-
-        Matching m = MaximumMatching.maximise(g,
-                                              ArbitraryMatching.of(g, subset),
-                                              IntSet.fromBitSet(subset));
+        
+        final Matching m = Matching.empty(g);
+        int n = subset.cardinality();
+        if (ArbitraryMatching.initial(g, m, subset) < n) {
+            if (MaximumMatching.maximise(g, m, n, IntSet.fromBitSet(subset)) < n)
+                throw new InternalError("Could not Kekulise");
+        }
 
         for (int v = subset.nextSetBit(0); v >= 0; v = subset.nextSetBit(v + 1)) {
             int w = m.other(v);

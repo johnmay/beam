@@ -70,9 +70,12 @@ final class MaximumMatching {
      * paths/blossoms.
      */
     private final BitSet vAncestors, wAncestors;
+    
+    /** Number of matched vertices. */
+    private final int nMatched;
 
 
-    private MaximumMatching(Graph graph, Matching matching, IntSet subset) {
+    private MaximumMatching(Graph graph, Matching matching, int nMatched, IntSet subset) {
 
         this.graph = graph;
         this.matching = matching;
@@ -89,9 +92,13 @@ final class MaximumMatching {
         vAncestors = new BitSet(graph.order());
         wAncestors = new BitSet(graph.order());
 
-        // continuously augment while we find new paths
-        while (augment())
-            continue;
+        // continuously augment while we find new paths, each
+        // path increases the matching cardinality by 2
+        while (augment()) {
+            nMatched += 2;
+        }
+        
+        this.nMatched = nMatched;
     }
 
     /**
@@ -350,13 +357,14 @@ final class MaximumMatching {
      * Utility to maximise an existing matching of the provided graph.
      *
      * @param g a graph
-     * @param m matching on the graph
+     * @param m matching on the graph, will me modified
+     * @param n current matching cardinality         
      * @param s subset of vertices to match
      * @return the maximal matching on the graph
      */
-    static Matching maximise(Graph g, Matching m, IntSet s) {
-        MaximumMatching mm = new MaximumMatching(g, m, s);
-        return m;
+    static int maximise(Graph g, Matching m, int n, IntSet s) {
+        MaximumMatching mm = new MaximumMatching(g, m, n, s);
+        return mm.nMatched;
     }
 
     /**
@@ -366,8 +374,8 @@ final class MaximumMatching {
      * @param m matching on the graph
      * @return the maximal matching on the graph
      */
-    static Matching maximise(Graph g, Matching m) {
-        return maximise(g, m, IntSet.universe());
+    static int maximise(Graph g, Matching m, int n) {
+        return maximise(g, m, n, IntSet.universe());
     }
 
     /**
@@ -377,7 +385,9 @@ final class MaximumMatching {
      * @return the maximal matching on the graph
      */
     static Matching maximal(Graph g) {
-        return maximise(g, Matching.empty(g));
+        Matching m = Matching.empty(g);
+        maximise(g, m, 0);
+        return m;
     }
 
     /**
