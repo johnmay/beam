@@ -166,7 +166,8 @@ public final class Graph {
     }
 
     /**
-     * Access the bonded valence of vertex 'u'.
+     * Access the bonded valence of vertex 'u'. This valence exclude any implicit hydrogen
+     * counts. 
      *
      * @param u a vertex index
      * @return the bonded valence of the specified vertex
