@@ -13,28 +13,25 @@ import java.util.Map;
  */
 final class Localise {
 
-    private final Graph delocalised, localised;
-    private final BitSet subset;
-    private final Map<Edge, Edge> edgeAssignments = new HashMap<Edge, Edge>();
-
-    private Localise(Graph delocalised, BitSet subset, BitSet aromatic) throws InvalidSmilesException {
-
-        this.delocalised = delocalised;
-        this.localised = new Graph(delocalised.order());
-        this.subset = subset;
-        this.localised.addFlags(delocalised.getFlags(0xffffffff) & ~Graph.HAS_AROM);
-
+    private static Graph genKekuleForm(Graph delocalised, BitSet subset, BitSet aromatic) throws InvalidSmilesException {
         // make initial matching - then improve it
         Matching m = MaximumMatching.maximise(delocalised,
                                               ArbitraryMatching.of(delocalised, subset),
                                               IntSet.fromBitSet(subset));
 
+        return copyAndAssign(delocalised, subset, aromatic, m);
+    }
+
+    private static Graph copyAndAssign(Graph delocalised, BitSet subset, BitSet aromatic, Matching m) throws InvalidSmilesException {
+        Graph localised = new Graph(delocalised.order());
+        localised.setFlags(delocalised.getFlags() & ~Graph.HAS_AROM);
+        final Map<Edge,Edge> edgeAssignments = new HashMap<>();
 
         // the edge assignments have all aromatic bonds going to single bonds
         // we now use the matching to update these 
         for (int u = subset.nextSetBit(0); u >= 0; u = subset.nextSetBit(u + 1)) {
             if (m.unmatched(u)) {
-                throw new InvalidSmilesException("a valid kekulé structure could not be assigned");
+                throw new InvalidSmilesException("a valid kekule structure could not be assigned");
             }
             int v = m.other(u);
             subset.clear(v);
@@ -78,8 +75,8 @@ final class Localise {
                 }
             }
         }
+        return localised;
     }
-
 
     static BitSet buildSet(Graph g, BitSet aromatic) {
 
@@ -103,16 +100,18 @@ final class Localise {
         int q = a.charge();
         int deg = g.degree(v) + g.implHCount(v);
 
-        for (Edge e : g.edges(v)) {
-            if (e.bond() == Bond.DOUBLE) {
-                if (q == 0 && (a.element() == Element.Nitrogen || (a.element() == Element.Sulfur && deg > 3))
-                        && g.atom(e.other(v)).element() == Element.Oxygen)
-                    return false;
-                return true;
-            }
-            // triple or quadruple bond - we don't need to assign anymore p electrons
-            else if (e.bond().order() > 2) {
-                return true;
+        if (g.bondedValence(v) > g.degree(v)) {
+            for (Edge e : g.edges(v)) {
+                if (e.bond() == Bond.DOUBLE) {
+                    if (q == 0 && (a.element() == Element.Nitrogen || (a.element() == Element.Sulfur && deg > 3))
+                            && g.atom(e.other(v)).element() == Element.Oxygen)
+                        return false;
+                    return true;
+                }
+                // triple or quadruple bond - we don't need to assign anymore p electrons
+                else if (e.bond().order() > 2) {
+                    return true;
+                }
             }
         }
 
@@ -165,7 +164,7 @@ final class Localise {
         for (Edge e : g.edges(v)) {
             int w = e.other(v);
             if (w == prev) continue;
-            if (inSmallRing(g, w, v, t, d+1, visit)) {
+            if (inSmallRing(g, w, v, t, d + 1, visit)) {
                 return true;
             }
         }
@@ -251,10 +250,10 @@ final class Localise {
             return delocalised;
 
         BitSet aromatic = new BitSet();
-        BitSet subset = buildSet(delocalised, aromatic);
+        BitSet subset   = buildSet(delocalised, aromatic);
         if (hasOddCardinality(subset))
             throw new InvalidSmilesException("a valid kekulé structure could not be assigned");
-        return new Localise(delocalised, subset, aromatic).localised;
+        return Localise.genKekuleForm(delocalised, subset, aromatic);
     }
 
     private static boolean hasOddCardinality(BitSet s) {
