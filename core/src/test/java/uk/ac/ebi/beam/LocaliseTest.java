@@ -58,6 +58,11 @@ public class LocaliseTest {
     @Test public void pyrole() throws Exception {
         test("[nH]1cccc1", "[NH]1C=CC=C1");
     }
+    
+    @Test public void CHEMBL385384() throws Exception {
+        test("CCc1c(C#N)c(c2ccc(cc2)c3ccc(OC)cc3)c(C(=O)O)n1C",
+             "CCC1=C(C#N)C(C2=CC=C(C=C2)C3=CC=C(OC)C=C3)=C(C(=O)O)N1C");
+    }
 
     @Test public void imidazole() throws Exception {
         test("c1c[nH]cn1", "C1=C[NH]C=N1");
@@ -104,6 +109,11 @@ public class LocaliseTest {
         test("cc1c(c)c(c)c(c)c(c)c1c", "C=C1C(=C)C(=C)C(=C)C(=C)C1=C");
         test("C=c1c(=C)c(=C)c(=C)c(=C)c1=C", "C=C1C(=C)C(=C)C(=C)C(=C)C1=C");
     }
+    
+    @Test(expected = InvalidSmilesException.class)
+    public void eMolecules492140() throws Exception {
+        test("c1ccc2c(c1)c1[n-]c2/N=c/2\\[n-]c(c3c2cccc3)/N=c/2\\[n-]/c(=N\\c3[n-]/c(=N\\1)/c1ccccc31)/c1c2cccc1.[Cu+4] 492140", "n/a");
+    }
 
     @Test(expected = InvalidSmilesException.class)
     public void tryptophanyl_radical() throws Exception {
@@ -124,6 +134,11 @@ public class LocaliseTest {
     @Test public void porphyrin1() throws Exception {
         test("c1cc2cc3ccc(cc4ccc(cc5ccc(cc1n2)[nH]5)n4)[nH]3",
              "C1=CC2=CC3=CC=C(C=C4C=CC(C=C5C=CC(=CC1=N2)[NH]5)=N4)[NH]3");
+    }
+    
+    @Test public void CHEMBL438024() throws Exception {
+        test("COC(=O)C1=C(C)NC(=C(C1c2c(nc3sccn23)c4cc(OC)ccc4OC)C(=O)OC)C",
+             "COC(=O)C1=C(C)NC(=C(C1C2=C(N=C3SC=CN23)C4=CC(OC)=CC=C4OC)C(=O)OC)C");
     }
 
     @Test public void porphyrin2() throws Exception {

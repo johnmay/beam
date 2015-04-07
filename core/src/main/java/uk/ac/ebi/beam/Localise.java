@@ -20,10 +20,15 @@ final class Localise {
         // gives us a perfect matching if not we maximise it
         // with Edmonds' algorithm
         
-        final Matching m = Matching.empty(g);
-        final int      n = subset.cardinality();
-        if (ArbitraryMatching.initial(g, m, subset) < n) {
-            if (MaximumMatching.maximise(g, m, n, IntSet.fromBitSet(subset)) < n)
+        final Matching m        = Matching.empty(g);
+        final int      n        = subset.cardinality();
+              int      nMatched = ArbitraryMatching.initial(g, m, subset); 
+        if (nMatched < n) {
+            if (n-nMatched == 2)
+                nMatched = ArbitraryMatching.augmentOnce(g, m, nMatched, subset);
+            if (nMatched < n)
+                nMatched = MaximumMatching.maximise(g, m, nMatched, IntSet.fromBitSet(subset));
+            if (nMatched < n)
                 throw new InvalidSmilesException("Could not Kekulise");
         }
 
@@ -245,11 +250,17 @@ final class Localise {
         g = g.sort(new Graph.CanOrderFirst());
         
         final Matching m = Matching.empty(g);
-        int n = subset.cardinality();
-        if (ArbitraryMatching.initial(g, m, subset) < n) {
-            if (MaximumMatching.maximise(g, m, n, IntSet.fromBitSet(subset)) < n)
+        int            n = subset.cardinality();
+        int     nMatched = ArbitraryMatching.initial(g, m, subset);
+        if (nMatched < n) {
+            if (n-nMatched == 2)
+                nMatched = ArbitraryMatching.augmentOnce(g, m, nMatched, subset);
+            if (nMatched < n)
+                nMatched = MaximumMatching.maximise(g, m, nMatched, IntSet.fromBitSet(subset));
+            if (nMatched < n)
                 throw new InternalError("Could not Kekulise");
         }
+
 
         for (int v = subset.nextSetBit(0); v >= 0; v = subset.nextSetBit(v + 1)) {
             int w = m.other(v);
@@ -286,7 +297,7 @@ final class Localise {
         BitSet subset   = buildSet(delocalised, aromatic);
         if (hasOddCardinality(subset))
             throw new InvalidSmilesException("a valid kekulé structure could not be assigned");
-        return Localise.generateKekuleForm(delocalised, subset, aromatic, false);
+        return Localise.generateKekuleForm(delocalised, subset, aromatic, true);
     }
 
     static Graph localiseInPlace(Graph delocalised) throws InvalidSmilesException {
