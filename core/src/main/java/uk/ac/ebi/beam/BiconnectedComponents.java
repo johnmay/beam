@@ -22,6 +22,8 @@ final class BiconnectedComponents {
 
     private final List<List<Edge>> components = new ArrayList<List<Edge>>(2);
 
+    private final BitSet cyclic = new BitSet();
+
     int count = 0;
 
     BiconnectedComponents(Graph g) {
@@ -59,29 +61,30 @@ final class BiconnectedComponents {
     }
 
     private void store(Edge e) {
-        List<Edge> component = new ArrayList<Edge>();
-        while (!stack.peek().equals(e)) {
-            component.add(stack.pop());
-        }
-        component.add(stack.pop());
-        if (component.size() > 1)
+        if (stack.peek() != e) {
+            List<Edge> component = new ArrayList<Edge>(6);
+            Edge f = null;
+            do {
+                f = stack.pop();
+                markCyclic(f);
+                component.add(f);
+            } while (f!=e);
             components.add(Collections.unmodifiableList(component));
+        } else {
+            stack.pop();
+        }
     }
-    
+
+    private void markCyclic(Edge f) {
+        cyclic.set(f.either());
+        cyclic.set(f.other(f.either()));
+    }
+
     public List<List<Edge>> components() {
         return Collections.unmodifiableList(components);
     }
 
     BitSet cyclic() {
-        BitSet cyclic = new BitSet(g.order());
-        for (List<Edge> component : components) {
-            for (Edge e : component) {
-                int u = e.either();
-                int v = e.other(u);
-                cyclic.set(u);
-                cyclic.set(v);
-            }
-        }
         return cyclic;
     }
 }
