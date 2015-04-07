@@ -53,8 +53,7 @@ public class FromSubsetAtomsTest {
     }
 
     @Test public void aromatic_carbon() {
-        Atom actual = FromSubsetAtoms
-                .fromSubset(AtomImpl.AromaticSubset.Carbon, 2, 0);
+        Atom actual = FromSubsetAtoms.fromSubset(AtomImpl.AromaticSubset.Carbon, 2, 0);
         Atom expect = new AtomImpl.BracketAtom(-1, Element.Carbon, 1, 0, 0, true);
         Assert.assertThat(expect, CoreMatchers.is(actual));
     }

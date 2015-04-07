@@ -109,11 +109,7 @@ final class AtomImpl {
         }
 
         @Override public int hydrogens(Graph g, int u) {
-            int sum = 0;
-            for (final Edge e : g.edges(u)) {
-                sum += e.bond().order();
-            }
-            return Element.implicitHydrogenCount(element, sum);
+            return Element.implicitHydrogenCount(element, g.bondedValence(u));
         }
 
         @Override public Generator.AtomToken token() {
@@ -197,19 +193,15 @@ final class AtomImpl {
         }
 
         @Override public int hydrogens(Graph g, int u) {
-            
-            int sum = 0; 
-            for (final Edge e : g.edges(u)) {
-                sum += e.bond().order();
-            }
+            int v = g.bondedValence(u);
             
             // no double, triple or quadruple bonds - then for aromatic atoms
             // we increase the bond order sum by '1'
-            if (sum == g.degree(u))
-                sum++;
-            
-            // only check first valence
-            return Element.implicitAromHydrogenCount(element, sum);
+            if (v == g.degree(u))
+                return Element.implicitAromHydrogenCount(element, v + 1);
+
+            // note: we only check first valence
+            return Element.implicitAromHydrogenCount(element, v);
         }
 
 
