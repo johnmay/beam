@@ -33,7 +33,7 @@ final class ArbitraryMatching {
             // find a single edge which is not matched and match it
             for (final Edge e : g.edges(v)) {
                 int w = e.other(v);
-                if (m.unmatched(w) && s.get(w)) {
+                if ((e.bond() != Bond.SINGLE) && m.unmatched(w) && s.get(w)) {
                     m.match(v, w);
                     nMatched += 2;
                     break;
