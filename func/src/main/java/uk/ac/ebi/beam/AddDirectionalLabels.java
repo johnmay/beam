@@ -55,7 +55,8 @@ final class AddDirectionalLabels
 
     enum Status {
         COMPLETED,
-        WAITING
+        WAITING,
+        INVALID
     }
 
     /**
@@ -94,7 +95,7 @@ final class AddDirectionalLabels
             altered = false;
             for (final Edge e : remain) {
                 Status status = replaceImplWithExpl(g, e, replacements);
-                if (status == Status.COMPLETED) {
+                if (status != Status.WAITING) {
                     completed.add(e);
                     altered = true;
                 }
@@ -181,7 +182,7 @@ final class AddDirectionalLabels
                                        Edge e,
                                        Map<Edge, Edge> acc)
             throws InvalidSmilesException {
-
+        
         int u = e.either(), v = e.other(u);
 
         Status ustat = replaceImplWithExpl(g, e, u, acc);
@@ -189,7 +190,11 @@ final class AddDirectionalLabels
 
         if (ustat == vstat)
             return ustat;
-        else
+        else if (ustat == Status.INVALID && vstat != Status.WAITING)
+            return Status.INVALID;
+        else if (vstat == Status.INVALID && ustat != Status.WAITING)
+            return Status.INVALID;
+        else    
             return Status.WAITING;
     }
 
@@ -236,11 +241,10 @@ final class AddDirectionalLabels
                             explicit = acc.get(explicit);
 
                         // original bonds are invalid
-                        if ((f.bond() == Bond.UP || f.bond() == Bond.DOWN) &&
-                                explicit.bond(u).inverse() != f.bond(u)) {
-                            throw new InvalidSmilesException("invalid double bond configuration");
+                        if ((f.bond() == Bond.UP || f.bond() == Bond.DOWN) && explicit.bond(u).inverse() != f.bond(u)) {
+                            return Status.INVALID;
                         }
-
+                        
                         if (explicit.bond(u).inverse() != f2.bond(u)) {
                             acc.put(f, f2.inverse());
                             BitSet visited = new BitSet();
@@ -272,8 +276,9 @@ final class AddDirectionalLabels
                                                    explicit.bond(u)
                                                            .inverse()));
 
-        if (existing != null && existing.bond(u) != explicit.bond(u).inverse())
+        if (existing != null && existing.bond(u) != explicit.bond(u).inverse()) {
             throw new InvalidSmilesException("unable to assign explict type for " + implicit);
+        }
 
         return Status.COMPLETED;
     }
@@ -289,11 +294,11 @@ final class AddDirectionalLabels
             int v = e.other(u);
             if (!visited.get(v)) {
                 Edge f = replacement.get(e);
-                if (f != null) {
+                if (f != null && f.bond().directional()) {
                     replacement.put(e,
                                     f.inverse());
                 }
-                else {
+                else if (e.bond().directional()) {
                     replacement.put(e,
                                     e.inverse());
                 }
