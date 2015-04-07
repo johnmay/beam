@@ -437,11 +437,10 @@ public final class Graph {
 
     /**
      * Localise delocalized (aromatic) bonds in this molecule producing the
-     * Kekulé form. The original graph is not modified.
+     * Kekulé form. The original graph <b>is</b> modified.
      *
      * <blockquote><pre>
-     * Graph furan        = Graph.fromSmiles("o1cccc1");
-     * Graph furan_kekule = furan.kekule();
+     * Graph furan        = Graph.fromSmiles("o1cccc1").kekule();
      * </pre></blockquote>
      *
      * If the graph could not be converted to a kekulé representation then a
@@ -452,9 +451,8 @@ public final class Graph {
      * Some reasons are shown below.
      *
      * <blockquote><pre>
-     * n1cncc1             pyrole (incorrect) could be either C1C=NC=N1 or
-     * N1C=CN=C1
-     * n1c[nH]cc1          pyrole (correct)
+     * n1cncc1             imidazole (incorrect) C1C=NC=N1 or N1C=CN=C1?
+     * n1c[nH]cc1          imidazole (correct)
      *
      * [Hg+2][c-]1ccccc1   mercury(2+) ion benzenide (incorrect)
      * [Hg+2].[c-]1ccccc1  mercury(2+) ion benzenide (correct)
@@ -464,7 +462,7 @@ public final class Graph {
      * @throws InvalidSmilesException molecule exploded on contact with reality
      */
     public Graph kekule() throws InvalidSmilesException {
-        return Localise.localise(this);
+        return Localise.localiseInPlace(this);
     }
 
 

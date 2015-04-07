@@ -171,7 +171,7 @@ public class LocaliseTest {
     public void mixing_aromatic_and_aliphatic() throws Exception {
         test("c1=cc=cc=c1", "C1=CC=CC=C1");
         test("c-1c-cc-cc1", "C1=CC=CC=C1");
-        test("C:1:C:C:C:C:C1", "C1CCCCC1");
+        test("C:1:C:C:C:C:C1", "C1CCCCC1"); // XXX: not handled inplace
     }
 
     // http://sourceforge.net/mailarchive/forum.php?thread_name=60825b0f0709302037g2d68f2eamdb5ebecf3baea6d1%40mail.gmail.com&forum_name=blueobelisk-smiles

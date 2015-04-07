@@ -13,7 +13,7 @@ import java.util.Map;
  */
 final class Localise {
 
-    private static Graph genKekuleForm(Graph g, BitSet subset, BitSet aromatic) throws InvalidSmilesException {
+    private static Graph generateKekuleForm(Graph g, BitSet subset, BitSet aromatic, boolean inplace) throws InvalidSmilesException {
         
         // make initial (empty) matching - then improve it, first
         // by matching the first edges we find, most of time this
@@ -27,61 +27,85 @@ final class Localise {
                 throw new InvalidSmilesException("Could not Kekulise");
         }
 
-        return copyAndAssign(g, subset, aromatic, m);
+        return inplace ? assign(g, subset, aromatic, m) 
+                       : copyAndAssign(g, subset, aromatic, m);
     }
 
     // invariant, m is a perfect matching
     private static Graph copyAndAssign(Graph delocalised, BitSet subset, BitSet aromatic, Matching m) throws InvalidSmilesException {
         Graph localised = new Graph(delocalised.order());
         localised.setFlags(delocalised.getFlags() & ~Graph.HAS_AROM);
-        final Map<Edge,Edge> edgeAssignments = new HashMap<>();
-
-        // the edge assignments have all aromatic bonds going to single bonds
-        // we now use the matching to update these 
-        for (int u = subset.nextSetBit(0); u >= 0; u = subset.nextSetBit(u + 1)) {
-            int v = m.other(u);
-            subset.clear(v);
-            edgeAssignments.put(delocalised.edge(u, v),
-                                Bond.DOUBLE_AROMATIC.edge(u, v));
-        }
-
-        // create the new graph
-        for (int v = 0; v < delocalised.order(); v++) {
-            localised.addAtom(delocalised.atom(v).toAliphatic());
-            localised.addTopology(delocalised.topologyOf(v));
-        }
-
-        for (Edge orgEdge : delocalised.edges()) {
-            Edge newEdge = edgeAssignments.get(orgEdge);
-            if (newEdge != null) {
-                localised.addEdge(newEdge);
-            }
-            else {
-                switch (orgEdge.bond()) {
-                    case SINGLE:
-                        localised.addEdge(Bond.IMPLICIT.edge(orgEdge.either(),
-                                                             orgEdge.other(orgEdge.either())));
-                        break;
-                    case AROMATIC:
-                        localised.addEdge(Bond.IMPLICIT_AROMATIC.edge(orgEdge.either(),
-                                                                      orgEdge.other(orgEdge.either())));
-                        break;
-                    case IMPLICIT:
-                        int u = orgEdge.either();
-                        int v = orgEdge.other(u);
-                        if (aromatic.get(u) && aromatic.get(v))
-                            localised.addEdge(Bond.IMPLICIT_AROMATIC.edge(orgEdge.either(),
-                                                                          orgEdge.other(orgEdge.either())));
-                        else
-                            localised.addEdge(orgEdge);
-                        break;
-                    default:
-                        localised.addEdge(orgEdge);
-                        break;
+        for (int u = 0; u < delocalised.order(); u++) {
+            localised.addAtom(delocalised.atom(u).toAliphatic());
+            localised.addTopology(delocalised.topologyOf(u));
+            for (final Edge e : delocalised.edges(u)) {
+                int v = e.other(u);
+                if (v < u) {
+                    switch (e.bond()) {
+                        case SINGLE:
+                            localised.addEdge(Bond.IMPLICIT.edge(u, v));
+                            break;
+                        case AROMATIC:
+                            if (subset.get(u) && m.other(u) == v) {
+                                localised.addEdge(Bond.DOUBLE_AROMATIC.edge(u, v));
+                            } else if (aromatic.get(u) && aromatic.get(v)) {
+                                localised.addEdge(Bond.IMPLICIT_AROMATIC.edge(u, v));
+                            } else {
+                                localised.addEdge(Bond.IMPLICIT.edge(u, v));
+                            }
+                            break;
+                        case IMPLICIT:
+                            if (subset.get(u) && m.other(u) == v) {
+                                localised.addEdge(Bond.DOUBLE_AROMATIC.edge(u, v));
+                            } else if (aromatic.get(u) && aromatic.get(v)) {
+                                localised.addEdge(Bond.IMPLICIT_AROMATIC.edge(u, v));
+                            } else {
+                                localised.addEdge(e);
+                            }
+                            break;
+                        default:
+                            localised.addEdge(e);
+                            break;
+                    }
                 }
             }
         }
         return localised;
+    }
+
+    // invariant, m is a perfect matching
+    private static Graph assign(Graph g, BitSet subset, BitSet aromatic, Matching m) throws InvalidSmilesException {
+        g.setFlags(g.getFlags() & ~Graph.HAS_AROM);
+        for (int u = aromatic.nextSetBit(0); u>=0; u = aromatic.nextSetBit(u+1)) {
+            g.setAtom(u, g.atom(u).toAliphatic());
+            for (final Edge e : g.edges(u)) {
+                int v = e.other(u);
+                if (v < u) {
+                    switch (e.bond()) {
+                        case SINGLE:
+                            e.bond(Bond.IMPLICIT);
+                            break;
+                        case AROMATIC:
+                            if (subset.get(u) && m.other(u) == v) {
+                                e.bond(Bond.DOUBLE_AROMATIC);
+                            } else if (aromatic.get(v)) {
+                                e.bond(Bond.IMPLICIT_AROMATIC);
+                            } else {
+                                e.bond(Bond.IMPLICIT);
+                            }
+                            break;
+                        case IMPLICIT:
+                            if (subset.get(u) && m.other(u) == v) {
+                                e.bond(Bond.DOUBLE_AROMATIC);
+                            } else if (aromatic.get(u) && aromatic.get(v)) {
+                                e.bond(Bond.IMPLICIT_AROMATIC);
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+        return g;
     }
 
     static BitSet buildSet(Graph g, BitSet aromatic) {
@@ -262,7 +286,20 @@ final class Localise {
         BitSet subset   = buildSet(delocalised, aromatic);
         if (hasOddCardinality(subset))
             throw new InvalidSmilesException("a valid kekulé structure could not be assigned");
-        return Localise.genKekuleForm(delocalised, subset, aromatic);
+        return Localise.generateKekuleForm(delocalised, subset, aromatic, false);
+    }
+
+    static Graph localiseInPlace(Graph delocalised) throws InvalidSmilesException {
+
+        // nothing to do, return fast
+        if (delocalised.getFlags(Graph.HAS_AROM) == 0)
+            return delocalised;
+
+        BitSet aromatic = new BitSet();
+        BitSet subset   = buildSet(delocalised, aromatic);
+        if (hasOddCardinality(subset))
+            throw new InvalidSmilesException("a valid kekulé structure could not be assigned");
+        return Localise.generateKekuleForm(delocalised, subset, aromatic, true);
     }
 
     private static boolean hasOddCardinality(BitSet s) {
