@@ -16,7 +16,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * An abstract module providing much of the boiler plate to implement a simple command line module
  * that consumes from one file (or stream) out produces another. <p/> To use the module simply
- * extend it and implement the {@link #process(BufferedReader, BufferedWriter,InputCounter, OptionSet)} method.
+ * extend it and implement the {@link #process(BufferedReader, BufferedWriter, InputCounter,
+ * OptionSet)} method.
  */
 public abstract class PipingCmdLnModule implements CmdLnModule {
 
@@ -76,12 +77,14 @@ public abstract class PipingCmdLnModule implements CmdLnModule {
 
         OptionSet optset = optparser.parse(args);
         List<?> nonopt = optset.nonOptionArguments();
-
-        final File fin = nonopt.size() > 1 ? new File(nonopt.get(0).toString()) : null;
+        
+        final File fin = nonopt.size() > 0 ? new File(nonopt.get(0).toString()) 
+                                           : null;
 
         InputStream in = fin == null ? System.in : new CountingInputStream(fin);
         OutputStream out = nonopt.size() < 2 ? System.out
                                              : new FileOutputStream(nonopt.get(1).toString());
+
 
         InputCounter nonFileCounter = new InputCounter() {
             @Override public long count() {
@@ -146,22 +149,22 @@ public abstract class PipingCmdLnModule implements CmdLnModule {
             return "";
         final double done = (double) count / (double) total;
         final char[] fill = Arrays.copyOf(PROG_BAR_EMPTY, PROG_BAR_EMPTY.length);
-        final int end = (int) Math.ceil(fill.length*done);
+        final int end = (int) Math.ceil(fill.length * done);
         System.arraycopy(PROG_BAR_FULL, 0, fill, 0, end);
         if (end < fill.length)
-            fill[end-1] = '>';
+            fill[end - 1] = '>';
         final String perc = String.format("%.1f%%%%", done * 100);
         return "[" + new String(fill) + "] " + perc;
     }
 
     protected String makeProgStr(long count, long total, long elapMs) {
         // estimate time remaining
-        long milliRemain = (long) ((elapMs/(double) count)*(total-count));
-        long secRemain  = TimeUnit.MILLISECONDS.toSeconds(milliRemain);
-        long minRemain  = TimeUnit.SECONDS.toMinutes(secRemain);
-        milliRemain -= TimeUnit.SECONDS.toMillis(secRemain); 
-        secRemain   -= TimeUnit.MINUTES.toSeconds(minRemain);
-        
+        long milliRemain = (long) ((elapMs / (double) count) * (total - count));
+        long secRemain = TimeUnit.MILLISECONDS.toSeconds(milliRemain);
+        long minRemain = TimeUnit.SECONDS.toMinutes(secRemain);
+        milliRemain -= TimeUnit.SECONDS.toMillis(secRemain);
+        secRemain -= TimeUnit.MINUTES.toSeconds(minRemain);
+
         final String tRemain = String.format(" %dm%ds%sms    ", minRemain, secRemain, milliRemain);
         return makeProgStr(count, total) + tRemain;
     }
@@ -192,7 +195,8 @@ public abstract class PipingCmdLnModule implements CmdLnModule {
 
         @Override public int read(byte[] b, int off, int len) throws IOException {
             int read = delegate.read(b, off, len);
-            count += read;
+            if (read>=0)
+                count += read;
             return read;
         }
 
