@@ -61,6 +61,8 @@ public final class Graph {
 
     /** The vertex labels, atoms. */
     private Atom[] atoms;
+    
+    private int[] valences;
 
     /** Incidence list storage of edges with attached bond labels. * */
     private List<Edge>[] edges;
@@ -86,6 +88,7 @@ public final class Graph {
         for (int i = 0; i < expSize; i++)
             edges[i] = new ArrayList<Edge>(4);
         this.atoms = new Atom[expSize];
+        this.valences = new int[expSize];
         this.topologies = new HashMap<Integer, Topology>(10);
     }
 
@@ -102,8 +105,9 @@ public final class Graph {
     /** Resize the graph if we are at maximum capacity. */
     private void ensureCapacity() {
         if (order >= atoms.length) {
-            atoms = Arrays.copyOf(atoms, order * 2);
-            edges = Arrays.copyOf(edges, order * 2);
+            atoms    = Arrays.copyOf(atoms, order * 2);
+            valences = Arrays.copyOf(valences, order * 2);
+            edges    = Arrays.copyOf(edges, order * 2);
             for (int i = order; i < edges.length; i++)
                 edges[i] = new ArrayList<Edge>(4);
         }
@@ -144,6 +148,8 @@ public final class Graph {
         int u = checkRange(e.either()), v = checkRange(e.other(u));
         edges[u].add(e);
         edges[v].add(e);
+        valences[u] += e.bond().order();
+        valences[v] += e.bond().order();
         size++;
     }
 
@@ -157,6 +163,22 @@ public final class Graph {
      */
     int degree(int u) {
         return edges[checkRange(u)].size();
+    }
+
+    /**
+     * Access the bonded valence of vertex 'u'.
+     *
+     * @param u a vertex index
+     * @return the bonded valence of the specified vertex
+     * @throws IllegalArgumentException attempting to access the degree of an
+     *                                  atom which does not exist
+     */
+    int bondedValence(int u) {
+        return valences[checkRange((u))];
+    }
+    
+    void updateBondedValence(int i, int x) {
+        valences[checkRange(i)] += x;
     }
 
     /**
@@ -257,7 +279,10 @@ public final class Graph {
                 edges[v].set(i, rep);
             }
         }
-
+        
+        int ord = rep.bond().order() - org.bond().order();
+        valences[u] += ord;
+        valences[v] += ord;
     }
 
     /**
@@ -481,6 +506,7 @@ public final class Graph {
 
         for (int u = 0; u < order; u++) {
             g.atoms[p[u]] = atoms[u];
+            g.valences[p[u]] = valences[u];
             g.addTopology(topologyOf(u).orderBy(p).transform(p));
         }
 
@@ -552,11 +578,19 @@ public final class Graph {
     }
 
     int getFlags(final int mask) {
-        return flags & mask;
+        return this.flags & mask;
+    }
+
+    int getFlags() {
+        return this.flags;
     }
 
     void addFlags(final int mask) {
-        flags = flags | mask;
+        this.flags = flags | mask;
+    }
+
+    void setFlags(final int flags) {
+        this.flags = flags;
     }
 
     private int checkRange(int u) {
