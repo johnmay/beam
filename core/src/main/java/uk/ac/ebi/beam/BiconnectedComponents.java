@@ -14,11 +14,11 @@ import java.util.List;
  */
 final class BiconnectedComponents {
 
-    private boolean[] visited;
-    private int[]     d, low;
+    private int[] d, low;
 
-    private final Graph       g;
-    private final Deque<Edge> stack;
+    private final Graph  g;
+    private final Edge[] stack;
+    private int nstack = 0;
 
     private final List<List<Edge>> components = new ArrayList<List<Edge>>(2);
 
@@ -27,13 +27,12 @@ final class BiconnectedComponents {
     int count = 0;
 
     BiconnectedComponents(Graph g) {
-        this.visited = new boolean[g.order()];
-        this.d = new int[g.order()];
-        this.low = new int[g.order()];
-        this.g = g;
-        this.stack = new ArrayDeque<Edge>();
+        this.d     = new int[g.order()];
+        this.low   = new int[g.order()];
+        this.g     = g;
+        this.stack = new Edge[g.size()];
         for (int u = 0; u < g.order(); u++) {
-            if (!visited[u])
+            if (d[u] == 0)
                 visit(u, u);
         }
         low = null;
@@ -41,38 +40,39 @@ final class BiconnectedComponents {
     }
 
     private void visit(int u, int p) {
-        visited[u] = true;
         low[u] = d[u] = ++count;
-        for (Edge e : g.edges(u)) {
-            int v = e.other(u);
-            if (!visited[v]) {
-                stack.push(e);
+        for (final Edge e : g.edges(u)) {
+            final int v = e.other(u);
+            if (d[v] == 0) {
+                stack[nstack++] = e;
                 visit(v, u);
-                if (low[v] >= d[u])
+                if (low[v] == d[u]) {
                     store(e);
-                low[u] = Math.min(low[u], low[v]);
+                }
+                else if (low[v] > d[u]) {
+                    --nstack;
+                }
+                if (low[v] < low[u])
+                    low[u] = low[v];
             }
             else if (v != p && d[v] < d[u]) {
                 // back edge
-                stack.push(e);
-                low[u] = Math.min(low[u], d[v]);
+                stack[nstack++] = e;
+                if (d[v] < low[u])
+                    low[u] = d[v];
             }
         }
     }
 
     private void store(Edge e) {
-        if (stack.peek() != e) {
-            List<Edge> component = new ArrayList<Edge>(6);
-            Edge f = null;
-            do {
-                f = stack.pop();
-                markCyclic(f);
-                component.add(f);
-            } while (f!=e);
-            components.add(Collections.unmodifiableList(component));
-        } else {
-            stack.pop();
-        }
+        List<Edge> component = new ArrayList<Edge>(6);
+        Edge f;
+        do {
+            f = stack[--nstack];
+            markCyclic(f);
+            component.add(f);
+        } while (f != e);
+        components.add(Collections.unmodifiableList(component));
     }
 
     private void markCyclic(Edge f) {
