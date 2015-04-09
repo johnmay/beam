@@ -34,6 +34,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
                  .withRequiredArg()
                  .ofType(Integer.class)
                  .defaultsTo(Runtime.getRuntime().availableProcessors());
+        optparser.accepts("no-warn", "suppress warnings");
     }
 
     /**
@@ -70,7 +71,8 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
 
     private void processSingle(BufferedReader brdr, BufferedWriter bwtr, InputCounter inputCounter, OptionSet optset) throws IOException {
         final long tStart = System.nanoTime();
-        final boolean progress = !optset.has("prog-off");
+        final boolean showProgress = !optset.has("prog-off");
+        final boolean showWarnings    = !optset.has("no-warn");
 
         final Functor functor = createFunctor(optset);
 
@@ -80,20 +82,23 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
             try {
                 bwtr.write(functor.map(line));
                 bwtr.newLine();
-                if (progress && ++cnt % 2500 == 0) {
+                if (showProgress && ++cnt % 2500 == 0) {
                     report("%d " + makeProgStr(inputCounter.count(),
                                                inputCounter.total(),
                                                elapsedMilli(tStart)), cnt);
                 }
             } catch (Exception e) {
-                report("error, " + e.getMessage() + "\nline:" + escapeForPrintf(line) + "\n");
-                if (progress)
+                if (showWarnings) {
+                    report("error, " + e.getMessage() + "\nline:" + escapeForPrintf(line) + "\n");
+                    e.printStackTrace();
+                }
+                if (showProgress)
                     report("%d " + makeProgStr(inputCounter.count(),
                                                inputCounter.total(),
                                                elapsedMilli(tStart)), cnt);
             }
         }
-        if (progress)
+        if (showProgress)
             report("%d " + makeProgStr(inputCounter.count(), inputCounter.total(), elapsedMilli(tStart)) + "\n", cnt);
     }
 
@@ -103,6 +108,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
 
         final long tStart = System.nanoTime();
         final boolean showProgress = !optset.has("prog-off");
+        final boolean showWarnings = !optset.has("no-warn");
 
         final ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
@@ -120,7 +126,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
 
         while (!lines.isEmpty()) {
 
-            running.add(executor.submit(new CallableFunctor(functor, lines, currInputCount)));
+            running.add(executor.submit(new CallableFunctor(functor, lines, showWarnings, currInputCount)));
 
             // spin round while all threads are occupied
             for (; running.size() >= numThreads; ) {
@@ -220,10 +226,12 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
         private final Functor      functor;
         private final List<String> lines;
         private final long         inputSize;
+        private final boolean warn;
 
-        public CallableFunctor(Functor functor, List<String> lines, long inputSize) {
+        public CallableFunctor(Functor functor, List<String> lines, boolean showWarnings, long inputSize) {
             this.functor = functor;
-            this.lines = lines;
+            this.lines = lines;    
+            this.warn = showWarnings;
             this.inputSize = inputSize;
         }
 
@@ -236,9 +244,11 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
                     lines.set(i,
                               functor.map(line));
                 } catch (Exception e) {
-                    report("\nerror, " + e.getMessage() + "\nline:" + escapeForPrintf(lines.get(i)) + "\n");
+                    if (warn) {
+                        report("\nerror, " + e.getMessage() + "\nline:" + escapeForPrintf(lines.get(i)) + "\n");
+                        e.printStackTrace();
+                    }
                     lines.set(i, null);
-
                 }
             }
             return new Result(lines, inputSize);
