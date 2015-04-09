@@ -49,7 +49,7 @@ package uk.ac.ebi.beam;
 public final class Edge {
 
     /** Endpoints of the edge. */
-    private final int u, v;
+    private final int u, v, xor;
 
     /** Label on the edge. */
     private Bond bond;
@@ -57,6 +57,7 @@ public final class Edge {
     Edge(final int u, final int v, final Bond bond) {
         this.u    = u;
         this.v    = v;
+        this.xor  = u ^ v; 
         this.bond = bond;
     }
 
@@ -79,9 +80,7 @@ public final class Edge {
      *                                  edge
      */
     public int other(final int x) {
-        if (x == u) return v;
-        if (x == v) return u;
-        throw new IllegalArgumentException(invalidEndpointMessage(x));
+        return x ^ xor;
     }
 
     /**
@@ -142,7 +141,7 @@ public final class Edge {
     /** {@inheritDoc} */
     @Override
     public int hashCode() {
-        return u ^ v;
+        return xor;
     }
 
     /** {@inheritDoc} */

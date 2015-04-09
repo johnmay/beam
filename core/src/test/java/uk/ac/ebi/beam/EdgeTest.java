@@ -29,6 +29,7 @@
 
 package uk.ac.ebi.beam;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -50,7 +51,7 @@ public class EdgeTest {
         assertThat(new Edge(3, 2, Bond.IMPLICIT).other(3), is(2));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Ignore("no longer thrown")
     public void invalidEndpoint() throws Exception {
         new Edge(2, 3, Bond.IMPLICIT).other(1);
     }
