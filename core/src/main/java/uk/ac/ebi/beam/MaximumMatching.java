@@ -130,7 +130,9 @@ final class MaximumMatching {
         while (!queue.empty()) {
             int v = queue.poll();
 
-            for (Edge e : graph.edges(v)) {
+            final int d = graph.degree(v);
+            for (int j=0; j<d; ++j) {
+                final Edge e = graph.edgeAt(v, j);
                 int w = e.other(v);
 
                 if (!subset.contains(w))

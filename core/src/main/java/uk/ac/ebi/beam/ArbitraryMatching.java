@@ -31,7 +31,9 @@ final class ArbitraryMatching {
                 continue;
 
             // find a single edge which is not matched and match it
-            for (final Edge e : g.edges(v)) {
+            int d = g.degree(v);
+            for (int j=0; j<d; ++j) {
+                Edge e = g.edgeAt(v, j);
                 int w = e.other(v);
                 if ((e.bond() != Bond.SINGLE) && m.unmatched(w) && s.get(w)) {
                     m.match(v, w);
@@ -85,7 +87,9 @@ final class ArbitraryMatching {
         unvisited.clear(v);
         path[len++] = v;
         int l;
-        for (final Edge e : g.edges(v)) {
+        int d = g.degree(v);
+        for (int j=0; j<d; ++j) {
+            Edge e = g.edgeAt(v, j);
             int w = e.other(v);
             if (unvisited.get(w)) {
                 if (w == end) {

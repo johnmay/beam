@@ -173,15 +173,19 @@ final class Parser {
             int nUpW   = 0;
             int nDownW = 0;
             int w      = -1;
-            
-            for (Edge e : g.edges(v)) {
-                Bond bond = e.bond(v);
-                if (bond == Bond.UP)
-                    nUpV++;
-                else if (bond == Bond.DOWN)
-                    nDownV++;
-                else if (bond == Bond.DOUBLE)
-                    w = e.other(v);    
+
+            {
+                final int d = g.degree(v);
+                for (int j = 0; j < d; ++j) {
+                    final Edge e = g.edgeAt(v, j);
+                    Bond bond = e.bond(v);
+                    if (bond == Bond.UP)
+                        nUpV++;
+                    else if (bond == Bond.DOWN)
+                        nDownV++;
+                    else if (bond == Bond.DOUBLE)
+                        w = e.other(v);
+                }
             }
             
             if (w < 0)
@@ -189,12 +193,16 @@ final class Parser {
             
             checkDirectionalBonds.clear(w);
 
-            for (Edge e : g.edges(w)) {
-                Bond bond = e.bond(w);
-                if (bond == Bond.UP)
-                    nUpW++;
-                else if (bond == Bond.DOWN)
-                    nDownW++;
+            {
+                final int d = g.degree(w);
+                for (int j = 0; j < d; ++j) {
+                    final Edge e = g.edgeAt(w, j);
+                    Bond bond = e.bond(w);
+                    if (bond == Bond.UP)
+                        nUpW++;
+                    else if (bond == Bond.DOWN)
+                        nDownW++;
+                }
             }
 
             if (nUpV + nDownV == 0 || nUpW + nDownW == 0) {
@@ -744,8 +752,11 @@ final class Parser {
         LocalArrangement la = arrangement.get(u);
         if (la == null) {
             la = new LocalArrangement();
-            for (Edge e : g.edges(stack.peek()))
+            final int d = g.degree(u);
+            for (int j=0; j<d; ++j) {
+                final Edge e = g.edgeAt(u, j);
                 la.add(e.other(u));
+            }
             arrangement.put(u, la);
         }
         return la;

@@ -1,10 +1,8 @@
 package uk.ac.ebi.beam;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.List;
 
 /**
@@ -14,7 +12,7 @@ import java.util.List;
  */
 final class BiconnectedComponents {
 
-    private int[] d, low;
+    private int[] depth, low;
 
     private final Graph  g;
     private final Edge[] stack;
@@ -27,39 +25,44 @@ final class BiconnectedComponents {
     int count = 0;
 
     BiconnectedComponents(Graph g) {
-        this.d     = new int[g.order()];
+        this.depth = new int[g.order()];
         this.low   = new int[g.order()];
         this.g     = g;
         this.stack = new Edge[g.size()];
         for (int u = 0; u < g.order(); u++) {
-            if (d[u] == 0)
-                visit(u, u);
+            if (depth[u] == 0)
+                visit(u, null);
         }
         low = null;
-        d = null;
+        depth = null;
     }
 
-    private void visit(int u, int p) {
-        low[u] = d[u] = ++count;
-        for (final Edge e : g.edges(u)) {
+    private void visit(final int u, final Edge from) {
+        low[u] = depth[u] = ++count;
+        int j = g.degree(u);
+        while (--j>=0) {
+            
+            final Edge e = g.edgeAt(u, j);
+            if (e==from) continue;
+            
             final int v = e.other(u);
-            if (d[v] == 0) {
-                stack[nstack++] = e;
-                visit(v, u);
-                if (low[v] == d[u]) {
+            if (depth[v] == 0) {
+                stack[nstack] = e;
+                ++nstack;
+                visit(v, e);
+                if (low[v] == depth[u])
                     store(e);
-                }
-                else if (low[v] > d[u]) {
+                else if (low[v] > depth[u])
                     --nstack;
-                }
                 if (low[v] < low[u])
                     low[u] = low[v];
             }
-            else if (v != p && d[v] < d[u]) {
+            else if (depth[v] < depth[u]) {
                 // back edge
-                stack[nstack++] = e;
-                if (d[v] < low[u])
-                    low[u] = d[v];
+                stack[nstack] = e;
+                ++nstack;
+                if (depth[v] < low[u])
+                    low[u] = depth[v];
             }
         }
     }

@@ -43,7 +43,9 @@ final class Localise {
         for (int u = 0; u < delocalised.order(); u++) {
             localised.addAtom(delocalised.atom(u).toAliphatic());
             localised.addTopology(delocalised.topologyOf(u));
-            for (final Edge e : delocalised.edges(u)) {
+            final int d = delocalised.degree(u);
+            for (int j=0; j<d; ++j) {
+                final Edge e = delocalised.edgeAt(u, j);
                 int v = e.other(u);
                 if (v < u) {
                     switch (e.bond()) {
@@ -83,8 +85,10 @@ final class Localise {
         g.setFlags(g.getFlags() & ~Graph.HAS_AROM);
         for (int u = aromatic.nextSetBit(0); u>=0; u = aromatic.nextSetBit(u+1)) {
             g.setAtom(u, g.atom(u).toAliphatic());
-            for (final Edge e : g.edges(u)) {
-                int v = e.other(u);
+            int deg = g.degree(u);
+            for (int j=0; j<deg; ++j) {
+                Edge e = g.edgeAt(u, j);
+                int  v = e.other(u);
                 if (v < u) {
                     switch (e.bond()) {
                         case SINGLE:
@@ -93,6 +97,8 @@ final class Localise {
                         case AROMATIC:
                             if (subset.get(u) && m.other(u) == v) {
                                 e.bond(Bond.DOUBLE_AROMATIC);
+                                g.updateBondedValence(u, +1);
+                                g.updateBondedValence(v, +1);
                             } else if (aromatic.get(v)) {
                                 e.bond(Bond.IMPLICIT_AROMATIC);
                             } else {
@@ -102,6 +108,8 @@ final class Localise {
                         case IMPLICIT:
                             if (subset.get(u) && m.other(u) == v) {
                                 e.bond(Bond.DOUBLE_AROMATIC);
+                                g.updateBondedValence(u, +1);
+                                g.updateBondedValence(v, +1);
                             } else if (aromatic.get(u) && aromatic.get(v)) {
                                 e.bond(Bond.IMPLICIT_AROMATIC);
                             }
@@ -136,7 +144,9 @@ final class Localise {
         int deg = g.degree(v) + g.implHCount(v);
 
         if (g.bondedValence(v) > g.degree(v)) {
-            for (Edge e : g.edges(v)) {
+            final int d = g.degree(v);
+            for (int j=0; j<d; ++j) {
+                Edge e = g.edgeAt(v, j);
                 if (e.bond() == Bond.DOUBLE) {
                     if (q == 0 && (a.element() == Element.Nitrogen || (a.element() == Element.Sulfur && deg > 3))
                             && g.atom(e.other(v)).element() == Element.Oxygen)
@@ -196,7 +206,9 @@ final class Localise {
         if (visit.get(v))
             return false;
         visit.set(v);
-        for (Edge e : g.edges(v)) {
+        final int deg = g.degree(v);
+        for (int j=0; j<deg; ++j) {
+            final Edge e = g.edgeAt(v, j);
             int w = e.other(v);
             if (w == prev) continue;
             if (inSmallRing(g, w, v, t, d + 1, visit)) {
@@ -278,7 +290,9 @@ final class Localise {
     }
 
     private static boolean hasAdjDirectionalLabels(Graph g, int u, BitSet cyclic) {
-        for (Edge f : g.edges(u)) {
+        final int d = g.degree(u);
+        for (int j=0; j<d; ++j) {
+            final Edge f = g.edgeAt(u, j);
             final int v = f.other(u);
             if (f.bond().directional() && cyclic.get(v)) {
                 return true;

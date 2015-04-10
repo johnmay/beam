@@ -264,7 +264,9 @@ abstract class Topology {
             // for now
             if (g.atom(u).element() == Element.Sulfur || g.atom(u).element() == Element.Selenium) {
                 int sb = 0, db = 0;
-                for (Edge e : g.edges(u)) {
+                final int d = g.degree(u);
+                for (int j=0; j<d; ++j) {
+                    final Edge e = g.edgeAt(u, j);
                     if (e.bond().order() == 1)
                         sb++;
                     else if (e.bond().order() == 2)
@@ -282,7 +284,9 @@ abstract class Topology {
             // a double bond and it's not sill tetrahedral specification such
             // as [C@-](N)(O)C
             int nDoubleBonds = 0;
-            for (Edge e : g.edges(u)) {
+            final int d = g.degree(u);
+            for (int j=0; j<d; ++j) {
+                final Edge e = g.edgeAt(u, j);
                 if (e.bond() == Bond.DOUBLE)
                     nDoubleBonds++;
             }
@@ -297,9 +301,12 @@ abstract class Topology {
         // odd number of cumulated double bond systems (e.g. allene)
         else if (deg == 2) {
             // check both bonds are double
-            for (Edge e : g.edges(u))
+            final int d = g.degree(u);
+            for (int j = 0; j < d; ++j) {
+                final Edge e = g.edgeAt(u, j);
                 if (e.bond() != Bond.DOUBLE)
                     return Configuration.UNKNOWN;
+            }
             return c == ANTI_CLOCKWISE ? AL1 : AL2;
         }
 

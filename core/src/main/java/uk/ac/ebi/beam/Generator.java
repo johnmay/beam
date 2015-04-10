@@ -125,7 +125,9 @@ final class Generator {
 
         boolean uncofiguredStereo = false;
         
-        for (Edge e : g.edges(u)) {
+        final int d = g.degree(u);
+        for (int j=0; j<d; ++j) {
+            final Edge e = g.edgeAt(u,j);
             int v = e.other(u);
             if (visitedAt[v] < 0) {
                 uncofiguredStereo = prepare(v, u, e.bond(u)) || uncofiguredStereo;
@@ -190,7 +192,9 @@ final class Generator {
         sb.append(b.token());
         tokens[u].append(sb);
 
-        for (Edge e : g.edges(u)) {
+        final int d = g.degree(u);
+        for (int j=0; j<d; ++j) {
+            final Edge e = g.edgeAt(u,j);
             int v = e.other(u);
             if (visitedAt[v] < 0) {
                 if (--remaining > 0) {
@@ -217,7 +221,9 @@ final class Generator {
         int[] localRank = new int[g.order()];
         int rank = 2;
         localRank[u] = 1;
-        for (Edge e : g.edges(u)) {
+        final int d = g.degree(u);
+        for (int j=0; j<d; ++j) {
+            final Edge e = g.edgeAt(u,j);
             localRank[e.other(u)] = g.degree(u) + rank++;
         }
         localRank[p] = 0;
