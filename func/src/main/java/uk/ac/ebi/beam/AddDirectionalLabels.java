@@ -72,7 +72,9 @@ final class AddDirectionalLabels
 
         // change edges (only changed added to replacement)
         for (int u = 0; u < g.order(); u++) {
-            for (final Edge e : g.edges(u)) {
+            final int d = g.degree(u);
+            for (int j = 0; j < d; ++j) {
+                final Edge e = g.edgeAt(u, j);
                 int v = e.other(u);
                 if (v > u && e.bond() == Bond.DOUBLE) {
                     if (g.degree(u) < 2 || g.degree(v) < 2)
@@ -86,8 +88,8 @@ final class AddDirectionalLabels
         if (doublebonds.isEmpty())
             return g;
 
-        final Set<Edge>       remain       = new HashSet<Edge>(doublebonds);
-        final Map<Edge, Edge> replacements = new HashMap<Edge, Edge>();
+        final Set<Edge>       remain       = new HashSet<>(doublebonds);
+        final Map<Edge, Edge> replacements = new HashMap<>();
 
         boolean altered;
         final Set<Edge> completed = new HashSet<>();
@@ -112,13 +114,17 @@ final class AddDirectionalLabels
         for (Edge e : remain) {
             int u = e.either();
             int v = e.other(u);
-            for (Edge f : g.edges(u)) {
+            final int d = g.degree(u);
+            for (int j = 0; j < d; ++j) {
+                final Edge f = g.edgeAt(u, j);
                 if (isDirectional(f, replacements) && safeToClean(g, f.other(u), replacements)) {
                     replacements.put(f,
                                      new Edge(u, f.other(u), Bond.IMPLICIT));
                 }
             }
-            for (Edge f : g.edges(v)) {
+            final int d2 = g.degree(v);
+            for (int j = 0; j < d2; ++j) {
+                final Edge f = g.edgeAt(v, j);
                 if (isDirectional(f, replacements) && safeToClean(g, f.other(v), replacements))
                     replacements.put(f,
                                      new Edge(v, f.other(v), Bond.IMPLICIT));
@@ -136,7 +142,9 @@ final class AddDirectionalLabels
         
         // append the edges, replacing any which need to be changed
         for (int u = 0; u < g.order(); u++) {
-            for (Edge e : g.edges(u)) {
+            final int d = g.degree(u);
+            for (int j = 0; j < d; ++j) {
+                Edge e = g.edgeAt(u, j);
                 if (e.other(u) < u) {
                     Edge replacement = replacements.get(e);
                     if (replacement != null)
@@ -157,10 +165,14 @@ final class AddDirectionalLabels
     }
 
     boolean safeToClean(Graph g, int v, Map<Edge,Edge> replacements) {
-        for (Edge e : g.edges(v)) {
+        final int d = g.degree(v);
+        for (int j = 0; j < d; ++j) {
+            final Edge e = g.edgeAt(v, j);
             if (e.bond().order() == 2) {
                 int w = e.other(v);
-                for (Edge f : g.edges(w)) {
+                final int d2 = g.degree(w);
+                for (int j2 = 0; j2 < d2; ++j2) {
+                    final Edge f = g.edgeAt(w, j2);
                     if (isDirectional(f, replacements))
                         return false;
                 }

@@ -33,7 +33,9 @@ final class NormaliseDirectionalLabels
 
         // change edges (only changed added to replacement)
         for (int u = 0; u < g.order(); u++) {
-            for (final Edge e : g.edges(u)) {
+            final int d = g.degree(u);
+            for (int j = 0; j < d; ++j) {
+                final Edge e = g.edgeAt(u, j);
                 if (e.other(u) > u) {
                     if (traversal.acc.containsKey(e)) {
                         h.addEdge(traversal.acc.get(e));
@@ -56,8 +58,8 @@ final class NormaliseDirectionalLabels
         private       int       i;
         private Map<Edge, Edge> acc = new HashMap<Edge, Edge>();
 
-        private List<Edge>   doubleBonds = new ArrayList<Edge>();
-        private Set<Integer> adj         = new HashSet<Integer>();
+        private List<Edge>   doubleBonds = new ArrayList<>();
+        private Set<Integer> adj         = new HashSet<>();
 
         private Traversal(Graph g) {
             this.g = g;
@@ -87,7 +89,7 @@ final class NormaliseDirectionalLabels
                     return max1 - max2;
                 }
             });
-            
+
             for (Edge e : doubleBonds) {
                 if (acc.containsKey(e))
                     continue;
@@ -99,7 +101,9 @@ final class NormaliseDirectionalLabels
             visited[u] = true;
             ordering[u] = i++;
             BitSet dbAtoms = new BitSet();
-            for (Edge e : g.edges(u)) {
+            final int d = g.degree(u);
+            for (int j = 0; j < d; ++j) {
+                final Edge e = g.edgeAt(u, j);
                 int v = e.other(u);
                 if (v == p)
                     continue;
@@ -115,10 +119,14 @@ final class NormaliseDirectionalLabels
 
                     // to stop adding other we mark all vertices adjacent to the
                     // double bond
-                    for (Edge f : g.edges(u))
-                        adj.add(f.other(u));
-                    for (Edge f : g.edges(v))
-                        adj.add(f.other(v));
+                    final int d2 = g.degree(u);
+                    for (int j2 = 0; j2 < d2; ++j2) {
+                        adj.add(g.edgeAt(u, j2).other(u));
+                    }
+                    final int d3 = g.degree(v);
+                    for (int j2 = 0; j2 < d3; ++j2) {
+                        adj.add(g.edgeAt(v, j2).other(v));
+                    }
                     doubleBonds.add(e);
                 }
                 if (!visited[v])
@@ -134,9 +142,12 @@ final class NormaliseDirectionalLabels
         }
 
         private boolean hasAdjDirectionalLabels(Graph g, int u) {
-            for (Edge f : g.edges(u))
+            final int d = g.degree(u);
+            for (int j = 0; j < d; ++j) {
+                final Edge f = g.edgeAt(u, j);
                 if (f.bond().directional())
                     return true;
+            }
             return false;
         }
 
@@ -204,7 +215,9 @@ final class NormaliseDirectionalLabels
 
         Edge firstDirectionalLabel(Graph g, int u) {
             Edge first = null;
-            for (Edge f : g.edges(u)) {
+            final int d = g.degree(u);
+            for (int j = 0; j < d; ++j) {
+                final Edge f = g.edgeAt(u, j);
                 if (f.bond() == Bond.UP || f.bond() == Bond.DOWN) {
                     if (first == null || ordering[f.other(u)] < ordering[first.other(u)])
                         first = f;
@@ -220,7 +233,9 @@ final class NormaliseDirectionalLabels
                                                      BitSet dbAtoms,
                                                      int u) {
             visited.set(u);
-            for (Edge e : g.edges(u)) {
+            final int d = g.degree(u);
+            for (int j = 0; j < d; ++j) {
+                final Edge e = g.edgeAt(u, j);
                 int v = e.other(u);
                 if (v == prev)
                     continue;
@@ -242,7 +257,9 @@ final class NormaliseDirectionalLabels
                                                    BitSet dbAtoms,
                                                    int u) {
             visited.set(u);
-            for (Edge e : g.edges(u)) {
+            final int d = g.degree(u);
+            for (int j = 0; j < d; ++j) {
+                final Edge e = g.edgeAt(u, j);
                 int v = e.other(u);
                 if (v == prev)
                     continue;
