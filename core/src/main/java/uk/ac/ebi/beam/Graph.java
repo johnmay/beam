@@ -61,11 +61,13 @@ public final class Graph {
 
     /** The vertex labels, atoms. */
     private Atom[] atoms;
-    
+
+    private int[] degrees;
+
     private int[] valences;
 
     /** Incidence list storage of edges with attached bond labels. * */
-    private List<Edge>[] edges;
+    private Edge[][] edges;
 
     /** Topologies indexed by the atom which they describe. */
     private Map<Integer, Topology> topologies;
@@ -84,10 +86,11 @@ public final class Graph {
     @SuppressWarnings("unchecked") Graph(int expSize) {
         this.order = 0;
         this.size = 0;
-        this.edges = new List[expSize];
+        this.edges = new Edge[expSize][];
         for (int i = 0; i < expSize; i++)
-            edges[i] = new ArrayList<Edge>(4);
+            edges[i] = new Edge[4];
         this.atoms = new Atom[expSize];
+        this.degrees = new int[expSize];
         this.valences = new int[expSize];
         this.topologies = new HashMap<Integer, Topology>(10);
     }
@@ -105,17 +108,17 @@ public final class Graph {
     /** Resize the graph if we are at maximum capacity. */
     private void ensureCapacity() {
         if (order >= atoms.length) {
-            atoms    = Arrays.copyOf(atoms, order * 2);
+            atoms = Arrays.copyOf(atoms, order * 2);
             valences = Arrays.copyOf(valences, order * 2);
+            degrees = Arrays.copyOf(degrees, order * 2);
             edges    = Arrays.copyOf(edges, order * 2);
             for (int i = order; i < edges.length; i++)
-                edges[i] = new ArrayList<Edge>(4);
+                edges[i] = new Edge[4];
         }
     }
 
     /**
-     * Add an atom to the graph and return the index to which the atom was
-     * added.
+     * Add an atom to the graph and return the index to which the atom was added.
      *
      * @param a add an atom
      * @return index of the atom in the graph (vertex)
@@ -131,26 +134,31 @@ public final class Graph {
      *
      * @param i index of the atom to access
      * @return the atom at that index
-     * @throws IllegalArgumentException no atom exists
      */
     public Atom atom(int i) {
-        return atoms[checkRange(i)];
+        return atoms[i];
     }
 
     /**
      * Add an labelled edge to the graph.
      *
      * @param e new edge
-     * @throws IllegalArgumentException attempt to create an edge between atoms
-     *                                  which do not exist
      */
     void addEdge(Edge e) {
-        int u = checkRange(e.either()), v = checkRange(e.other(u));
-        edges[u].add(e);
-        edges[v].add(e);
-        valences[u] += e.bond().order();
-        valences[v] += e.bond().order();
+        int u = e.either(), v = e.other(u);
+        ensureEdgeCapacity(u);
+        ensureEdgeCapacity(v);
+        edges[u][degrees[u]++] = e;
+        edges[v][degrees[v]++] = e;
+        int ord = e.bond().order();
+        valences[u] += ord;
+        valences[v] += ord;
         size++;
+    }
+    
+    private void ensureEdgeCapacity(int i) {
+        if (degrees[i] == edges[i].length)
+            edges[i] = Arrays.copyOf(edges[i], degrees[i] + 2);
     }
 
     /**
@@ -158,28 +166,23 @@ public final class Graph {
      *
      * @param u a vertex
      * @return the degree of the specified vertex
-     * @throws IllegalArgumentException attempting to access the degree of an
-     *                                  atom which does not exist
      */
     int degree(int u) {
-        return edges[checkRange(u)].size();
+        return degrees[u];
     }
 
     /**
-     * Access the bonded valence of vertex 'u'. This valence exclude any implicit hydrogen
-     * counts. 
+     * Access the bonded valence of vertex 'u'. This valence exclude any implicit hydrogen counts.
      *
      * @param u a vertex index
      * @return the bonded valence of the specified vertex
-     * @throws IllegalArgumentException attempting to access the degree of an
-     *                                  atom which does not exist
      */
     int bondedValence(int u) {
-        return valences[checkRange((u))];
+        return valences[u];
     }
-    
+
     void updateBondedValence(int i, int x) {
-        valences[checkRange(i)] += x;
+        valences[i] += x;
     }
 
     /**
@@ -187,11 +190,9 @@ public final class Graph {
      *
      * @param u a vertex
      * @return edges incident to 'u'
-     * @throws IllegalArgumentException attempting to access the edges of an
-     *                                  atom which does not exist
      */
     public List<Edge> edges(int u) {
-        return Collections.unmodifiableList(edges[checkRange(u)]);
+        return Arrays.asList(Arrays.copyOf(edges[u], degrees[u]));
     }
 
     /**
@@ -206,7 +207,7 @@ public final class Graph {
      * @see #configurationOf(int)
      */
     public int[] neighbors(int u) {
-        List<Edge> es = edges[checkRange(u)];
+        List<Edge> es = edges(u);
         int[] vs = new int[es.size()];
         int deg = es.size();
         for (int i = 0; i < deg; i++)
@@ -224,10 +225,12 @@ public final class Graph {
      * @return whether they are adjacent
      */
     public boolean adjacent(int u, int v) {
-        checkRange(v);
-        for (Edge e : edges(u))
+        final int d = degrees[u];
+        for (int j = 0; j < d; ++j) {
+            Edge e = edges[u][j];
             if (e.other(u) == v)
                 return true;
+        }
         return false;
     }
 
@@ -240,7 +243,7 @@ public final class Graph {
      * @return the number of implicit hydrogens
      */
     public int implHCount(int u) {
-        return atom(checkRange(u)).hydrogens(this, u);
+        return atom(u).hydrogens(this, u);
     }
 
     /**
@@ -252,10 +255,17 @@ public final class Graph {
      * @throws IllegalArgumentException u and v are not adjacent
      */
     public Edge edge(int u, int v) {
-        for (Edge e : edges(u))
+        final int d = degrees[u];
+        for (int j = 0; j < d; ++j) {
+            Edge e = edges[u][j];
             if (e.other(u) == v)
                 return e;
+        }
         throw new IllegalArgumentException(u + ", " + v + " are not adjacent");
+    }
+
+    Edge edgeAt(int u, int j) {
+        return edges[u][j];
     }
 
     /**
@@ -269,26 +279,26 @@ public final class Graph {
         int u = org.either();
         int v = org.other(u);
 
-        for (int i = 0; i < edges[u].size(); i++) {
-            if (edges[u].get(i) == org) {
-                edges[u].set(i, rep);
+        for (int i = 0; i < degrees[u]; i++) {
+            if (edges[u][i] == org) {
+                edges[u][i] = rep;
             }
         }
 
-        for (int i = 0; i < edges[v].size(); i++) {
-            if (edges[v].get(i) == org) {
-                edges[v].set(i, rep);
+        for (int i = 0; i < degrees[v]; i++) {
+            if (edges[v][i] == org) {
+                edges[v][i] = rep;
             }
         }
-        
+
         int ord = rep.bond().order() - org.bond().order();
         valences[u] += ord;
         valences[v] += ord;
     }
 
     /**
-     * Add a topology description to the graph. The topology describes the
-     * configuration around a given atom.
+     * Add a topology description to the graph. The topology describes the configuration around a
+     * given atom.
      *
      * @param t topology
      * @return whether the topology replaced an existing configuration
@@ -505,17 +515,21 @@ public final class Graph {
 
         for (int u = 0; u < order; u++) {
             g.atoms[p[u]] = atoms[u];
-            g.valences[p[u]] = valences[u];
             g.addTopology(topologyOf(u).orderBy(p).transform(p));
         }
 
         for (int u = 0; u < order; u++) {
-            for (Edge e : edges[u]) {
+            final int d = degrees[u];
+            for (int j=0; j<d; ++j) {
+                final Edge e = edgeAt(u, j);
                 if (u < e.other(u)) {
                     int v = p[u], w = p[e.other(u)];
                     Edge f = new Edge(v, w, e.bond(u));
-                    g.edges[v].add(f);
-                    g.edges[w].add(f);
+                    g.ensureEdgeCapacity(v);
+                    g.ensureEdgeCapacity(w);
+                    g.edges[v][g.degrees[v]++] = f;
+                    g.edges[w][g.degrees[w]++] = f;
+                    g.size++;
                 }
             }
         }
@@ -547,7 +561,9 @@ public final class Graph {
     public Iterable<Edge> edges() {
         List<Edge> es = new ArrayList<Edge>(size);
         for (int u = 0; u < order; u++) {
-            for (Edge e : this.edges[u]) {
+            final int d = degrees[u];
+            for (int i = 0; i < d; ++i) {
+                final Edge e = edges[u][i];
                 if (e.other(u) < u)
                     es.add(e);
             }
@@ -570,7 +586,7 @@ public final class Graph {
         topologies.clear();
         for (int i = 0; i < order; i++) {
             atoms[i] = null;
-            edges[i].clear();
+            degrees[i] = 0;
         }
         order = 0;
         size = 0;
@@ -592,12 +608,6 @@ public final class Graph {
         this.flags = flags;
     }
 
-    private int checkRange(int u) {
-        if (u < 0 || u >= order)
-            throw new IllegalArgumentException("invalid atom index: " + u);
-        return u;
-    }
-
     /**
      * Sort the edges of the graph to visit in a specific order. The graph is
      * modified.
@@ -607,16 +617,17 @@ public final class Graph {
      */
     public Graph sort(EdgeComparator comparator) {
         for (int u = 0; u < order; u++) {
-            List<Edge> es = edges[u];
-            
+            final Edge[] es = edges[u];
+
             // insertion sort as most atoms have small degree <= 4
-            for (int i = 1; i < es.size(); i++) {
+            final int deg = degrees[u];
+            for (int i = 1; i < deg; i++) {
                 int j = i - 1;
-                Edge e = es.get(i);
-                while (j >= 0 && comparator.less(this, u, e, es.get(j))) {
-                    es.set(j + 1, es.get(j--));
+                Edge e = es[i];
+                while (j >= 0 && comparator.less(this, u, e, es[j])) {
+                    es[j + 1] = es[j--];
                 }
-                es.set(j + 1, e);
+                es[j + 1] = e;
             }
         }
         return this;

@@ -184,28 +184,6 @@ public class GraphTest {
         assertFalse(g.adjacent(0, 2));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void adjacentInvalid() {
-        Graph g = new Graph(5);
-        g.addAtom(mock(Atom.class));
-        g.addAtom(mock(Atom.class));
-        g.addAtom(mock(Atom.class));
-        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
-        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
-        g.adjacent(0, 4);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void adjacentInvalid2() {
-        Graph g = new Graph(5);
-        g.addAtom(mock(Atom.class));
-        g.addAtom(mock(Atom.class));
-        g.addAtom(mock(Atom.class));
-        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
-        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
-        g.adjacent(4, 0);
-    }
-
     @Test
     public void edge() {
         Graph g = new Graph(5);
@@ -228,43 +206,7 @@ public class GraphTest {
         g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
         g.edge(0, 2);
     }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidEdges() {
-        Graph g = new Graph(5);
-        g.edges(4);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidDegree() {
-        Graph g = new Graph(5);
-        g.degree(4);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void addingEdgeNonVertex1() {
-        Graph g = new Graph(5);
-        g.addAtom(mock(Atom.class));
-        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void addingEdgeNonVertex2() {
-        Graph g = new Graph(5);
-        g.addAtom(mock(Atom.class));
-        g.addEdge(new Edge(1, 0, Bond.IMPLICIT));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void invalidAtom() {
-        new Graph(5).atom(-1);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void invalidAtom2() {
-        new Graph(5).atom(2);
-    }
-
+    
     @Test public void addTopology() {
         Topology t = mock(Topology.class);
         when(t.atom()).thenReturn(5);
@@ -533,5 +475,9 @@ public class GraphTest {
         g.sort(new Graph.VisitHighOrderFirst());
         g.sort(new Graph.VisitHydrogenFirst());
         assertThat(g.toSmiles(), is("C1([H])=C([H])C([H])=C([H])C([H])=C1[H]"));
+    }
+    
+    @Test public void CHEMBL1215012() throws Exception {
+        Graph g = Graph.fromSmiles("[Na+].[Na+].CC(C)c1c(O)c(O)c(\\C=N\\[C@H]2[C@H]3SC(C)(C)[C@@H](N3C2=O)C(=O)[O-])c4C(=O)C(=C(C)C(=O)c14)C5=C(C)C(=O)c6c(C(C)C)c(O)c(O)c(\\C=N\\[C@H]7[C@H]8SC(C)(C)[C@@H](N8C7=O)C(=O)[O-])c6C5=O CHEMBL1215012");
     }
 }
