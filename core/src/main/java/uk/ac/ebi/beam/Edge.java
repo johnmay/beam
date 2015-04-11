@@ -61,6 +61,10 @@ public final class Edge {
         this.bond = bond;
     }
 
+    Edge(Edge e) {
+        this(e.u, e.v, e.bond);
+    }
+
     /**
      * Access either endpoint of the edge. For directional bonds, the endpoint
      * can be considered as relative to this vertex.

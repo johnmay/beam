@@ -83,7 +83,7 @@ public final class Graph {
      *
      * @param expSize expected size
      */
-    @SuppressWarnings("unchecked") Graph(int expSize) {
+    Graph(int expSize) {
         this.order = 0;
         this.size = 0;
         this.edges = new Edge[expSize][];
@@ -93,6 +93,37 @@ public final class Graph {
         this.degrees = new int[expSize];
         this.valences = new int[expSize];
         this.topologies = new HashMap<Integer, Topology>(10);
+    }
+
+    /**
+     * Copy constructor.
+     *
+     * @param org original graph
+     */
+    Graph(Graph org) {
+        this.order      = org.order;
+        this.size       = org.size;
+        this.flags      = org.flags;
+        this.atoms      = Arrays.copyOf(org.atoms, order);
+        this.valences   = Arrays.copyOf(org.valences, order);
+        this.degrees    = new int[order];
+        this.edges      = new Edge[order][];
+        this.topologies = new HashMap<>(org.topologies);
+        
+        for (int u = 0; u < order; u++) {
+            final int deg = org.degrees[u];
+            this.edges[u] = new Edge[deg];
+            for (int j = 0; j < deg; ++j) {
+                final Edge e = org.edges[u][j];
+                final int  v = e.other(u);
+                // important - we have made use edges are allocated
+                if (u > v) {
+                    Edge f = new Edge(e);
+                    edges[u][degrees[u]++] = f;
+                    edges[v][degrees[v]++] = f;
+                }
+            }
+        }
     }
 
     /**
