@@ -539,34 +539,38 @@ public final class Graph {
         if (p.length != order)
             throw new IllegalArgumentException("permuation size should equal |V| (order)");
 
-        Graph g = new Graph(order);
-        g.flags = flags;
-        g.order = order;
-        g.size = size;
+        Graph cpy = new Graph(order);
+        cpy.flags = flags;
+        cpy.order = order;
+        cpy.size = size;
 
         for (int u = 0; u < order; u++) {
-            g.atoms[p[u]] = atoms[u];
-            g.addTopology(topologyOf(u).orderBy(p).transform(p));
-        }
+            int d = degrees[u];
+            // v is the image of u in the permutation
+            final int v = p[u];
+            if (d > 4) cpy.edges[v] = new Edge[d];
+            cpy.atoms[v]    = atoms[u];
+            cpy.valences[v] = valences[u];
+            cpy.addTopology(topologyOf(u).orderBy(p).transform(p));
+            while (--d >= 0) {
+                final Edge e = edgeAt(u, d);
 
-        for (int u = 0; u < order; u++) {
-            final int d = degrees[u];
-            for (int j=0; j<d; ++j) {
-                final Edge e = edgeAt(u, j);
-                if (u < e.other(u)) {
-                    int v = p[u], w = p[e.other(u)];
-                    Edge f = new Edge(v, w, e.bond(u));
-                    g.ensureEdgeCapacity(v);
-                    g.ensureEdgeCapacity(w);
-                    g.edges[v][g.degrees[v]++] = f;
-                    g.edges[w][g.degrees[w]++] = f;
-                    g.size++;
+                // important this is the second time we have seen the edge
+                // so the capacity must have been allocated. otherwise we
+                // would get an index out of bounds
+                if (u > e.other(u)) {
+                    // w is the image of vertex adjacen to u
+                    final int  w = p[e.other(u)];
+                    final Edge f = new Edge(v, w, e.bond(u));
+                    cpy.edges[v][cpy.degrees[v]++] = f;
+                    cpy.edges[w][cpy.degrees[w]++] = f;
+                    cpy.size++;
                 }
             }
         }
 
         // ensure edges are in sorted order
-        return g.sort(new CanOrderFirst());
+        return cpy.sort(new CanOrderFirst());
     }
 
     /**
