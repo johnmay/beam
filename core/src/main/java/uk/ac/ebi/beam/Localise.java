@@ -249,12 +249,18 @@ final class Localise {
                     final int v = e.other(u);
                     // check for bond validity
                     if (e.bond().order() == 2) {
+                        
                         int vExtra = g.bondedValence(v) - g.degree(v);
                         if (cyclic.get(v) && vExtra > 0) {
-                            if (hasAdjDirectionalLabels(g, e, cyclic) && !inSmallRing(g, e))
+
+                            if (hasAdjDirectionalLabels(g, e, cyclic) && !inSmallRing(g, e)) {
+                                other = -1;
                                 break;
-                            if (vExtra > 1 && hasAdditionalCyclicDoubleBond(g, cyclic, u, v))
+                            }
+                            if (vExtra > 1 && hasAdditionalCyclicDoubleBond(g, cyclic, u, v)) {
+                                other = -1;
                                 break;
+                            }
                             if (other == -1) {
                                 other  = v;  // first one
                                 target = e;
