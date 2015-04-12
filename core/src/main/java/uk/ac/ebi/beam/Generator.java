@@ -141,14 +141,17 @@ final class Generator {
         // until the end
         if (g.topologyOf(u).configuration().type() == Configuration.Type.ExtendedTetrahedral)
             return true;
-        if (rings.containsKey(u)) {
-            tokens[u].configure(g.topologyOf(u)
-                                 .orderBy(localRank(u, p))
-                                 .configuration());
-        } else {
-            tokens[u].configure(g.topologyOf(u)
-                                 .orderBy(visitedAt)
-                                 .configuration());
+        if (g.topologyOf(u) != Topology.unknown()) {
+            if (rings.containsKey(u)) {
+                tokens[u].configure(g.topologyOf(u)
+                                     .orderBy(localRank(u, p))
+                                     .configuration());
+            }
+            else {
+                tokens[u].configure(g.topologyOf(u)
+                                     .orderBy(visitedAt)
+                                     .configuration());
+            }
         }
         
         return uncofiguredStereo;
