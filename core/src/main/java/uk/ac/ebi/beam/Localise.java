@@ -1,6 +1,7 @@
 package uk.ac.ebi.beam;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
@@ -14,17 +15,17 @@ import java.util.Map;
 final class Localise {
 
     private static Graph generateKekuleForm(Graph g, BitSet subset, BitSet aromatic, boolean inplace) throws InvalidSmilesException {
-        
+
         // make initial (empty) matching - then improve it, first
         // by matching the first edges we find, most of time this
         // gives us a perfect matching if not we maximise it
         // with Edmonds' algorithm
-        
-        final Matching m        = Matching.empty(g);
-        final int      n        = subset.cardinality();
-              int      nMatched = ArbitraryMatching.initial(g, m, subset); 
+
+        final Matching m = Matching.empty(g);
+        final int n = subset.cardinality();
+        int nMatched = ArbitraryMatching.initial(g, m, subset);
         if (nMatched < n) {
-            if (n-nMatched == 2)
+            if (n - nMatched == 2)
                 nMatched = ArbitraryMatching.augmentOnce(g, m, nMatched, subset);
             if (nMatched < n)
                 nMatched = MaximumMatching.maximise(g, m, nMatched, IntSet.fromBitSet(subset));
@@ -32,7 +33,7 @@ final class Localise {
                 throw new InvalidSmilesException("Could not Kekulise");
         }
 
-        return inplace ? assign(g, subset, aromatic, m) 
+        return inplace ? assign(g, subset, aromatic, m)
                        : copyAndAssign(g, subset, aromatic, m);
     }
 
@@ -44,7 +45,7 @@ final class Localise {
             localised.addAtom(delocalised.atom(u).toAliphatic());
             localised.addTopology(delocalised.topologyOf(u));
             final int d = delocalised.degree(u);
-            for (int j=0; j<d; ++j) {
+            for (int j = 0; j < d; ++j) {
                 final Edge e = delocalised.edgeAt(u, j);
                 int v = e.other(u);
                 if (v < u) {
@@ -55,18 +56,22 @@ final class Localise {
                         case AROMATIC:
                             if (subset.get(u) && m.other(u) == v) {
                                 localised.addEdge(Bond.DOUBLE_AROMATIC.edge(u, v));
-                            } else if (aromatic.get(u) && aromatic.get(v)) {
+                            }
+                            else if (aromatic.get(u) && aromatic.get(v)) {
                                 localised.addEdge(Bond.IMPLICIT_AROMATIC.edge(u, v));
-                            } else {
+                            }
+                            else {
                                 localised.addEdge(Bond.IMPLICIT.edge(u, v));
                             }
                             break;
                         case IMPLICIT:
                             if (subset.get(u) && m.other(u) == v) {
                                 localised.addEdge(Bond.DOUBLE_AROMATIC.edge(u, v));
-                            } else if (aromatic.get(u) && aromatic.get(v)) {
+                            }
+                            else if (aromatic.get(u) && aromatic.get(v)) {
                                 localised.addEdge(Bond.IMPLICIT_AROMATIC.edge(u, v));
-                            } else {
+                            }
+                            else {
                                 localised.addEdge(e);
                             }
                             break;
@@ -83,12 +88,12 @@ final class Localise {
     // invariant, m is a perfect matching
     private static Graph assign(Graph g, BitSet subset, BitSet aromatic, Matching m) throws InvalidSmilesException {
         g.setFlags(g.getFlags() & ~Graph.HAS_AROM);
-        for (int u = aromatic.nextSetBit(0); u>=0; u = aromatic.nextSetBit(u+1)) {
+        for (int u = aromatic.nextSetBit(0); u >= 0; u = aromatic.nextSetBit(u + 1)) {
             g.setAtom(u, g.atom(u).toAliphatic());
             int deg = g.degree(u);
-            for (int j=0; j<deg; ++j) {
+            for (int j = 0; j < deg; ++j) {
                 Edge e = g.edgeAt(u, j);
-                int  v = e.other(u);
+                int v = e.other(u);
                 if (v < u) {
                     switch (e.bond()) {
                         case SINGLE:
@@ -99,9 +104,11 @@ final class Localise {
                                 e.bond(Bond.DOUBLE_AROMATIC);
                                 g.updateBondedValence(u, +1);
                                 g.updateBondedValence(v, +1);
-                            } else if (aromatic.get(v)) {
+                            }
+                            else if (aromatic.get(v)) {
                                 e.bond(Bond.IMPLICIT_AROMATIC);
-                            } else {
+                            }
+                            else {
                                 e.bond(Bond.IMPLICIT);
                             }
                             break;
@@ -110,7 +117,8 @@ final class Localise {
                                 e.bond(Bond.DOUBLE_AROMATIC);
                                 g.updateBondedValence(u, +1);
                                 g.updateBondedValence(v, +1);
-                            } else if (aromatic.get(u) && aromatic.get(v)) {
+                            }
+                            else if (aromatic.get(u) && aromatic.get(v)) {
                                 e.bond(Bond.IMPLICIT_AROMATIC);
                             }
                             break;
@@ -145,7 +153,7 @@ final class Localise {
 
         if (g.bondedValence(v) > g.degree(v)) {
             final int d = g.degree(v);
-            for (int j=0; j<d; ++j) {
+            for (int j = 0; j < d; ++j) {
                 Edge e = g.edgeAt(v, j);
                 if (e.bond() == Bond.DOUBLE) {
                     if (q == 0 && (a.element() == Element.Nitrogen || (a.element() == Element.Sulfur && deg > 3))
@@ -207,7 +215,7 @@ final class Localise {
             return false;
         visit.set(v);
         final int deg = g.degree(v);
-        for (int j=0; j<deg; ++j) {
+        for (int j = 0; j < deg; ++j) {
             final Edge e = g.edgeAt(v, j);
             int w = e.other(v);
             if (w == prev) continue;
@@ -218,20 +226,10 @@ final class Localise {
         return false;
     }
 
-    /**
-     * Resonate double bonds in a cyclic system such that given a molecule with the same ordering
-     * produces the same resonance assignment. This procedure provides a canonical kekulué
-     * representation for conjugated rings.
-     *
-     * @param g graph
-     * @return the input graph (same reference)
-     */
-    static Graph resonate(Graph g) {
-
-        BitSet cyclic = new BiconnectedComponents(g).cyclic();
+    static Graph resonate(Graph g, BitSet cyclic, boolean ordered) {
 
         BitSet subset = new BitSet();
-        
+
         for (int u = cyclic.nextSetBit(0); u >= 0; u = cyclic.nextSetBit(u + 1)) {
             // candidates must have a bonded
             // valence of one more than their degree
@@ -244,12 +242,12 @@ final class Localise {
 
                 final int d = g.degree(u);
                 for (int j = 0; j < d; ++j) {
-                    
+
                     final Edge e = g.edgeAt(u, j);
                     final int v = e.other(u);
                     // check for bond validity
                     if (e.bond().order() == 2) {
-                        
+
                         int vExtra = g.bondedValence(v) - g.degree(v);
                         if (cyclic.get(v) && vExtra > 0) {
 
@@ -281,8 +279,9 @@ final class Localise {
                 }
             }
         }
-        
-        g = g.sort(new Graph.CanOrderFirst());
+
+        if (!ordered)
+            g = g.sort(new Graph.CanOrderFirst());
 
         final Matching m = Matching.empty(g);
         int n = subset.cardinality();
@@ -303,7 +302,19 @@ final class Localise {
             g.edge(v,w).bond(Bond.DOUBLE);
         }
 
-        return g;
+        return g;    
+    }
+
+    /**
+     * Resonate double bonds in a cyclic system such that given a molecule with the same ordering
+     * produces the same resonance assignment. This procedure provides a canonical kekulué
+     * representation for conjugated rings.
+     *
+     * @param g graph
+     * @return the input graph (same reference)
+     */
+    static Graph resonate(Graph g) {
+        return resonate(g, new BiconnectedComponents(g).cyclic(), false);
     }
 
     private static boolean hasAdditionalCyclicDoubleBond(Graph g, BitSet cyclic, int u, int v) {
@@ -323,7 +334,7 @@ final class Localise {
 
     private static boolean hasAdjDirectionalLabels(Graph g, int u, BitSet cyclic) {
         final int d = g.degree(u);
-        for (int j=0; j<d; ++j) {
+        for (int j = 0; j < d; ++j) {
             final Edge f = g.edgeAt(u, j);
             final int v = f.other(u);
             if (f.bond().directional() && cyclic.get(v)) {
@@ -340,7 +351,7 @@ final class Localise {
             return delocalised;
 
         BitSet aromatic = new BitSet();
-        BitSet subset   = buildSet(delocalised, aromatic);
+        BitSet subset = buildSet(delocalised, aromatic);
         if (hasOddCardinality(subset))
             throw new InvalidSmilesException("a valid kekulé structure could not be assigned");
         return Localise.generateKekuleForm(delocalised, subset, aromatic, false);
@@ -353,7 +364,7 @@ final class Localise {
             return delocalised;
 
         BitSet aromatic = new BitSet();
-        BitSet subset   = buildSet(delocalised, aromatic);
+        BitSet subset = buildSet(delocalised, aromatic);
         if (hasOddCardinality(subset))
             throw new InvalidSmilesException("a valid kekulé structure could not be assigned");
         return Localise.generateKekuleForm(delocalised, subset, aromatic, true);
