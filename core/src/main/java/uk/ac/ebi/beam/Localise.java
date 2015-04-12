@@ -229,43 +229,60 @@ final class Localise {
     static Graph resonate(Graph g) {
 
         BitSet cyclic = new BiconnectedComponents(g).cyclic();
+
         BitSet subset = new BitSet();
-        int[] count = new int[g.order()];
-
-        List<Edge> edges = new ArrayList<Edge>();
-        for (Edge e : g.edges()) {
-            if (e.bond().order() == 2) {
-                int u = e.either();
-                int v = e.other(u);
-                if (hasAdjDirectionalLabels(g, e, cyclic)) {
-                    // need to check ring size > 7
-                    if (!inSmallRing(g, e))
-                        continue;
-                }
-                if (cyclic.get(u) && cyclic.get(v)) {
-                    count[u]++;
-                    count[v]++;
-                    edges.add(e);
-                }
-            }
-        }
-
-        for (Edge e : edges) {
-            int u = e.either();
-            int v = e.other(u);
-            if (count[u] == 1 && count[v] == 1) {
-                e.bond(Bond.IMPLICIT);
-                subset.set(u);
-                subset.set(v);
-            }
-        }
-        g = g.sort(new Graph.CanOrderFirst());
         
+        for (int u = cyclic.nextSetBit(0); u >= 0; u = cyclic.nextSetBit(u + 1)) {
+            // candidates must have a bonded
+            // valence of one more than their degree
+            // and in a ring
+            int uExtra = g.bondedValence(u) - g.degree(u);
+            if (uExtra > 0) {
+
+                int  other  = -1;
+                Edge target = null;
+
+                final int d = g.degree(u);
+                for (int j = 0; j < d; ++j) {
+                    
+                    final Edge e = g.edgeAt(u, j);
+                    final int v = e.other(u);
+                    // check for bond validity
+                    if (e.bond().order() == 2) {
+                        int vExtra = g.bondedValence(v) - g.degree(v);
+                        if (cyclic.get(v) && vExtra > 0) {
+                            if (hasAdjDirectionalLabels(g, e, cyclic) && !inSmallRing(g, e))
+                                break;
+                            if (vExtra > 1 && hasAdditionalCyclicDoubleBond(g, cyclic, u, v))
+                                break;
+                            if (other == -1) {
+                                other  = v;  // first one
+                                target = e;
+                            } else {
+                                other = -2; // found more than one
+                            }
+                        }
+                        // only one double bond don't check any more
+                        if (uExtra == 1)
+                            break;
+                    }
+                }
+
+                if (other >= 0) {
+                    subset.set(u);
+                    subset.set(other);
+                    target.bond(Bond.IMPLICIT);
+                }
+            }
+        }
+        
+        g = g.sort(new Graph.CanOrderFirst());
+
         final Matching m = Matching.empty(g);
-        int            n = subset.cardinality();
-        int     nMatched = ArbitraryMatching.initial(g, m, subset);
+        int n = subset.cardinality();
+        int nMatched = ArbitraryMatching.initial(g, m, subset);
         if (nMatched < n) {
-            if (n-nMatched == 2)
+            if (n - nMatched == 2)
                 nMatched = ArbitraryMatching.augmentOnce(g, m, nMatched, subset);
             if (nMatched < n)
                 nMatched = MaximumMatching.maximise(g, m, nMatched, IntSet.fromBitSet(subset));
@@ -273,14 +290,23 @@ final class Localise {
                 throw new InternalError("Could not Kekulise");
         }
 
-
+        // assign new double bonds
         for (int v = subset.nextSetBit(0); v >= 0; v = subset.nextSetBit(v + 1)) {
             int w = m.other(v);
             subset.clear(w);
-            g.edge(v, w).bond(Bond.DOUBLE);
+            g.edge(v,w).bond(Bond.DOUBLE);
         }
 
         return g;
+    }
+
+    private static boolean hasAdditionalCyclicDoubleBond(Graph g, BitSet cyclic, int u, int v) {
+        for (Edge f : g.edges(v)) {
+            if (f.bond() == Bond.DOUBLE && f.other(v) != u && cyclic.get(u)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean hasAdjDirectionalLabels(Graph g, Edge e, BitSet cyclic) {
