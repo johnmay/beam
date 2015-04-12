@@ -112,11 +112,11 @@ final class BiconnectedComponents {
         }
     }
     
-    boolean inRing(int v) {
+    boolean inCycle(int v) {
         return cyclic.get(v);
     }
 
-    boolean inSimpleRing(int v) {
+    boolean inSimpleCycle(int v) {
         return simple.get(v);
     }
 
