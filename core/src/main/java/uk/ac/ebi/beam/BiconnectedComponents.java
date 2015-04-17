@@ -13,7 +13,7 @@ import java.util.List;
  */
 final class BiconnectedComponents {
 
-    private int[] depth, low;
+    private int[] depth;
 
     private final Graph  g;
     private final Edge[] stack;
@@ -25,8 +25,7 @@ final class BiconnectedComponents {
     private final BitSet simple = new BitSet();
 
     int count = 0;
-
-    private int mark = 1;
+    int numfrags = 0;
 
     BiconnectedComponents(Graph g) {
         this(g, true);
@@ -34,57 +33,53 @@ final class BiconnectedComponents {
 
     BiconnectedComponents(Graph g, boolean storeComponents) {
         this.depth = new int[g.order()];
-        this.low = new int[g.order()];
         this.g = g;
         this.stack  = new Edge[g.size()];
+        
         if (storeComponents) {
-            for (int u = 0; u < g.order(); u++) {
-                if (depth[u] == 0)
+            for (int u = 0; count < g.order(); u++) {
+                if (depth[u] == 0) {
                     visitWithComp(u, null);
+                    ++numfrags;
+                }
             }
         } else {
-            for (int u = 0; u < g.order(); u++) {
-                if (depth[u] == 0)
+            for (int u = 0; count < g.order(); u++) {
+                if (depth[u] == 0) {
                     visit(u, null);
+                    ++numfrags;
+                }
             }
         }
-        low = null;
-        depth = null;
     }
 
-    private void visit(final int u, final Edge from) {
-        low[u] = depth[u] = ++count;
-        int j = g.degree(u);
-        while (--j>=0) {
-            
-            final Edge e = g.edgeAt(u, j);
+    private int visit(final int u, final Edge from) {
+        depth[u] = ++count;
+        int d    = g.degree(u);
+        int lo   = count + 1;
+
+        while (--d>=0) {
+            final Edge e = g.edgeAt(u, d);
             if (e==from) continue;
-            
             final int v = e.other(u);
             if (depth[v] == 0) {
-                stack[nstack] = e;
-                ++nstack;
-                visit(v, e);
-                if (low[v] == depth[u])
-                    store(e);
-                else if (low[v] > depth[u])
-                    --nstack;
-                if (low[v] < low[u])
-                    low[u] = low[v];
+                int res = visit(v, e);
+                if (res < lo)
+                    lo = res;
             }
-            else if (depth[v] < depth[u]) {
-                // back edge
-                stack[nstack] = e;
-                ++nstack;
-                if (depth[v] < low[u])
-                    low[u] = depth[v];
+            else if (depth[v] < lo) {
+                lo = depth[v];
             }
         }
+        if (lo <= depth[u])
+            cyclic.set(u);
+        return lo;
     }
 
-    private void visitWithComp(final int u, final Edge from) {
-        low[u] = depth[u] = ++count;
-        int j = g.degree(u);
+    private int visitWithComp(final int u, final Edge from) {
+        depth[u] = ++count;
+        int j  = g.degree(u);
+        int lo = count + 1; 
         while (--j>=0) {
 
             final Edge e = g.edgeAt(u, j);
@@ -94,57 +89,25 @@ final class BiconnectedComponents {
             if (depth[v] == 0) {
                 stack[nstack] = e;
                 ++nstack;
-                visitWithComp(v, e);
-                if (low[v] == depth[u])
+                int tmp = visitWithComp(v, e);
+                if (tmp == depth[u])
                     storeWithComp(e);
-                else if (low[v] > depth[u])
+                else if (tmp > depth[u])
                     --nstack;
-                if (low[v] < low[u])
-                    low[u] = low[v];
+                if (tmp < lo)
+                    lo = tmp;
             }
             else if (depth[v] < depth[u]) {
                 // back edge
                 stack[nstack] = e;
                 ++nstack;
-                if (depth[v] < low[u])
-                    low[u] = depth[v];
+                if (depth[v] < lo)
+                    lo = depth[v];
             }
         }
+        return lo;
     }
     
-    boolean inCycle(int v) {
-        return cyclic.get(v);
-    }
-
-    boolean inSimpleCycle(int v) {
-        return simple.get(v);
-    }
-
-    private void store(Edge e) {
-        Edge f;
-
-        final BitSet tmp = new BitSet();
-        
-        // count the number of unique vertices and edges
-        int numEdges = 0;
-        
-        do {
-            f = stack[--nstack];
-            int v = f.either();
-            int w = f.other(v);
-
-            tmp.set(v);
-            tmp.set(w);
-            
-            numEdges++;
-        } while (f != e);
-        
-        cyclic.or(tmp);
-        
-        if (tmp.cardinality() == numEdges)
-            simple.or(tmp);
-    }
-
     private void storeWithComp(Edge e) {
         List<Edge> component = new ArrayList<Edge>(6);
         Edge f;
@@ -153,12 +116,16 @@ final class BiconnectedComponents {
 
         // count the number of unique vertices and edges
         int numEdges = 0;
+        boolean spiro = false;
 
         do {
             f = stack[--nstack];
             int v = f.either();
             int w = f.other(v);
 
+            if (cyclic.get(v) || cyclic.get(w))
+                spiro = true;
+                
             tmp.set(v);
             tmp.set(w);
 
@@ -168,7 +135,7 @@ final class BiconnectedComponents {
 
         cyclic.or(tmp);
 
-        if (tmp.cardinality() == numEdges)
+        if (!spiro && tmp.cardinality() == numEdges)
             simple.or(tmp);
 
         components.add(Collections.unmodifiableList(component));
@@ -180,5 +147,9 @@ final class BiconnectedComponents {
 
     BitSet cyclic() {
         return cyclic;
+    }
+
+    public boolean connected() {
+        return numfrags < 2;
     }
 }

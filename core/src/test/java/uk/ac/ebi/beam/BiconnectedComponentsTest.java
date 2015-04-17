@@ -15,6 +15,12 @@ public class BiconnectedComponentsTest {
         assertThat(bc.components().get(0).size(), is(6));
     }
 
+    @Test public void benzylbenzene() throws Exception {
+        Graph g = Graph.fromSmiles("c1ccccc1Cc1ccccc1");
+        BiconnectedComponents bc = new BiconnectedComponents(g, false);
+        assertThat(bc.cyclic().cardinality(), is(12));
+    }
+
     @Test public void spiro() throws Exception {
         Graph g = Graph.fromSmiles("C1CCCCC11CCCCC1");
         BiconnectedComponents bc = new BiconnectedComponents(g);
