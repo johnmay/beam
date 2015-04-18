@@ -27,6 +27,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
      * How much input we process at once, could be adjustable.
      */
     final int WORK_UNIT_SIZE = 15000;
+    final boolean debug = false;
 
     FunctorCmdLnModule(String name) {
         super(name);
@@ -87,10 +88,10 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
                                                inputCounter.total(),
                                                elapsedMilli(tStart)), cnt);
                 }
-            } catch (Exception e) {
+            } catch (Exception | InternalError e) {
+                if (debug) e.printStackTrace();
                 if (showWarnings) {
                     report("error, " + e.getMessage() + "\nline:" + escapeForPrintf(line) + "\n");
-                    e.printStackTrace();
                 }
                 if (showProgress)
                     report("%d " + makeProgStr(inputCounter.count(),
@@ -133,8 +134,11 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
 
                 for (Future<Result> future : running) {
                     if (future.isDone()) {
-                        cnt += output(bwtr, future);
-                        inputCount = undateInputCount(inputCount, future);
+                        Result result = getResult(future);
+                        if (result == null)
+                            throw new InternalError("Could not get thread result");
+                        cnt += output(bwtr, result);
+                        inputCount = undateInputCount(inputCount, result);
                         if (showProgress)
                             report("%d " + makeProgStr(inputCount,
                                                        inputCounter.total(),
@@ -156,8 +160,11 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
         for (; !running.isEmpty(); ) {
             for (Future<Result> future : running) {
                 if (future.isDone()) {
-                    cnt += output(bwtr, future);
-                    inputCount = undateInputCount(inputCount, future);
+                    Result result = getResult(future);
+                    if (result == null)
+                        throw new InternalError("Could not get thread result");
+                    cnt += output(bwtr, result);
+                    inputCount = undateInputCount(inputCount, result);
                     if (showProgress)
                         report("%d " + makeProgStr(inputCount, inputCounter.total(), elapsedMilli(tStart)), cnt);
                     completed.add(future);
@@ -176,27 +183,34 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
     private long elapsedMilli(long tStart) {
         return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - tStart);
     }
-
-    private long undateInputCount(long inputCount, Future<Result> future) {
+    
+    private Result getResult(Future<Result> future) {
         try {
-            inputCount += future.get().inputSize;
+            return future.get();
         } catch (InterruptedException | ExecutionException e) {
             System.err.println(e.getMessage());
+            if (debug) 
+                e.printStackTrace();
         }
+        return null;
+    }
+
+    private long undateInputCount(long inputCount, Result result) {
+        inputCount += result.inputSize;
         return inputCount;
     }
 
-    private int output(BufferedWriter bwtr, Future<Result> future) {
+    private int output(BufferedWriter bwtr, Result res) {
         try {
             int cnt = 0;
-            for (String str : future.get().lines) {
+            for (String str : res.lines) {
                 if (str == null) continue;
                 bwtr.write(str);
                 bwtr.newLine();
                 ++cnt;
             }
             return cnt;
-        } catch (IOException | InterruptedException | ExecutionException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return 0;
@@ -246,7 +260,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
                 } catch (Exception e) {
                     if (warn) {
                         report("\nerror, " + e.getMessage() + "\nline:" + escapeForPrintf(lines.get(i)) + "\n");
-                        e.printStackTrace();
+                        if (debug) e.printStackTrace();
                     }
                     lines.set(i, null);
                 }
