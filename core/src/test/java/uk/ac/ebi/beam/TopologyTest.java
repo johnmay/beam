@@ -170,6 +170,25 @@ public class TopologyTest {
         assertThat(Topology.toExplicit(g, 1, ANTI_CLOCKWISE), is(TH1));
         assertThat(Topology.toExplicit(g, 1, CLOCKWISE), is(TH2));
     }
+    
+    // CCCCC[P@@]1CCC[C@H]1[C@@H]2CCCP2CCCCC CID 59836513
+    @Test public void implicitToExplicit_phosphorus() throws Exception {
+        // C[P@@](CC)O
+        Graph g = new Graph(5);
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(new AtomImpl.BracketAtom(Element.Phosphorus, 0, 0));
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(AtomImpl.AliphaticSubset.Carbon);
+        g.addAtom(AtomImpl.AliphaticSubset.Oxygen);
+
+        g.addEdge(new Edge(0, 1, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 2, Bond.IMPLICIT));
+        g.addEdge(new Edge(1, 4, Bond.IMPLICIT));
+        g.addEdge(new Edge(2, 3, Bond.IMPLICIT));
+        
+        assertThat(Topology.toExplicit(g, 1, ANTI_CLOCKWISE), is(TH1));
+        assertThat(Topology.toExplicit(g, 1, CLOCKWISE), is(TH2));
+    }
 
     @Test public void implicitToExplicit_allene() {
 

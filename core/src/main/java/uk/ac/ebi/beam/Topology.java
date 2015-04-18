@@ -247,7 +247,7 @@ abstract class Topology {
         if (c.type() != Implicit)
             return c;
 
-        int deg = g.degree(u);
+        int deg     = g.degree(u);
         int valence = deg + g.atom(u).hydrogens();
 
         // tetrahedral topology, square planar must always be explicit
@@ -278,6 +278,12 @@ abstract class Topology {
                     return c == ANTI_CLOCKWISE ? TH1 : TH2;
                 else
                     return Configuration.UNKNOWN;
+            }
+            
+            if (g.atom(u).element() == Element.Phosphorus) {
+                if (g.bondedValence(u) == 3 && g.implHCount(u) == 0 && g.atom(u).charge() == 0)  {
+                    return c == ANTI_CLOCKWISE ? TH1 : TH2;
+                }
             }
 
             // for the atom centric double bond configuration check there is
