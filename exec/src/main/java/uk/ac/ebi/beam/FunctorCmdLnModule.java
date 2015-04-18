@@ -148,6 +148,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
                 }
                 running.removeAll(completed);
                 completed.clear();
+                sleepSafe(2);
             }
 
             // get more lines
@@ -172,6 +173,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
             }
             running.removeAll(completed);
             completed.clear();
+            sleepSafe(2);
         }
 
         if (showProgress)
@@ -180,6 +182,14 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
         executor.shutdown();
     }
 
+    private static void sleepSafe(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            // ignore
+        }
+    }
+    
     private long elapsedMilli(long tStart) {
         return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - tStart);
     }
