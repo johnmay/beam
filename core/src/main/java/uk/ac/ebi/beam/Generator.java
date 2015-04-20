@@ -29,7 +29,6 @@
 
 package uk.ac.ebi.beam;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,7 +47,7 @@ final class Generator {
     private final StringBuilder sb;
 
     private final int[]                           visitedAt;
-    private       int                             i;
+    private       int                             nVisit;
     private final AtomToken[]                     tokens;
     private final Map<Integer, List<RingClosure>> rings;
     private final RingNumbering                   rnums;
@@ -59,9 +58,9 @@ final class Generator {
      * @param g chemical graph
      */
     Generator(Graph g, RingNumbering rnums) throws InvalidSmilesException {
-        this(g, new int[g.order()], rnums);    
+        this(g, new int[g.order()], rnums);
     }
-    
+
     /**
      * Create a new generator the given chemical graph.
      *
@@ -77,10 +76,9 @@ final class Generator {
         this.rings = new HashMap<Integer, List<RingClosure>>();
 
         // prepare ring closures and topologies
-        int visited = 0;
         Arrays.fill(visitedAt, -1);
-        boolean uncofiguredStereo = false; 
-        for (int u = 0; u < g.order() && visited < g.order(); u++) {
+        boolean uncofiguredStereo = false;
+        for (int u = 0; u < g.order() && nVisit < g.order(); u++) {
             if (visitedAt[u] < 0)
                 uncofiguredStereo = prepare(u, u, u == 0 ? Bond.IMPLICIT : Bond.DOT) || uncofiguredStereo;
         }
@@ -96,15 +94,16 @@ final class Generator {
         }
 
         // write notation
-        visited = 0;
-        i = 0;
+        nVisit = 0;
+        nVisit = 0;
         Arrays.fill(visitedAt, -1);
-        for (int u = 0; u < g.order() && visited < g.order(); u++) {
+        for (int u = 0; u < g.order() && nVisit < g.order(); u++) {
             if (visitedAt[u] < 0) {
                 if (u > 0) {
                     rnums.reset();
                     write(u, u, Bond.DOT);
-                } else {
+                }
+                else {
                     write(u, u, Bond.IMPLICIT);
                 }
             }
@@ -120,7 +119,7 @@ final class Generator {
      * @param b bond type
      */
     boolean prepare(int u, int p, Bond b) {
-        visitedAt[u] = i++;
+        visitedAt[u] = nVisit++;
         tokens[u] = g.atom(u).token();
 
         boolean uncofiguredStereo = false;
@@ -165,7 +164,7 @@ final class Generator {
      * @param b the bond from the previous vertex to this vertex
      */
     void write(int u, int p, Bond b) throws InvalidSmilesException {
-        visitedAt[u] = i++;
+        visitedAt[u] = nVisit++;
 
         int remaining = g.degree(u);
 
