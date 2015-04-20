@@ -80,7 +80,7 @@ final class Generator {
         boolean uncofiguredStereo = false;
         for (int u = 0; u < g.order() && nVisit < g.order(); u++) {
             if (visitedAt[u] < 0)
-                uncofiguredStereo = prepare(u, u, u == 0 ? Bond.IMPLICIT : Bond.DOT) || uncofiguredStereo;
+                uncofiguredStereo = prepare(u, null) || uncofiguredStereo;
         }
 
         if (uncofiguredStereo) {
@@ -94,7 +94,6 @@ final class Generator {
         }
 
         // write notation
-        nVisit = 0;
         nVisit = 0;
         Arrays.fill(visitedAt, -1);
         for (int u = 0; u < g.order() && nVisit < g.order(); u++) {
@@ -115,10 +114,9 @@ final class Generator {
      * configures topologies.
      *
      * @param u the vertex to visit
-     * @param p parent vertex (where we came from)
-     * @param b bond type
+     * @param from bond we came from
      */
-    boolean prepare(int u, int p, Bond b) {
+    boolean prepare(int u, Edge from) {
         visitedAt[u] = nVisit++;
         tokens[u] = g.atom(u).token();
 
@@ -127,10 +125,11 @@ final class Generator {
         final int d = g.degree(u);
         for (int j=0; j<d; ++j) {
             final Edge e = g.edgeAt(u,j);
+            if (e == from) continue;
             int v = e.other(u);
             if (visitedAt[v] < 0) {
-                uncofiguredStereo = prepare(v, u, e.bond(u)) || uncofiguredStereo;
-            } else if (v != p && visitedAt[v] < visitedAt[u]) {
+                uncofiguredStereo = prepare(v, e) || uncofiguredStereo;
+            } else if (visitedAt[v] < visitedAt[u]) {
                 cyclicEdge(v, u, e.bond(v));
             }
         }
@@ -144,7 +143,7 @@ final class Generator {
                 return true;
             if (rings.containsKey(u)) {
                 tokens[u].configure(topology
-                                     .orderBy(localRank(u, p))
+                                     .orderBy(localRank(u, from == null ? u : from.other(u)))
                                      .configuration());
             }
             else {
