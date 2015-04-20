@@ -138,16 +138,17 @@ final class Generator {
         // Configure the topology using the traversal order
         // extended tetrahedral (@AL1/@AL2) doesn't have all neighbors visited 
         // until the end
-        if (g.topologyOf(u).configuration().type() == Configuration.Type.ExtendedTetrahedral)
-            return true;
-        if (g.topologyOf(u) != Topology.unknown()) {
+        Topology topology = g.topologyOf(u);
+        if (topology != Topology.unknown()) {
+            if (topology.configuration().type() == Configuration.Type.ExtendedTetrahedral)
+                return true;
             if (rings.containsKey(u)) {
-                tokens[u].configure(g.topologyOf(u)
+                tokens[u].configure(topology
                                      .orderBy(localRank(u, p))
                                      .configuration());
             }
             else {
-                tokens[u].configure(g.topologyOf(u)
+                tokens[u].configure(topology
                                      .orderBy(visitedAt)
                                      .configuration());
             }
