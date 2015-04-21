@@ -203,8 +203,9 @@ final class Generator {
             remaining--;
 
         // assign ring numbers
-        if (rings.containsKey(u)) {
-            for (RingClosure rc : rings.get(u)) {
+        final List<RingClosure> closures = rings.get(u);
+        if (closures != null) {
+            for (RingClosure rc : closures) {
                 // as we are composing tokens, make sure apply in reverse
                 int rnum = rnums.next();
                 if (rc.register(rnum)) {
