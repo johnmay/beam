@@ -223,8 +223,11 @@ public final class GraphBuilder {
      */
     void topology(int u, Topology t) {
         g.addTopology(t);
-        if (t != Topology.unknown())
+        if (t != Topology.unknown()) {
             g.addFlags(Graph.HAS_ATM_STRO);
+            if (t.configuration().type() == Configuration.Type.ExtendedTetrahedral)
+                g.addFlags(Graph.HAS_EXT_STRO);
+        }
     }
 
     private void assignLeftOverFlags() {

@@ -85,7 +85,7 @@ final class Generator {
                 uncofiguredStereo = prepare(u, null) || uncofiguredStereo;
         }
 
-        if (uncofiguredStereo) {
+        if (g.getFlags(Graph.HAS_EXT_STRO) != 0) {
             for (int u = 0; u < g.order(); u++) {
                 if (g.topologyOf(u).configuration().type() == Configuration.Type.ExtendedTetrahedral) {
                     tokens[u].configure(g.topologyOf(u)
@@ -121,8 +121,6 @@ final class Generator {
     boolean prepare(int u, Edge from) {
         visitedAt[u] = nVisit++;
         tokens[u] = g.atom(u).token();
-
-        boolean uncofiguredStereo = false;
         
         final int d = g.degree(u);
         for (int j=0; j<d; ++j) {
@@ -130,7 +128,7 @@ final class Generator {
             if (e == from) continue;
             int v = e.other(u);
             if (visitedAt[v] < 0) {
-                uncofiguredStereo = prepare(v, e) || uncofiguredStereo;
+                prepare(v, e);
             } else if (visitedAt[v] < visitedAt[u]) {
                 cyclicEdge(v, u, e.bond(v));
             }
@@ -141,8 +139,6 @@ final class Generator {
         // until the end
         Topology topology = g.topologyOf(u);
         if (topology != Topology.unknown()) {
-            if (topology.configuration().type() == Configuration.Type.ExtendedTetrahedral)
-                return true;
             if (rings.containsKey(u)) {
                 tokens[u].configure(topology
                                      .configurationOf(localRank(u, from == null ? u : from.other(u))));
@@ -153,7 +149,7 @@ final class Generator {
             }
         }
         
-        return uncofiguredStereo;
+        return false;
     }
 
     /**

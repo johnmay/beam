@@ -163,9 +163,10 @@ final class Parser {
      */
     private void createTopologies(CharBuffer buffer) throws InvalidSmilesException {
         // create topologies (stereo configurations)
-        for (Entry<Integer, Configuration> e : configurations.entrySet())
+        for (Entry<Integer, Configuration> e : configurations.entrySet()) {
             addTopology(e.getKey(),
                         Topology.toExplicit(g, e.getKey(), e.getValue()));
+        }
         
         for (int v = checkDirectionalBonds.nextSetBit(0); v >= 0; v = checkDirectionalBonds.nextSetBit(v+1)) {
             int nUpV   = 0;
@@ -232,6 +233,9 @@ final class Parser {
      */
     private void addTopology(int u, Configuration c) throws
                                                      InvalidSmilesException {
+
+        if (c == Configuration.AL1 || c == Configuration.AL2)
+            g.addFlags(Graph.HAS_EXT_STRO);
 
         // stereo on ring closure - use local arrangement
         if (arrangement.containsKey(u)) {
