@@ -47,6 +47,7 @@ final class Generator {
     private final StringBuilder sb;
 
     private final int[]                           visitedAt;
+    private final int[]                           localRank;
     private       int                             nVisit;
     private final AtomToken[]                     tokens;
     private final Map<Integer, List<RingClosure>> rings;
@@ -72,6 +73,7 @@ final class Generator {
         this.rnums = rnums;
         this.sb = new StringBuilder(g.order() * 2);
         this.visitedAt = visitedAt;
+        this.localRank = new int[g.order()];
         this.tokens = new AtomToken[g.order()];
         this.rings = new HashMap<Integer, List<RingClosure>>();
 
@@ -220,7 +222,6 @@ final class Generator {
      * @return the local rank for the neighbors of the vertex u
      */
     private int[] localRank(int u, int p) {
-        int[] localRank = new int[g.order()];
         int rank = 2;
         localRank[u] = 1;
         final int d = g.degree(u);

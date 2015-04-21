@@ -218,7 +218,7 @@ public class GraphTest {
     @Test public void addUnknownTopology() {
         Topology t = Topology.unknown();
         Graph g = new Graph(5);
-        assertFalse(g.addTopology(t));
+        g.addTopology(t);
     }
 
     @Test public void defaultTopology() {
