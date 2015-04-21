@@ -222,7 +222,8 @@ public final class GraphBuilder {
      * @param t the topology to add
      */
     void topology(int u, Topology t) {
-        if (g.addTopology(t))
+        g.addTopology(t);
+        if (t != Topology.unknown())
             g.addFlags(Graph.HAS_ATM_STRO);
     }
 

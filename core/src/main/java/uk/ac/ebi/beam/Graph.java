@@ -70,7 +70,7 @@ public final class Graph {
     private Edge[][] edges;
 
     /** Topologies indexed by the atom which they describe. */
-    private Map<Integer, Topology> topologies;
+    private Topology topologies[];
 
     /** Vertex and edge counts. */
     private int order, size;
@@ -92,7 +92,7 @@ public final class Graph {
         this.atoms = new Atom[expSize];
         this.degrees = new int[expSize];
         this.valences = new int[expSize];
-        this.topologies = new HashMap<Integer, Topology>(10);
+        this.topologies = new Topology[expSize];
     }
 
     /**
@@ -108,7 +108,7 @@ public final class Graph {
         this.valences   = Arrays.copyOf(org.valences, order);
         this.degrees    = new int[order];
         this.edges      = new Edge[order][];
-        this.topologies = new HashMap<>(org.topologies);
+        this.topologies = Arrays.copyOf(org.topologies, org.topologies.length);
         
         for (int u = 0; u < order; u++) {
             final int deg = org.degrees[u];
@@ -139,10 +139,11 @@ public final class Graph {
     /** Resize the graph if we are at maximum capacity. */
     private void ensureCapacity() {
         if (order >= atoms.length) {
-            atoms = Arrays.copyOf(atoms, order * 2);
-            valences = Arrays.copyOf(valences, order * 2);
-            degrees = Arrays.copyOf(degrees, order * 2);
-            edges    = Arrays.copyOf(edges, order * 2);
+            atoms      = Arrays.copyOf(atoms, order * 2);
+            valences   = Arrays.copyOf(valences, order * 2);
+            degrees    = Arrays.copyOf(degrees, order * 2);
+            edges      = Arrays.copyOf(edges, order * 2);
+            topologies = Arrays.copyOf(topologies, order * 2);
             for (int i = order; i < edges.length; i++)
                 edges[i] = new Edge[4];
         }
@@ -334,14 +335,13 @@ public final class Graph {
      * @param t topology
      * @return whether the topology replaced an existing configuration
      */
-    boolean addTopology(Topology t) {
-        if (t == Topology.unknown())
-            return false;
-        return topologies.put(t.atom(), t) != null;
+    void addTopology(Topology t) {
+        if (t != Topology.unknown())
+            topologies[t.atom()] = t;
     }
 
-    boolean clearTopology(int v) {
-        return topologies.remove(v) != null;
+    void clearTopology(int v) {
+        topologies[v] = null;
     }
 
     /**
@@ -352,8 +352,9 @@ public final class Graph {
      * @return the topology of vertex 'u'
      */
     Topology topologyOf(int u) {
-        Topology t = topologies.get(u);
-        return t != null ? t : Topology.unknown();
+        if (topologies[u] == null)
+            return Topology.unknown();
+        return topologies[u];
     }
 
     /**
@@ -622,7 +623,7 @@ public final class Graph {
     }
 
     void clear() {
-        topologies.clear();
+        Arrays.fill(topologies, Topology.unknown());
         for (int i = 0; i < order; i++) {
             atoms[i] = null;
             degrees[i] = 0;
