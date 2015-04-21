@@ -47,7 +47,7 @@ final class Generator {
     private final StringBuilder sb;
 
     private final int[]                           visitedAt;
-    private final int[]                           localRank;
+    private final int[]                           tmp;
     private       int                             nVisit;
     private final AtomToken[]                     tokens;
     private final Map<Integer, List<RingClosure>> rings;
@@ -73,7 +73,7 @@ final class Generator {
         this.rnums = rnums;
         this.sb = new StringBuilder(g.order() * 2);
         this.visitedAt = visitedAt;
-        this.localRank = new int[g.order()];
+        this.tmp = new int[4];
         this.tokens = new AtomToken[g.order()];
         this.rings = new HashMap<Integer, List<RingClosure>>();
 
@@ -130,22 +130,63 @@ final class Generator {
                 cyclicEdge(v, u, e.bond(v));
             }
         }
-        
-        if (d<3) return;
 
+        prepareStereochemistry(u, from);
+    }
+
+    private void prepareStereochemistry(int u, Edge from) {
         final Topology topology = g.topologyOf(u);
         if (topology != Topology.unknown()) {
-            if (rings.containsKey(u)) {
-                tokens[u].configure(topology
-                                            .configurationOf(localRank(u, from == null ? u : from.other(u))));
+            List<RingClosure> closures = rings.get(u);
+            if (closures != null) {
+                
+                // most of time we only have a single closure, we can
+                // handle this easily by moving the ranks of the prev
+                // and curr atom back and using the curr rank for the
+                // ring
+                if (closures.size() == 1) {
+                    int prev = from != null ? from.other(u) : u;
+                    int ring = closures.get(0).other(u);
+                    int uAt = visitedAt[u]; 
+                    int rAt = visitedAt[ring]; 
+                    visitedAt[prev]--;
+                    visitedAt[u]--;
+                    visitedAt[ring] = uAt;
+                    tokens[u].configure(topology.configurationOf(visitedAt));
+                    // restore
+                    visitedAt[prev]++;
+                    visitedAt[u]++;
+                    visitedAt[ring] = rAt;
+                } else {
+                    // more complicated, we first move the other two atoms out
+                    // the way then store and change the current ranks of the 
+                    // ring atoms. We restore all visitedAt once we exit
+                    assert closures.size() <= 4; 
+                    int prev = from != null ? from.other(u) : u;
+                    
+                    visitedAt[prev] -= 4;
+                    visitedAt[u] -= 4;
+                    int rank = visitedAt[u]; 
+                    for (int i = 0; i < closures.size(); ++i) {
+                        final int v = closures.get(i).other(u);
+                        tmp[i] = visitedAt[v];
+                        visitedAt[v] = ++rank;
+                    }
+                    
+                    tokens[u].configure(topology.configurationOf(visitedAt));
+                    // restore
+                    for (int i = 0; i < closures.size(); ++i)
+                        visitedAt[closures.get(i).other(u)] = tmp[i];
+                    visitedAt[prev] += 4;
+                    visitedAt[u] += 4;
+                }
             }
             else {
-                tokens[u].configure(topology
-                                            .configurationOf(visitedAt));
+                tokens[u].configure(topology.configurationOf(visitedAt));
             }
         }
     }
-    
+
     /**
      * Second traversal writes the bonds and atoms to the SMILES string.
      *
@@ -200,30 +241,7 @@ final class Generator {
         }
     }
 
-    /**
-     * Local ordering around a vertex, required for stereo-configurations which
-     * have ring closures. Here we need to consider the order of the ring bonds
-     * in the stereo specification.
-     *
-     * @param u a vertex
-     * @param p the vertex we came from (parent)
-     * @return the local rank for the neighbors of the vertex u
-     */
-    private int[] localRank(int u, int p) {
-        int rank = 2;
-        localRank[u] = 1;
-        final int d = g.degree(u);
-        for (int j=0; j<d; ++j) {
-            final Edge e = g.edgeAt(u,j);
-            localRank[e.other(u)] = g.degree(u) + rank++;
-        }
-        localRank[p] = 0;
-        rank = 2;
-        for (RingClosure rc : rings.get(u)) {
-            localRank[rc.other(u)] = rank++;
-        }
-        return localRank;
-    }
+   
 
     /**
      * Indicate that the edge connecting the vertices u and v forms a ring.
