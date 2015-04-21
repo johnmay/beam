@@ -145,13 +145,11 @@ final class Generator {
                 return true;
             if (rings.containsKey(u)) {
                 tokens[u].configure(topology
-                                     .orderBy(localRank(u, from == null ? u : from.other(u)))
-                                     .configuration());
+                                     .configurationOf(localRank(u, from == null ? u : from.other(u))));
             }
             else {
                 tokens[u].configure(topology
-                                     .orderBy(visitedAt)
-                                     .configuration());
+                                     .configurationOf(visitedAt));
             }
         }
         

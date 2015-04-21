@@ -73,6 +73,16 @@ abstract class Topology {
     abstract Configuration configuration();
 
     /**
+     * The configuration of the topology when it's carriers have the specified
+     * ranks.
+     *
+     * @return configuration for this topology
+     */
+    Configuration configurationOf(int[] rank) {
+        return orderBy(rank).configuration();
+    }
+
+    /**
      * What type of configuration is defined by this topology (e.g. Tetrahedral,
      * DoubleBond etc).
      *
@@ -121,6 +131,22 @@ abstract class Topology {
                     count++;
             }
         }
+        // odd parity = -1, even parity = 1
+        return (count & 0x1) == 1 ? -1 : 1;
+    }
+
+    // help the compiler, array is a fixed size!
+    static int parity4(int[] vs, int[] rank) {
+        // count elements which are out of order and by how much
+        int count = 0;
+        for (int i = 0; i < 4; i++) {
+            final int prev = rank[vs[i]];
+            for (int j = i + 1; j < 4; j++) {
+                if (prev > rank[vs[j]])
+                    count++;
+            }
+        }
+            
         // odd parity = -1, even parity = 1
         return (count & 0x1) == 1 ? -1 : 1;
     }
@@ -396,7 +422,7 @@ abstract class Topology {
         @Override Topology orderBy(int[] rank) {
             return new Tetrahedral(u,
                                    sort(vs, rank),
-                                   p * parity(vs, rank));
+                                   p * parity4(vs, rank));
         }
 
         /** @inheritDoc */
@@ -409,6 +435,10 @@ abstract class Topology {
 
         @Override void copy(int[] dest) {
             System.arraycopy(vs, 0, dest, 0, 4);
+        }
+
+        @Override Configuration configurationOf(int[] rank) {
+            return p * parity4(vs, rank) < 0 ? TH1 : TH2;
         }
 
         public String toString() {
@@ -444,7 +474,7 @@ abstract class Topology {
         @Override Topology orderBy(int[] rank) {
             return new ExtendedTetrahedral(u,
                                            sort(vs, rank),
-                                           p * parity(vs, rank));
+                                           p * parity4(vs, rank));
         }
 
         /** @inheritDoc */
