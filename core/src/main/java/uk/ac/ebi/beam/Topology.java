@@ -97,6 +97,8 @@ abstract class Topology {
      * @return a new topology with it's vertices mapped
      */
     abstract Topology transform(int[] mapping);
+    
+    abstract void copy(int[] dest);
 
     /**
      * Compute the permutation parity of the vertices {@literal vs} for the
@@ -361,6 +363,9 @@ abstract class Topology {
         @Override Topology transform(int[] mapping) {
             return this;
         }
+
+        @Override void copy(int[] dest) {
+        }
     };
 
     private static final class Tetrahedral extends Topology {
@@ -402,11 +407,15 @@ abstract class Topology {
             return new Tetrahedral(mapping[u], ws, p);
         }
 
+        @Override void copy(int[] dest) {
+            System.arraycopy(vs, 0, dest, 0, 4);
+        }
+
         public String toString() {
             return u + " " + Arrays.toString(vs) + ":" + p;
         }
     }
-    
+
     private static final class ExtendedTetrahedral extends Topology {
 
         private final int   u;
@@ -444,6 +453,10 @@ abstract class Topology {
             for (int i = 0; i < vs.length; i++)
                 ws[i] = mapping[vs[i]];
             return new ExtendedTetrahedral(mapping[u], ws, p);
+        }
+
+        @Override void copy(int[] dest) {
+            System.arraycopy(vs, 0, dest, 0, 4);
         }
 
         public String toString() {
@@ -487,6 +500,10 @@ abstract class Topology {
             for (int i = 0; i < vs.length; i++)
                 ws[i] = mapping[vs[i]];
             return new Trigonal(mapping[u], ws, p);
+        }
+
+        @Override void copy(int[] dest) {
+            System.arraycopy(vs, 0, dest, 0, 3);
         }
 
         public String toString() {
