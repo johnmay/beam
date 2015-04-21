@@ -81,7 +81,7 @@ final class Generator {
         Arrays.fill(visitedAt, -1);
         for (int u = 0; u < g.order() && nVisit < g.order(); u++) {
             if (visitedAt[u] < 0)
-                prepare(u, null);
+                prepare(u, u);
         }
 
         if (g.getFlags(Graph.HAS_EXT_STRO) != 0) {
@@ -114,9 +114,9 @@ final class Generator {
      * configures topologies.
      *
      * @param u the vertex to visit
-     * @param from bond we came from
+     * @param p the atom we came from
      */
-    void prepare(int u, Edge from) {
+    void prepare(int u, int p) {
         visitedAt[u] = nVisit++;
         tokens[u] = g.atom(u).token();
         
@@ -125,16 +125,16 @@ final class Generator {
             final Edge e = g.edgeAt(u,j);
             int v = e.other(u);
             if (visitedAt[v] < 0) {
-                prepare(v, e);
-            } else if (e != from && visitedAt[v] < visitedAt[u]) {
+                prepare(v, u);
+            } else if (v != p && visitedAt[v] < visitedAt[u]) {
                 cyclicEdge(v, u, e.bond(v));
             }
         }
 
-        prepareStereochemistry(u, from);
+        prepareStereochemistry(u, p);
     }
 
-    private void prepareStereochemistry(int u, Edge from) {
+    private void prepareStereochemistry(int u, int prev) {
         final Topology topology = g.topologyOf(u);
         if (topology != Topology.unknown()) {
             List<RingClosure> closures = rings.get(u);
@@ -145,7 +145,6 @@ final class Generator {
                 // and curr atom back and using the curr rank for the
                 // ring
                 if (closures.size() == 1) {
-                    int prev = from != null ? from.other(u) : u;
                     int ring = closures.get(0).other(u);
                     int uAt = visitedAt[u]; 
                     int rAt = visitedAt[ring]; 
@@ -162,7 +161,6 @@ final class Generator {
                     // the way then store and change the current ranks of the 
                     // ring atoms. We restore all visitedAt once we exit
                     assert closures.size() <= 4; 
-                    int prev = from != null ? from.other(u) : u;
                     
                     visitedAt[prev] -= 4;
                     visitedAt[u] -= 4;
