@@ -1,11 +1,6 @@
 package uk.ac.ebi.beam;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Utility to localise aromatic bonds.
@@ -285,7 +280,7 @@ final class Localise {
 
         final Matching m = Matching.empty(g);
         int n = subset.cardinality();
-        int nMatched = ArbitraryMatching.initial(g, m, subset);
+        int nMatched = ArbitraryMatching.dfs(g, m, subset);
         if (nMatched < n) {
             if (n - nMatched == 2)
                 nMatched = ArbitraryMatching.augmentOnce(g, m, nMatched, subset);
