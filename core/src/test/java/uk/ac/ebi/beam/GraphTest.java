@@ -210,7 +210,7 @@ public class GraphTest {
     @Test public void addTopology() {
         Topology t = mock(Topology.class);
         when(t.atom()).thenReturn(5);
-        Graph g = new Graph(5);
+        Graph g = new Graph(6);
         g.addTopology(t);
         assertThat(g.topologyOf(5), is(t));
     }
@@ -223,7 +223,7 @@ public class GraphTest {
 
     @Test public void defaultTopology() {
         Graph g = new Graph(5);
-        assertThat(g.topologyOf(5), is(Topology.unknown()));
+        assertThat(g.topologyOf(4), is(Topology.unknown()));
     }
 
     @Test public void clear() {
@@ -422,8 +422,7 @@ public class GraphTest {
         assertThat(g.toSmiles(), is("C1=CC2=CC=CC2=C1"));
         assertThat(h.toSmiles(), is("C=1C=C2C=CC=C2C1"));
         // but once resonate we get the same SMILES 
-        assertThat(g.resonate().toSmiles(), is("C1=CC2=CC=CC2=C1"));
-        assertThat(h.resonate().toSmiles(), is("C1=CC2=CC=CC2=C1"));
+        assertThat(g.resonate().toSmiles(), is(h.resonate().toSmiles()));
     }
 
 
@@ -435,8 +434,7 @@ public class GraphTest {
         assertThat(g.toSmiles(), is("O=N1=CC=CC=C1"));
         assertThat(h.toSmiles(), is("O=N=1C=CC=CC1"));
         // but once resonate we get the same SMILES 
-        assertThat(g.resonate().toSmiles(), is("O=N1=CC=CC=C1"));
-        assertThat(h.resonate().toSmiles(), is("O=N1=CC=CC=C1"));    
+        assertThat(g.resonate().toSmiles(), is(h.resonate().toSmiles()));
     }
     
     // ensures we don't loose the allene
