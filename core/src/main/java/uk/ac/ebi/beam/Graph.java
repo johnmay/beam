@@ -340,6 +340,10 @@ public final class Graph {
         return topologies.put(t.atom(), t) != null;
     }
 
+    boolean clearTopology(int v) {
+        return topologies.remove(v) != null;
+    }
+
     /**
      * Access the topology of the vertex 'u'. If no topology is defined then
      * {@link Topology#unknown()} is returned.
@@ -551,7 +555,7 @@ public final class Graph {
             if (d > 4) cpy.edges[v] = new Edge[d];
             cpy.atoms[v]    = atoms[u];
             cpy.valences[v] = valences[u];
-            cpy.addTopology(topologyOf(u).orderBy(p).transform(p));
+            cpy.addTopology(topologyOf(u).transform(p));
             while (--d >= 0) {
                 final Edge e = edgeAt(u, d);
 
