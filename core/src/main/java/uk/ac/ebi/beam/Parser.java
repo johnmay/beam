@@ -234,9 +234,6 @@ final class Parser {
     private void addTopology(int u, Configuration c) throws
                                                      InvalidSmilesException {
 
-        if (c == Configuration.AL1 || c == Configuration.AL2)
-            g.addFlags(Graph.HAS_EXT_STRO);
-
         // stereo on ring closure - use local arrangement
         if (arrangement.containsKey(u)) {
             int[] vs = arrangement.get(u).toArray();
@@ -262,6 +259,7 @@ final class Parser {
             } else if (c.type() == Configuration.Type.DoubleBond) {
                 us = insertDbImplicitRef(u, us); // XXX: temp fix
             } else if (c.type() == Configuration.Type.ExtendedTetrahedral) {
+                g.addFlags(Graph.HAS_EXT_STRO);
                 // Extended tetrahedral is a little more complicated, note
                 // following presumes the end atoms are not in ring closures
                 int v = es.get(0).other(u);

@@ -79,18 +79,16 @@ final class Generator {
 
         // prepare ring closures and topologies
         Arrays.fill(visitedAt, -1);
-        boolean uncofiguredStereo = false;
         for (int u = 0; u < g.order() && nVisit < g.order(); u++) {
             if (visitedAt[u] < 0)
-                uncofiguredStereo = prepare(u, null) || uncofiguredStereo;
+                prepare(u, null);
         }
 
         if (g.getFlags(Graph.HAS_EXT_STRO) != 0) {
             for (int u = 0; u < g.order(); u++) {
                 if (g.topologyOf(u).configuration().type() == Configuration.Type.ExtendedTetrahedral) {
                     tokens[u].configure(g.topologyOf(u)
-                                         .orderBy(visitedAt)
-                                         .configuration());
+                                         .configurationOf(visitedAt));
                 }
             }
         }
@@ -118,40 +116,36 @@ final class Generator {
      * @param u the vertex to visit
      * @param from bond we came from
      */
-    boolean prepare(int u, Edge from) {
+    void prepare(int u, Edge from) {
         visitedAt[u] = nVisit++;
         tokens[u] = g.atom(u).token();
         
         final int d = g.degree(u);
         for (int j=0; j<d; ++j) {
             final Edge e = g.edgeAt(u,j);
-            if (e == from) continue;
             int v = e.other(u);
             if (visitedAt[v] < 0) {
                 prepare(v, e);
-            } else if (visitedAt[v] < visitedAt[u]) {
+            } else if (e != from && visitedAt[v] < visitedAt[u]) {
                 cyclicEdge(v, u, e.bond(v));
             }
         }
+        
+        if (d<3) return;
 
-        // Configure the topology using the traversal order
-        // extended tetrahedral (@AL1/@AL2) doesn't have all neighbors visited 
-        // until the end
-        Topology topology = g.topologyOf(u);
+        final Topology topology = g.topologyOf(u);
         if (topology != Topology.unknown()) {
             if (rings.containsKey(u)) {
                 tokens[u].configure(topology
-                                     .configurationOf(localRank(u, from == null ? u : from.other(u))));
+                                            .configurationOf(localRank(u, from == null ? u : from.other(u))));
             }
             else {
                 tokens[u].configure(topology
-                                     .configurationOf(visitedAt));
+                                            .configurationOf(visitedAt));
             }
         }
-        
-        return false;
     }
-
+    
     /**
      * Second traversal writes the bonds and atoms to the SMILES string.
      *

@@ -53,12 +53,12 @@ public final class Graph {
      */
     public static final int HAS_AROM     = 0x1;
     
-    public static final int HAS_ATM_STRO = 0x3;
+    public static final int HAS_ATM_STRO = 0x2;
     
-    // extended stereo accross multiple atoms
-    public static final int HAS_EXT_STRO = 0x5;
+    // extended stereo (across multiple atoms) e.g. @AL1/@Al2
+    public static final int HAS_EXT_STRO = 0x4;
 
-    public static final int HAS_BND_STRO = 0x7;
+    public static final int HAS_BND_STRO = 0x8;
 
     public static final int HAS_STRO = HAS_ATM_STRO |  HAS_EXT_STRO | HAS_BND_STRO;
 
