@@ -80,6 +80,9 @@ public final class Graph {
 
     /** Molecule flags. */
     private int flags = 0;
+    
+    /** Molecule title. */
+    private String title;
 
     /**
      * Create a new chemical graph with expected size.
@@ -649,6 +652,14 @@ public final class Graph {
 
     void setFlags(final int flags) {
         this.flags = flags;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    
+    public String getTitle() {
+        return title;
     }
 
     /**

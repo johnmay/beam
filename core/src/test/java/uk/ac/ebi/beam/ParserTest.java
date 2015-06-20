@@ -212,6 +212,24 @@ public class ParserTest {
         Parser.parse("C/C=C/C\\C=C/C");
     }
     
+    @Test
+    public void parseTitleSpace() throws Exception {
+        Graph g = Parser.parse("CCO ethanol");
+        assertThat(g.getTitle(), is("ethanol"));
+    }
+
+    @Test
+    public void parseTitleTab() throws Exception {
+        Graph g = Parser.parse("CCO\tethanol");
+        assertThat(g.getTitle(), is("ethanol"));
+    }
+
+    @Test
+    public void parseTitleTabNewline() throws Exception {
+        Graph g = Parser.parse("CCO\tethanol\n");
+        assertThat(g.getTitle(), is("ethanol"));
+    }
+    
     // this one has been mistreated... ignore for now
     @Ignore
     @Test(expected = InvalidSmilesException.class)

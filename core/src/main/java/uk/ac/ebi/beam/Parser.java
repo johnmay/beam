@@ -91,7 +91,7 @@ final class Parser {
     private final boolean strict;
 
     private BitSet checkDirectionalBonds = new BitSet();
-    
+
     /**
      * Create a new parser for the specified buffer.
      *
@@ -167,13 +167,13 @@ final class Parser {
             addTopology(e.getKey(),
                         Topology.toExplicit(g, e.getKey(), e.getValue()));
         }
-        
-        for (int v = checkDirectionalBonds.nextSetBit(0); v >= 0; v = checkDirectionalBonds.nextSetBit(v+1)) {
-            int nUpV   = 0;
+
+        for (int v = checkDirectionalBonds.nextSetBit(0); v >= 0; v = checkDirectionalBonds.nextSetBit(v + 1)) {
+            int nUpV = 0;
             int nDownV = 0;
-            int nUpW   = 0;
+            int nUpW = 0;
             int nDownW = 0;
-            int w      = -1;
+            int w = -1;
 
             {
                 final int d = g.degree(v);
@@ -188,10 +188,10 @@ final class Parser {
                         w = e.other(v);
                 }
             }
-            
+
             if (w < 0)
                 continue;
-            
+
             checkDirectionalBonds.clear(w);
 
             {
@@ -209,7 +209,7 @@ final class Parser {
             if (nUpV + nDownV == 0 || nUpW + nDownW == 0) {
                 continue;
             }
-            
+
             if (nUpV > 1)
                 throw new InvalidSmilesException("Multiple directional bonds on atom " + v, buffer);
             if (nDownV > 1)
@@ -256,9 +256,11 @@ final class Parser {
 
             if (c.type() == Configuration.Type.Tetrahedral) {
                 us = insertThImplicitRef(u, us); // XXX: temp fix
-            } else if (c.type() == Configuration.Type.DoubleBond) {
+            }
+            else if (c.type() == Configuration.Type.DoubleBond) {
                 us = insertDbImplicitRef(u, us); // XXX: temp fix
-            } else if (c.type() == Configuration.Type.ExtendedTetrahedral) {
+            }
+            else if (c.type() == Configuration.Type.ExtendedTetrahedral) {
                 g.addFlags(Graph.HAS_EXT_STRO);
                 // Extended tetrahedral is a little more complicated, note
                 // following presumes the end atoms are not in ring closures
@@ -272,7 +274,7 @@ final class Parser {
                     int x = e.other(v);
                     if (e.bond().order() == 1) us[i++] = x;
                 }
-                
+
                 i = 2;
                 for (Edge e : ws) {
                     int x = e.other(w);
@@ -281,7 +283,7 @@ final class Parser {
 
                 if (us[0] < 0 || us[2] < 0)
                     return;
-                
+
                 Arrays.sort(us);
             }
 
@@ -331,7 +333,8 @@ final class Parser {
                     checkDirectionalBonds.set(v);
                 }
                 g.addEdge(new Edge(u, v, bond));
-            } else {
+            }
+            else {
                 start.add(v); // start of a new run
             }
             if (arrangement.containsKey(u))
@@ -474,7 +477,7 @@ final class Parser {
                 // bond/dot
                 case '-':
                     if (bond != Bond.IMPLICIT)
-                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);    
+                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.SINGLE;
                     break;
                 case '=':
@@ -534,6 +537,17 @@ final class Parser {
                 // termination
                 case '\t':
                 case ' ':
+
+                    // String suffix is title 
+                    StringBuilder sb = new StringBuilder();
+                    while (buffer.hasRemaining()) {
+                        c = buffer.get();
+                        if (c == '\n' || c == '\r')
+                            break;
+                        sb.append(c);
+                    }
+                    g.setTitle(sb.toString());
+
                 case '\n':
                 case '\r':
                     return;
@@ -564,7 +578,7 @@ final class Parser {
         int start = buffer.position;
 
         boolean arbitraryLabel = false;
-        
+
         if (!buffer.hasRemaining())
             throw new InvalidSmilesException("Unclosed bracket atom", buffer);
 
@@ -659,7 +673,7 @@ final class Parser {
      * @param buffer a character buffer
      * @return the formal charge value, 0 if none present
      * @see <a href="http://www.opensmiles.org/opensmiles.html#charge">Charge -
-     *      OpenSMILES Specification</a>
+     * OpenSMILES Specification</a>
      */
     static int readCharge(final CharBuffer buffer) {
         return readCharge(0, buffer);
@@ -692,7 +706,7 @@ final class Parser {
      * @param buffer a character buffer
      * @return the atom class, or 0
      * @see <a href="http://www.opensmiles.org/opensmiles.html#atomclass">Atom
-     *      Class - OpenSMILES Specification</a>
+     * Class - OpenSMILES Specification</a>
      */
     static int readClass(CharBuffer buffer) throws InvalidSmilesException {
         if (buffer.getIf(':')) {
@@ -755,7 +769,7 @@ final class Parser {
         if (la == null) {
             la = new LocalArrangement();
             final int d = g.degree(u);
-            for (int j=0; j<d; ++j) {
+            for (int j = 0; j < d; ++j) {
                 final Edge e = g.edgeAt(u, j);
                 la.add(e.other(u));
             }
@@ -785,12 +799,12 @@ final class Parser {
                                              buffer);
 
         bond = decideBond(rbond.bond, bond.inverse(), buffer);
-        
+
         if (bond.directional()) {
             checkDirectionalBonds.set(u);
             checkDirectionalBonds.set(v);
         }
-        
+
         g.addEdge(new Edge(u, v, bond));
         bond = Bond.IMPLICIT;
         // adjust the arrangement replacing where this ring number was openned
