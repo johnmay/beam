@@ -250,7 +250,9 @@ public final class GraphBuilder {
                 continue;
             checkGeometricBuilder(builder); // check required vertices are adjacent
 
-            int u = builder.u, v = builder.v, x = builder.x, y = builder.y;
+            final int u = builder.u, v = builder.v, x = builder.x, y = builder.y;
+
+            if (x == y) continue;
            
             fix(g, u, v, adjToDb);
             fix(g, v, u, adjToDb);
