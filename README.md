@@ -5,7 +5,7 @@ Beam - _to express by means of a radiant smile_
 Beam is a free toolkit dedicated to parsing and generating Simplified
 molecular-input line-entry system - [SMILES&trade;](http://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system)
 line notations. The primary focus of the library is to elegantly handle the
-SMILES&trade; syntax.
+SMILES&trade; syntax and as fast as possible.
 
 ## Beaming
 
