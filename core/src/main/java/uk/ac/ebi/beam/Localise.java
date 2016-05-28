@@ -166,6 +166,8 @@ final class Localise {
         // no pi bonds does the degree and charge indicate that
         // there can be no other pi bonds
         switch (a.element()) {
+            case Boron:
+                return (q == 0) && deg == 3;
             case Carbon:
                 return (q == 1 || q == -1) && deg == 3;
             case Silicon:

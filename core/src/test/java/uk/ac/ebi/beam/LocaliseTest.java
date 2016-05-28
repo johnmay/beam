@@ -126,6 +126,11 @@ public class LocaliseTest {
              "O=S1C=CC=C1");
     }
 
+    @Test public void trivalentBoronNoPiBonds() throws Exception {
+        test("b1(C)ob(C)ob1(C)",
+             "B1(C)OB(C)OB1C");
+    }
+
     @Test public void tellurophene() throws Exception {
         test("[Te]1cccc1", "[Te]1C=CC=C1");
         test("[te]1cccc1", "[Te]1C=CC=C1");
