@@ -188,8 +188,12 @@ public enum Element {
     Darmstadtium(110, "Ds"),
     Roentgenium(111, "Rg"),
     Copernicium(112, "Cn"),
+    Nihonium(113, "Nh"),
     Flerovium(114, "Fl"),
+    Moscovium(115, "Mc"),
     Livermorium(116, "Lv"),
+    Tennessine(117, "Ts"),
+    Oganesson(118, "Og"),
 
     Lanthanum(57, "La"),
     Cerium(58, "Ce"),
