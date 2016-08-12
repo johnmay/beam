@@ -130,7 +130,7 @@ public final class AtomBuilder {
             throw new NullPointerException("no element provided");
         if (e == Element.Unknown)
             return new AtomBuilder(e, false);
-        if (!e.aromatic(Element.AromaticSpecification.Daylight))
+        if (!e.aromatic(Element.AromaticSpecification.General))
             throw new IllegalArgumentException("The element '" + e + "' cannot be aromatic by the Daylight specification.");
         return new AtomBuilder(e, true);
     }
