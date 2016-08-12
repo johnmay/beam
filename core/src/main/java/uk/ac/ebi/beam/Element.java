@@ -242,7 +242,7 @@ public enum Element {
     /** Look up of elements by symbol */
     private static final Map<String, Element> elementMap = new HashMap<String, Element>();
 
-    private static final Element[] elements = new Element[117];
+    private static final Element[] elements = new Element[119];
 
     /** Provide verification of valence/charge values. */
     private ElementCheck defaults = ElementCheck.NO_CHECK;
