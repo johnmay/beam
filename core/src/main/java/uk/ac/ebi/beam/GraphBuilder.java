@@ -241,7 +241,18 @@ public final class GraphBuilder {
         
         // store the vertices which are adjacent to pi bonds with a config
         BitSet adjToDb = new BitSet();
-       
+
+        // clear existing directional labels, if build is called multiple times
+        // this can cause problems
+        if (g.getFlags(Graph.HAS_BND_STRO) != 0) {
+            for (Edge edge : g.edges()) {
+                if (edge.bond().directional()) {
+                    edge.bond(Bond.IMPLICIT);
+                }
+            }
+        }
+
+
         for (GeometricBuilder builder : builders) {
             g.addFlags(Graph.HAS_BND_STRO);
             
@@ -297,7 +308,6 @@ public final class GraphBuilder {
             adjToDb.set(v);
                 
         }
-        builders.clear();
     }
 
     private void fix(Graph g, int u, int p, BitSet adjToDb) {
