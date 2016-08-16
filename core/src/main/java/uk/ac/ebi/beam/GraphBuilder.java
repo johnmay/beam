@@ -34,7 +34,9 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static uk.ac.ebi.beam.Configuration.DoubleBond.TOGETHER;
 
@@ -238,9 +240,14 @@ public final class GraphBuilder {
     }
     
     private void assignDirectionalLabels() {
+
+        if (builders.isEmpty())
+            return;
         
         // store the vertices which are adjacent to pi bonds with a config
-        BitSet adjToDb = new BitSet();
+        BitSet    pibonded    = new BitSet();
+        BitSet    unspecified = new BitSet();
+        Set<Edge> unspecEdges = new HashSet<>();
 
         // clear existing directional labels, if build is called multiple times
         // this can cause problems
@@ -252,8 +259,20 @@ public final class GraphBuilder {
             }
         }
 
+        for (Edge e : g.edges()) {
+            final int u = e.either();
+            final int v = e.other(u);
+            if (e.bond().order() == 2 && g.degree(u) >= 2 && g.degree(v) >= 2) {
+                unspecified.set(u);
+                unspecified.set(v);
+                pibonded.set(u);
+                pibonded.set(v);
+                unspecEdges.add(e);
+            }
+        }
 
         for (GeometricBuilder builder : builders) {
+
             g.addFlags(Graph.HAS_BND_STRO);
             
             // unspecified only used for getting not setting configuration
@@ -261,33 +280,37 @@ public final class GraphBuilder {
                 continue;
             checkGeometricBuilder(builder); // check required vertices are adjacent
 
-            final int u = builder.u, v = builder.v, x = builder.x, y = builder.y;
+            int u = builder.u, v = builder.v, x = builder.x, y = builder.y;
 
             if (x == y) continue;
-           
-            fix(g, u, v, adjToDb);
-            fix(g, v, u, adjToDb);
-            
-            Bond first  = firstDirectionalLabel(u, x, adjToDb);
+
+            unspecEdges.remove(g.edge(u, v));
+            unspecified.clear(u);
+            unspecified.clear(v);
+
+            fix(g, u, v, pibonded);
+            fix(g, v, u, pibonded);
+
+            Bond first  = firstDirectionalLabel(u, x, pibonded);
             Bond second = builder.c == TOGETHER ? first
                                                 : first.inverse();
 
             // check if the second label would cause a conflict
-            if (checkDirectionalAssignment(second, v, y, adjToDb)) {
+            if (checkDirectionalAssignment(second, v, y, pibonded)) {
                 // okay to assign the labels as they are
                 g.replace(g.edge(u, x), new Edge(u, x, first));
                 g.replace(g.edge(v, y), new Edge(v, y, second));
             }
             // there will be a conflict - check if we invert the first one...
-            else if (checkDirectionalAssignment(first.inverse(), u, x, adjToDb)) {
+            else if (checkDirectionalAssignment(first.inverse(), u, x, pibonded)) {
                 g.replace(g.edge(u, x), new Edge(u, x, (first = first.inverse())));
                 g.replace(g.edge(v, y), new Edge(v, y, (second = second.inverse())));
             } else {                                   
                 BitSet visited = new BitSet();
                 visited.set(v);
-                invertExistingDirectionalLabels(adjToDb, visited, v, u);
-                if (!checkDirectionalAssignment(first, u, x, adjToDb) ||
-                        !checkDirectionalAssignment(second, v, y, adjToDb))
+                invertExistingDirectionalLabels(pibonded, visited, v, u);
+                if (!checkDirectionalAssignment(first, u, x, pibonded) ||
+                        !checkDirectionalAssignment(second, v, y, pibonded))
                     throw new IllegalArgumentException("cannot assign geometric configuration");
                 g.replace(g.edge(u, x), new Edge(u, x, first));
                 g.replace(g.edge(v, y), new Edge(v, y, second));
@@ -302,12 +325,52 @@ public final class GraphBuilder {
                 if (e.bond() != Bond.DOUBLE && !e.bond().directional()) {
                     e.bond(e.either() == v ? second.inverse() : second);
                 }
-        
-
-            adjToDb.set(u);
-            adjToDb.set(v);
-                
         }
+
+        // unspecified pibonds should "not" have a configuration, if they
+        // do we try to eliminate it
+        for (Edge unspecEdge : unspecEdges) {
+            final int u = unspecEdge.either();
+            final int v = unspecEdge.other(u);
+            // no problem if one side isn't defined
+            if (!hasDirectional(g, u) || !hasDirectional(g, v))
+                continue;
+            for (Edge e : g.edges(u))
+                if (isRedundantDirectionalEdge(g, e, unspecified))
+                    e.bond(Bond.IMPLICIT);
+            if (!hasDirectional(g, u))
+                continue;
+            for (Edge e : g.edges(v))
+                if (isRedundantDirectionalEdge(g, e, unspecified))
+                    e.bond(Bond.IMPLICIT);
+            // if (hasDirectional(g, v))
+            // could generate warning!
+        }
+    }
+
+    private boolean hasDirectional(Graph g, int v) {
+        for (Edge e : g.edges(v)) {
+            if (e.bond().directional())
+                return true;
+        }
+        return false;
+    }
+
+    private boolean isRedundantDirectionalEdge(Graph g, Edge edge, BitSet unspecified) {
+        if (!edge.bond().directional())
+            return false;
+        int u = edge.either();
+        int v = edge.other(u);
+        if (!unspecified.get(u)) {
+            for (Edge f : g.edges(u))
+                if (f.bond().directional() && edge != f)
+                    return true;
+        } else if (!unspecified.get(v)) {
+            for (Edge f : g.edges(v))
+                if (f.bond().directional() && edge != f)
+                    return true;
+        }
+        return false;
     }
 
     private void fix(Graph g, int u, int p, BitSet adjToDb) {
