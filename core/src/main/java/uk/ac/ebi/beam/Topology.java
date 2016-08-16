@@ -334,14 +334,22 @@ abstract class Topology {
 
         // odd number of cumulated double bond systems (e.g. allene)
         else if (deg == 2) {
+
+            int nDoubleBonds = 0;
+
             // check both bonds are double
             final int d = g.degree(u);
             for (int j = 0; j < d; ++j) {
                 final Edge e = g.edgeAt(u, j);
                 if (e.bond() != Bond.DOUBLE)
-                    return Configuration.UNKNOWN;
+                    nDoubleBonds++;
             }
-            return c == ANTI_CLOCKWISE ? AL1 : AL2;
+
+            if (nDoubleBonds == 1) {
+                return c == ANTI_CLOCKWISE ? DB1 : DB2;
+            } else {
+                return c == ANTI_CLOCKWISE ? AL1 : AL2;
+            }
         }
 
         // trigonal bipyramidal

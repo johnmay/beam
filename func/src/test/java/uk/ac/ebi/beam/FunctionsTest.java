@@ -34,6 +34,12 @@ public class FunctionsTest {
                    is("F/C=C/F"));
     }
 
+    @Test public void bondBasedDBStereo2() throws Exception {
+        Graph g = Graph.fromSmiles("F[N@]=[N@@]F");
+        assertThat(Functions.bondBasedDBStereo(g).toSmiles(),
+                   is("F/N=N/F"));    }
+
+
     @Test public void ensureAlleneStereoDoesntBreakConversion() throws Exception {
         Graph g = Graph.fromSmiles("CC=[C@]=CC");
         assertThat(Functions.bondBasedDBStereo(g).toSmiles(),
