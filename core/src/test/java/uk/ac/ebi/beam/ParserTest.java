@@ -237,6 +237,11 @@ public class ParserTest {
         Parser.parse("c1c(ccc(c1)F)c2/c3n/c(c(\\c4[nH]c(/c(c/5\\nc(/c(c/6\\s\\c2\\cc6)/c7ccc(cc7)F)C=C5)/c8ccc(cc8)S(=O)(=O)[O-])cc4)/c9ccc(cc9)S(=O)(=O)[O-])/C=C3.[Na+].[Na+] CHEMBL345045");
     }
 
+    @Test(expected = InvalidSmilesException.class)
+    public void lowPercentNums() throws Exception {
+        Parser.strict("C%1CCCC%1");
+    }
+
     @Test(expected = InvalidSmilesException.class) 
     public void openBracketIsInvalid() throws Exception {
         Parser.parse("[");

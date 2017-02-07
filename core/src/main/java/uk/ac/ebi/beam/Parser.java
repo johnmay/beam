@@ -471,6 +471,8 @@ final class Parser {
                     int num = buffer.getNumber(2);
                     if (num < 0)
                         throw new InvalidSmilesException("a number (<digit>+) must follow '%':", buffer);
+                    if (strict && num < 10)
+                        throw new InvalidSmilesException("two digits must follow '%'", buffer);
                     ring(num, buffer);
                     break;
 
