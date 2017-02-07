@@ -46,7 +46,11 @@ final class Localise {
                 if (v < u) {
                     switch (e.bond()) {
                         case SINGLE:
-                            localised.addEdge(Bond.IMPLICIT.edge(u, v));
+                            if (aromatic.get(u) && aromatic.get(v)) {
+                                localised.addEdge(Bond.SINGLE.edge(u, v));
+                            } else {
+                                localised.addEdge(Bond.IMPLICIT.edge(u, v));
+                            }
                             break;
                         case AROMATIC:
                             if (subset.get(u) && m.other(u) == v) {
@@ -92,7 +96,11 @@ final class Localise {
                 if (v < u) {
                     switch (e.bond()) {
                         case SINGLE:
-                            e.bond(Bond.IMPLICIT);
+                            if (aromatic.get(u) && aromatic.get(v)) {
+                                e.bond(Bond.SINGLE);
+                            } else {
+                                e.bond(Bond.IMPLICIT);
+                            }
                             break;
                         case AROMATIC:
                             if (subset.get(u) && m.other(u) == v) {
