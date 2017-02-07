@@ -94,7 +94,7 @@ public class LocaliseTest {
 
     @Test public void biphenyl() throws Exception {
         test("c1ccccc1c1ccccc1", "C1=CC=CC=C1C2=CC=CC=C2");
-        test("c1ccccc1-c1ccccc1", "C1=CC=CC=C1C2=CC=CC=C2");
+        test("c1ccccc1-c1ccccc1", "C1=CC=CC=C1-C2=CC=CC=C2");
     }
 
     @Test public void phospho_nitro_ring() throws Exception {
@@ -190,7 +190,7 @@ public class LocaliseTest {
     @Test
     public void mixing_aromatic_and_aliphatic() throws Exception {
         test("c1=cc=cc=c1", "C1=CC=CC=C1");
-        test("c-1c-cc-cc1", "C1=CC=CC=C1");
+        test("c-1c-cc-cc1", "C-1=C-C=C-C=C1");
         test("C:1:C:C:C:C:C1", "C1CCCCC1"); // XXX: not handled inplace
     }
 
@@ -201,11 +201,11 @@ public class LocaliseTest {
         test("c1=cc=cc=c1", "C1=CC=CC=C1");
         test("c1=c:c:c:c:c1", "C1=CC=CC=C1");
         test("c1=c:c=c:c:c1", "C1=CC=CC=C1");
-        test("c1=c-c=c:c:c1", "C1=CC=CC=C1");
+        test("c1=c-c=c:c:c1", "C1=C-C=CC=C1");
     }
 
     @Test public void fluorene() throws Exception {
-        test("C1c2ccccc2-c3ccccc13", "C1C2=CC=CC=C2C3=CC=CC=C13");
+        test("C1c2ccccc2-c3ccccc13", "C1C2=CC=CC=C2-C3=CC=CC=C13");
         test("C1c2ccccc2c3ccccc13", "C1C2=CC=CC=C2C3=CC=CC=C13");
     }
 
@@ -235,7 +235,7 @@ public class LocaliseTest {
 
     @Test public void xanax() throws Exception {
         test("Cc1nnc2CN=C(c3ccccc3)c4cc(Cl)ccc4-n12",
-             "CC1=NN=C2CN=C(C3=CC=CC=C3)C4=CC(Cl)=CC=C4N12");
+             "CC1=NN=C2CN=C(C3=CC=CC=C3)C4=CC(Cl)=CC=C4-N12");
     }
 
     @Test public void phentermine() throws Exception {
