@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
@@ -477,5 +478,10 @@ public class GraphTest {
     
     @Test public void CHEMBL1215012() throws Exception {
         Graph g = Graph.fromSmiles("[Na+].[Na+].CC(C)c1c(O)c(O)c(\\C=N\\[C@H]2[C@H]3SC(C)(C)[C@@H](N3C2=O)C(=O)[O-])c4C(=O)C(=C(C)C(=O)c14)C5=C(C)C(=O)c6c(C(C)C)c(O)c(O)c(\\C=N\\[C@H]7[C@H]8SC(C)(C)[C@@H](N8C7=O)C(=O)[O-])c6C5=O CHEMBL1215012");
+    }
+
+    @Test public void nitgrogenStereochemistry() throws Exception {
+        assertThat(Graph.fromSmiles("C1C[N@@]2CC[C@H]1C2").toSmiles(),
+                   containsString("N@"));
     }
 }

@@ -308,7 +308,8 @@ abstract class Topology {
                     return Configuration.UNKNOWN;
             }
             
-            if (g.atom(u).element() == Element.Phosphorus) {
+            if (g.atom(u).element() == Element.Phosphorus ||
+                g.atom(u).element() == Element.Nitrogen) {
                 if (g.bondedValence(u) == 3 && g.implHCount(u) == 0 && g.atom(u).charge() == 0)  {
                     return c == ANTI_CLOCKWISE ? TH1 : TH2;
                 }
