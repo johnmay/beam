@@ -103,9 +103,9 @@ final class Parser {
         g = new Graph(1 + (2 * (buffer.length() / 3)));
         readSmiles(buffer);
         if (openRings > 0)
-            throw new InvalidSmilesException("Unclosed ring detected:", buffer);
+            throw new InvalidSmilesException("Unclosed ring detected, SMILES may be truncated:", buffer);
         if (stack.size() > 1)
-            throw new InvalidSmilesException("Unclosed branch detected:", buffer);
+            throw new InvalidSmilesException("Unclosed branch detected, SMILES may be truncated:", buffer);
         start.add(0); // always include first vertex as start
         if (g.getFlags(Graph.HAS_STRO) != 0) {
             createTopologies(buffer);
