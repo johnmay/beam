@@ -525,13 +525,13 @@ final class Parser {
                 // branching
                 case '(':
                     if (stack.empty())
-                        throw new InvalidSmilesException("cannot open branch - there were no previous atoms:",
+                        throw new InvalidSmilesException("Cannot open branch at this position, SMILES may be truncated:",
                                                          buffer);
                     stack.push(stack.peek());
                     break;
                 case ')':
                     if (stack.size() < 2)
-                        throw new InvalidSmilesException("closing of an unopened branch:",
+                        throw new InvalidSmilesException("Closing of an unopened branch, SMILES may be truncated:",
                                                          buffer);
                     stack.pop();
                     break;
@@ -582,14 +582,14 @@ final class Parser {
         boolean arbitraryLabel = false;
 
         if (!buffer.hasRemaining())
-            throw new InvalidSmilesException("Unclosed bracket atom", buffer);
+            throw new InvalidSmilesException("Unclosed bracket atom, SMILES may be truncated", buffer);
 
         final int isotope = buffer.getNumber();
         final boolean aromatic = buffer.next() >= 'a' && buffer.next() <= 'z';
         final Element element = Element.read(buffer);
 
         if (strict && element == null)
-            throw new InvalidSmilesException("unrecognised element symbol: ", buffer);
+            throw new InvalidSmilesException("unrecognised element symbol, SMILES may be truncated: ", buffer);
 
         if (element != null && aromatic)
             g.addFlags(Graph.HAS_AROM);

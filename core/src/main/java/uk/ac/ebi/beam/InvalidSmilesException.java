@@ -81,7 +81,7 @@ final class InvalidSmilesException extends IOException {
      * @return the invalid smiles exception with buffer information
      */
     static InvalidSmilesException invalidBracketAtom(CharBuffer buffer) {
-        return new InvalidSmilesException("Invalid bracket atom, [ <isotope>? <symbol> <chiral>? <hcount>? <charge>? <class>? ]:",
+        return new InvalidSmilesException("Invalid bracket atom, [ <isotope>? <symbol> <chiral>? <hcount>? <charge>? <class>? ], SMILES may be truncated:",
                                           buffer);
     }
 
