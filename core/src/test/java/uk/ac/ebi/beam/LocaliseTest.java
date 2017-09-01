@@ -177,6 +177,19 @@ public class LocaliseTest {
         test("[cH+]1cccccc1", "[CH+]1C=CC=CC=C1");
     }
 
+    /**
+     * Test case from Noel that should fail Kekulization
+     */
+    @Test(expected = InvalidSmilesException.class)
+    public void exocyclicCarbonFiveMemberRing() throws Exception {
+        test("c1n(=C)ccc1", "n/a");
+    }
+
+    @Test
+    public void exocyclicCarbonSixMemberRing() throws Exception {
+        test("c1cn(=C)ccc1", "C1=CN(=C)=CC=C1");
+    }
+
     @Test(expected = InvalidSmilesException.class)
     public void pyrole_invalid() throws Exception {
         test("n1cncc1", "n/a");

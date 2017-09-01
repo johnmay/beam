@@ -160,7 +160,7 @@ final class Localise {
                 Edge e = g.edgeAt(v, j);
                 if (e.bond() == Bond.DOUBLE) {
                     if (q == 0 && (a.element() == Element.Nitrogen || (a.element() == Element.Sulfur && deg > 3))
-                            && g.atom(e.other(v)).element() == Element.Oxygen)
+                            )
                         return false;
                     return true;
                 }
