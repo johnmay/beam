@@ -133,6 +133,8 @@ final class MaximumMatching {
             final int d = graph.degree(v);
             for (int j=0; j<d; ++j) {
                 final Edge e = graph.edgeAt(v, j);
+                if (e.bond() == Bond.SINGLE)
+                    continue;
                 int w = e.other(v);
 
                 if (!subset.contains(w))

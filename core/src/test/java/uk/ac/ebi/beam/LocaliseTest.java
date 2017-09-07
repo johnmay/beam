@@ -402,4 +402,12 @@ public class LocaliseTest {
                        is(g2.implHCount(i)));
     }
 
+
+    @Test public void biphenylene() throws InvalidSmilesException
+    {
+        String smi = "c1cccc2-c3ccccc3-c12";
+        assertThat(Graph.fromSmiles(smi).kekule().toSmiles(),
+                   is("C1=CC=CC=2-C3=CC=CC=C3-C12"));
+    }
+
 }
