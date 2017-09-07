@@ -385,4 +385,21 @@ public class LocaliseTest {
         assertThat(h.toSmiles(), is(localised));
     }
 
+    /**
+     * Example from Noel's analysis generate with RDKit, the hcount changes before/after
+     * kekulization. This was problematic because explicit single bonds were incorrectly
+     * present in the SMILES string. Nether the less it should cause a problem.
+     * @throws InvalidSmilesException
+     */
+    @Test public void unchangedHydrogenCount() throws InvalidSmilesException
+    {
+        String smi = "c12c3c4c5c6c7c-4c4c8c9c%10c%11c%12c%13c%14c%15c%16c%17c%18c%19c%20c(c1c1c%21c%20c%20c%22c%19c%16c%16c%22c%19c%22c%20c=%21c(c8c%22c%10c%19c%12c%14%16)C48C31CC(=N)C=C8)c-%18c1c2c5c2c3c6c(c%11c79)c%13c-3c%15C%17C12";
+        Graph  g1   = Graph.fromSmiles(smi);
+        Graph  g2   = Graph.fromSmiles(smi).kekule();
+        for (int i = 0; i < g1.order(); i++)
+            assertThat("Atom idx=" + i + " had a different hydrogen count before/after kekulization",
+                       g1.implHCount(i),
+                       is(g2.implHCount(i)));
+    }
+
 }

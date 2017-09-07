@@ -140,6 +140,9 @@ final class ArbitraryMatching {
         int d = g.degree(v);
         for (int j = 0; j < d; ++j) {
             Edge e = g.edgeAt(v, j);
+            // explicit single bond can not be augmented along!!
+            if (e.bond() == Bond.SINGLE)
+                continue;
             int w = e.other(v);
             if (unvisited.get(w)) {
                 if (w == end) {
