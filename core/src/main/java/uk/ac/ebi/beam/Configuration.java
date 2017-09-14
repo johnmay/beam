@@ -230,6 +230,10 @@ public enum Configuration {
         if (buffer.getIf('@')) {
             if (buffer.getIf('@')) {
                 return Configuration.CLOCKWISE;
+            } else if (buffer.getIf('1')) {
+                return Configuration.ANTI_CLOCKWISE;
+            } else if (buffer.getIf('2')) {
+                return Configuration.CLOCKWISE;
             } else if (buffer.getIf('T')) {
                 // TH (tetrahedral) or TB (trigonal bipyramidal)
                 if (buffer.getIf('H')) {

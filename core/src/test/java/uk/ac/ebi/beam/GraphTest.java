@@ -484,4 +484,11 @@ public class GraphTest {
         assertThat(Graph.fromSmiles("C1C[N@@]2CC[C@H]1C2").toSmiles(),
                    containsString("N@"));
     }
+
+    @Test public void implicitChiralClasses() throws Exception {
+        assertThat(Graph.fromSmiles("C1C[N@1]2CC[C@H]1C2").toSmiles(),
+                   containsString("C1C[N@]2CC[C@H]1C2"));
+        assertThat(Graph.fromSmiles("C1C[N@2]2CC[C@H]1C2").toSmiles(),
+                   containsString("C1C[N@@]2CC[C@H]1C2"));
+    }
 }
