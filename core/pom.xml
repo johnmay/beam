@@ -5,7 +5,7 @@
     <parent>
         <artifactId>beam</artifactId>
         <groupId>uk.ac.ebi.beam</groupId>
-        <version>0.9.4</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
