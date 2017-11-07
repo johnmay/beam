@@ -205,7 +205,7 @@ public final class Graph {
      * @param u a vertex
      * @return the degree of the specified vertex
      */
-    int degree(int u) {
+    public int degree(int u) {
         return degrees[u];
     }
 
@@ -302,7 +302,7 @@ public final class Graph {
         throw new IllegalArgumentException(u + ", " + v + " are not adjacent");
     }
 
-    Edge edgeAt(int u, int j) {
+    public Edge edgeAt(int u, int j) {
         return edges[u][j];
     }
 
@@ -638,11 +638,11 @@ public final class Graph {
         size = 0;
     }
 
-    int getFlags(final int mask) {
+    public int getFlags(final int mask) {
         return this.flags & mask;
     }
 
-    int getFlags() {
+    public int getFlags() {
         return this.flags;
     }
 
