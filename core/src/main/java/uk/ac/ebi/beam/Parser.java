@@ -221,6 +221,16 @@ final class Parser {
         }
     }
 
+    public List<Edge> getEdges(LocalArrangement localArrangement, int u) {
+        if (localArrangement == null)
+            return g.edges(u);
+        int[] vs = localArrangement.toArray();
+        List<Edge> edges = new ArrayList<Edge>(vs.length);
+        for (int v : vs)
+            edges.add(g.edge(u, v));
+        return edges;
+    }
+
     /**
      * Add a topology for vertex 'u' with configuration 'c'. If the atom 'u' was
      * involved in a ring closure the local arrangement is used instead of the
@@ -236,17 +246,49 @@ final class Parser {
 
         // stereo on ring closure - use local arrangement
         if (arrangement.containsKey(u)) {
-            int[] vs = arrangement.get(u).toArray();
-            List<Edge> es = new ArrayList<Edge>(vs.length);
-            for (int v : vs)
-                es.add(g.edge(u, v));
+            int[] us = arrangement.get(u).toArray();
+            List<Edge> es = getEdges(arrangement.get(u), u);
 
             if (c.type() == Configuration.Type.Tetrahedral)
-                vs = insertThImplicitRef(u, vs); // XXX: temp fix
+                us = insertThImplicitRef(u, us); // XXX: temp fix
             else if (c.type() == Configuration.Type.DoubleBond)
-                vs = insertDbImplicitRef(u, vs); // XXX: temp fix
+                us = insertDbImplicitRef(u, us); // XXX: temp fix
+            else if (c.type() == Configuration.Type.ExtendedTetrahedral) {
+                g.addFlags(Graph.HAS_EXT_STRO);
+                // Extended tetrahedral is a little more complicated, note
+                // following presumes the end atoms are not in ring closures
+                int v = es.get(0).other(u);
+                int w = es.get(1).other(u);
+                List<Edge> vs = getEdges(arrangement.get(v), v);
+                List<Edge> ws = getEdges(arrangement.get(w), w);
+                us = new int[4];
+                int i = 0;
+                for (Edge e : vs) {
+                    int x = e.other(v);
+                    if (e.bond().order() == 1) us[i++] = x;
+                }
+                if (i < 2) {
+                    if (start.contains(u)) {
+                        us[i++] = us[0];
+                        us[0] = v;
+                    } else {
+                        us[i++] = v;
+                    }
+                }
+                if (i != 2) return;
+                for (Edge e : ws) {
+                    int x = e.other(w);
+                    if (e.bond().order() == 1) us[i++] = x;
+                }
+                if (i < 4) {
+                    us[i++] = us[2];
+                    us[u] = w;
+                }
+                if (i != 4)
+                    return;
+            }
 
-            g.addTopology(Topology.create(u, vs, es, c));
+            g.addTopology(Topology.create(u, us, es, c));
         }
         else {
             int[] us = new int[g.degree(u)];
@@ -266,25 +308,31 @@ final class Parser {
                 // following presumes the end atoms are not in ring closures
                 int v = es.get(0).other(u);
                 int w = es.get(1).other(u);
-                List<Edge> vs = g.edges(v);
-                List<Edge> ws = g.edges(w);
-                us = new int[]{-1, v, -1, w};
+                List<Edge> vs = getEdges(arrangement.get(v), v);
+                List<Edge> ws = getEdges(arrangement.get(w), w);
+                us = new int[4];
                 int i = 0;
                 for (Edge e : vs) {
                     int x = e.other(v);
                     if (e.bond().order() == 1) us[i++] = x;
                 }
-
-                i = 2;
+                if (i < 2) {
+                    if (start.contains(u)) {
+                        us[i++] = us[0];
+                        us[0] = v;
+                    } else {
+                        us[i++] = v;
+                    }
+                }
+                if (i != 2) return;
+                if (ws.size() < 3)
+                    us[i++] = w;
                 for (Edge e : ws) {
                     int x = e.other(w);
                     if (e.bond().order() == 1) us[i++] = x;
                 }
-
-                if (us[0] < 0 || us[2] < 0)
+                if (i != 4)
                     return;
-
-                Arrays.sort(us);
             }
 
             g.addTopology(Topology.create(u, us, es, c));

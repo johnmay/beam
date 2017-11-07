@@ -242,6 +242,16 @@ public class ParserTest {
         Parser.strict("C%1CCCC%1");
     }
 
+    @Test public void alleneStereochemistryWithRingClosures() throws Exception {
+        Graph g = Graph.fromSmiles("CC=[C@]=C1OCCCC1");
+        Topology topology = g.topologyOf(2);
+        assertThat(topology.configuration(), is(Configuration.AL1));
+        int[] order = new int[4];
+        topology.copy(order);
+        assertThat(order, is(new int[]{0,1,8,4}));
+        System.out.println(g.toSmiles());
+    }
+
     @Test(expected = InvalidSmilesException.class) 
     public void openBracketIsInvalid() throws Exception {
         Parser.parse("[");
