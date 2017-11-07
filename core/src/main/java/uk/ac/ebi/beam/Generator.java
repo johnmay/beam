@@ -29,8 +29,10 @@
 
 package uk.ac.ebi.beam;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -87,8 +89,7 @@ final class Generator {
         if (g.getFlags(Graph.HAS_EXT_STRO) != 0) {
             for (int u = 0; u < g.order(); u++) {
                 if (g.topologyOf(u).configuration().type() == Configuration.Type.ExtendedTetrahedral) {
-                    tokens[u].configure(g.topologyOf(u)
-                                         .configurationOf(visitedAt));
+                    setAllenalStereo(g, visitedAt, u);
                 }
             }
         }
@@ -106,6 +107,50 @@ final class Generator {
                     write(u, u, Bond.IMPLICIT);
                 }
             }
+        }
+    }
+
+    private void setAllenalStereo(Graph g, int[] visitedAt, int u)
+    {
+        assert g.degree(u) == 2;
+        Edge a = g.edgeAt(u, 0);
+        Edge b = g.edgeAt(u, 1);
+        assert a.bond() == Bond.DOUBLE &&
+               b.bond() == Bond.DOUBLE;
+
+        int aAtom = a.other(u);
+        int bAtom = b.other(u);
+
+        if (rings.get(aAtom) == null && rings.get(bAtom) == null) {
+            // no rings on either end, this is simply the order we visited the
+            // atoms in
+            tokens[u].configure(g.topologyOf(u).configurationOf(visitedAt));
+        } else {
+            // hokay this case is harder... this makes me wince but BEAM v2
+            // has a much better way of handling this
+
+            // we can be clever here rollback any changes we make (see the
+            // tetrahedral handling) however since this is a very rare
+            // operation it much simpler to copy the array
+            int[] tmp = Arrays.copyOf(visitedAt, visitedAt.length);
+
+            if (visitedAt[aAtom] > visitedAt[bAtom]) {
+                int swap = aAtom;
+                aAtom = bAtom;
+                bAtom = swap;
+            }
+
+            assert rings.get(aAtom) == null || rings.get(aAtom).size() == 1;
+            assert rings.get(bAtom) == null || rings.get(bAtom).size() == 1;
+
+            if (rings.get(aAtom) != null) {
+                tmp[rings.get(aAtom).get(0).other(aAtom)] = visitedAt[aAtom];
+            }
+            if (rings.get(bAtom) != null) {
+                tmp[rings.get(bAtom).get(0).other(bAtom)] = visitedAt[bAtom];
+            }
+
+            tokens[u].configure(g.topologyOf(u).configurationOf(tmp));
         }
     }
 

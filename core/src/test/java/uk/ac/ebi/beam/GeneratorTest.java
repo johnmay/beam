@@ -294,6 +294,12 @@ public class GeneratorTest {
         }
     }
 
+    @Test public void alleneStereochemistryWithRingClosures() throws Exception {
+        Graph g = Graph.fromSmiles("CC=[C@]=C1OCCCC1");
+        Topology topology = g.topologyOf(2);
+        assertThat(g.toSmiles(), is("CC=[C@]=C1OCCCC1"));
+    }
+
     static void roundTrip(String smi) throws InvalidSmilesException {
         assertThat(Generator.generate(Parser.parse(smi)), is(smi));
     }
