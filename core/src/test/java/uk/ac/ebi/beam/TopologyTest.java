@@ -312,20 +312,41 @@ public class TopologyTest {
 
     @Test
     public void create_tb() {
-        assertThat(Topology.create(0, new int[0], Collections
-                .<Edge>emptyList(), Configuration.TB1), is(Topology.unknown()));
+        int[] vs = new int[]{1, 2, 3, 4, 5};
+        List<Edge> es = Arrays.asList(new Edge(0, 1, Bond.IMPLICIT),
+                                      new Edge(0, 2, Bond.IMPLICIT),
+                                      new Edge(0, 3, Bond.IMPLICIT),
+                                      new Edge(0, 4, Bond.IMPLICIT),
+                                      new Edge(0, 5, Bond.IMPLICIT));
+        Topology t = Topology.create(0, vs, es, Configuration.TB5);
+        assertThat(t.configuration(), is(Configuration.TB5));
+        assertThat(t.atom(), is(0));
     }
 
     @Test
     public void create_sp() {
-        assertThat(Topology.create(0, new int[0], Collections
-                .<Edge>emptyList(), Configuration.SP1), is(Topology.unknown()));
+        int[] vs = new int[]{1, 2, 3, 4};
+        List<Edge> es = Arrays.asList(new Edge(0, 1, Bond.IMPLICIT),
+                                      new Edge(0, 2, Bond.IMPLICIT),
+                                      new Edge(0, 3, Bond.IMPLICIT),
+                                      new Edge(0, 4, Bond.IMPLICIT));
+        Topology t = Topology.create(0, vs, es, Configuration.SP1);
+        assertThat(t.configuration(), is(Configuration.SP1));
+        assertThat(t.atom(), is(0));
     }
 
     @Test
     public void create_oh() {
-        assertThat(Topology.create(0, new int[0], Collections
-                .<Edge>emptyList(), Configuration.OH1), is(Topology.unknown()));
+        int[] vs = new int[]{1, 2, 3, 4, 5, 6};
+        List<Edge> es = Arrays.asList(new Edge(0, 1, Bond.IMPLICIT),
+                                      new Edge(0, 2, Bond.IMPLICIT),
+                                      new Edge(0, 3, Bond.IMPLICIT),
+                                      new Edge(0, 4, Bond.IMPLICIT),
+                                      new Edge(0, 5, Bond.IMPLICIT),
+                                      new Edge(0, 6, Bond.IMPLICIT));
+        Topology t = Topology.create(0, vs, es, Configuration.OH1);
+        assertThat(t.configuration(), is(Configuration.OH1));
+        assertThat(t.atom(), is(0));
     }
 
     @Test(expected = IllegalArgumentException.class)

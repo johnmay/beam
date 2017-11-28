@@ -491,4 +491,49 @@ public class GraphTest {
         assertThat(Graph.fromSmiles("C1C[N@2]2CC[C@H]1C2").toSmiles(),
                    containsString("C1C[N@@]2CC[C@H]1C2"));
     }
+
+    @Test public void cisplatin() throws InvalidSmilesException {
+        Graph g = Graph.fromSmiles("[NH3][Pt@SP1]([NH3])(Cl)Cl");
+        assertThat(g.topologyOf(1).type(),
+                   is(Configuration.Type.SquarePlanar));
+        assertThat(g.toSmiles(), is("[NH3][Pt@SP1]([NH3])(Cl)Cl"));
+        assertThat(g.permute(new int[]{0, 1, 2, 4, 3}).toSmiles(),
+                   is("[NH3][Pt@SP3]([NH3])(Cl)Cl"));
+    }
+
+    @Test public void trigonalBipyramidal() throws InvalidSmilesException {
+        Graph g = Graph.fromSmiles("S[As@TB1](F)(Cl)(Br)N");
+        assertThat(g.topologyOf(1).type(),
+                   is(Configuration.Type.TrigonalBipyramidal));
+        assertThat(g.toSmiles(), is("S[As@](F)(Cl)(Br)N"));
+        assertThat(g.permute(new int[]{0, 1, 2, 4, 3, 5}).toSmiles(),
+                   is("S[As@@](F)(Br)(Cl)N"));
+    }
+
+    @Test public void trigonalBipyramidal2() throws InvalidSmilesException {
+        Graph g = Graph.fromSmiles("S[As@TB2](F)(Cl)(Br)N");
+        assertThat(g.topologyOf(1).type(),
+                   is(Configuration.Type.TrigonalBipyramidal));
+        assertThat(g.toSmiles(), is("S[As@@](F)(Cl)(Br)N"));
+        assertThat(g.permute(new int[]{0, 1, 2, 4, 3, 5}).toSmiles(),
+                   is("S[As@](F)(Br)(Cl)N"));
+    }
+
+    @Test public void trigonalBipyramidal15() throws InvalidSmilesException {
+        Graph g = Graph.fromSmiles("F[As@TB15](Cl)(S)(Br)N");
+        assertThat(g.topologyOf(1).type(),
+                   is(Configuration.Type.TrigonalBipyramidal));
+        assertThat(g.toSmiles(), is("F[As@TB15](Cl)(S)(Br)N"));
+        assertThat(g.permute(new int[]{0, 1, 2, 4, 3, 5}).toSmiles(),
+                   is("F[As@TB17](Cl)(Br)(S)N"));
+    }
+
+    @Test public void octahedral1() throws InvalidSmilesException {
+        Graph g = Graph.fromSmiles("C[Co@](F)(Cl)(Br)(I)S");
+        assertThat(g.topologyOf(1).type(),
+                   is(Configuration.Type.Octahedral));
+        assertThat(g.toSmiles(), is("C[Co@](F)(Cl)(Br)(I)S"));
+        assertThat(g.permute(new int[]{0, 1, 2, 4, 3, 5, 6}).toSmiles(),
+                   is("C[Co@OH8](F)(Br)(Cl)(I)S"));
+    }
 }

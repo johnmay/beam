@@ -342,7 +342,7 @@ public final class Graph {
      * @return whether the topology replaced an existing configuration
      */
     void addTopology(Topology t) {
-        if (t != Topology.unknown())
+        if (t != null && t != Topology.unknown())
             topologies[t.atom()] = t;
     }
 
@@ -357,7 +357,7 @@ public final class Graph {
      * @param u a vertex to access the topology of
      * @return the topology of vertex 'u'
      */
-    Topology topologyOf(int u) {
+    public Topology topologyOf(int u) {
         if (topologies[u] == null)
             return Topology.unknown();
         return topologies[u];
