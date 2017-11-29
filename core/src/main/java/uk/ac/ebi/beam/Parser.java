@@ -777,7 +777,12 @@ final class Parser {
         if (bond == Bond.DOT)
             throw new InvalidSmilesException("a ring bond can not be a 'dot':",
                                              buffer,
-                                             -1);
+                                             buffer.position());
+        if (stack.empty())
+            throw new InvalidSmilesException("No previous atom for ring open!",
+                                             buffer,
+                                             buffer.position());
+
         if (rings.length <= rnum || rings[rnum] == null) {
             openRing(rnum);
         }
@@ -795,6 +800,7 @@ final class Parser {
         if (rnum >= rings.length)
             rings = Arrays.copyOf(rings,
                                   Math.min(100, rnum * 2)); // max rnum: 99
+
         int u = stack.peek();
 
         // create a ring bond

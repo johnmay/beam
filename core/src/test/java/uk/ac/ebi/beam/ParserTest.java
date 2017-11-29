@@ -256,4 +256,9 @@ public class ParserTest {
     public void openBracketIsInvalid() throws Exception {
         Parser.parse("[");
     }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void nonSmiles() throws InvalidSmilesException {
+        Graph.fromSmiles("50-00-0");
+    }
 }
