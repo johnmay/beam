@@ -173,7 +173,9 @@ The views and conclusions contained in the software and documentation are those 
 
 ## How to cite
 
-John Mayfield, BEAM 1.0, 2017, URL: https://github.com/johnmay/beam
+John Mayfield, BEAM v1.0, 2017, [![DOI](https://zenodo.org/badge/12061606.svg)](https://zenodo.org/badge/latestdoi/12061606)
+
+
 
 ---------------------------------------
 
