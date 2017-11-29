@@ -1,5 +1,6 @@
 package uk.ac.ebi.beam;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -307,6 +308,15 @@ public class GeneratorTest {
     static void roundTrip(String smi, int[] p, String res) throws
                                                            InvalidSmilesException {
         assertThat(Generator.generate(Parser.parse(smi).permute(p)), is(res));
+    }
+
+    @Test public void hExpand() throws Exception {
+        assertThat(Graph.fromSmiles("[HH]").toSmiles(),
+                   CoreMatchers.is("[H][H]"));
+        assertThat(Graph.fromSmiles("[HH2]").toSmiles(),
+                   CoreMatchers.is("[H]([H])[H]"));
+        assertThat(Graph.fromSmiles("[2HH]").toSmiles(),
+                   CoreMatchers.is("[2H][H]"));
     }
 
     /**

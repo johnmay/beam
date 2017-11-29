@@ -164,7 +164,9 @@ final class Generator {
     void prepare(int u, int p) {
         visitedAt[u] = nVisit++;
         tokens[u] = g.atom(u).token();
-        
+        tokens[u].setGraph(g);
+        tokens[u].setIdx(u);
+
         final int d = g.degree(u);
         for (int j=0; j<d; ++j) {
             final Edge e = g.edgeAt(u,j);
@@ -379,13 +381,25 @@ final class Generator {
         }
     }
 
-    static interface AtomToken {
-        void configure(Configuration c);
+    static abstract class AtomToken {
 
-        void append(StringBuilder sb);
+        Graph g;
+        int idx;
+
+        void setGraph(Graph g) {
+            this.g = g;
+        }
+
+        void setIdx(int idx) {
+            this.idx = idx;
+        }
+
+        abstract void configure(Configuration c);
+
+        abstract void append(StringBuilder sb);
     }
 
-    static final class SubsetToken implements AtomToken {
+    static final class SubsetToken extends AtomToken {
         private final String str;
 
         SubsetToken(String str) {
@@ -401,7 +415,7 @@ final class Generator {
         }
     }
 
-    static final class BracketToken implements AtomToken {
+    static final class BracketToken extends AtomToken {
 
         private Atom atom;
         private Configuration c = Configuration.UNKNOWN;
@@ -415,6 +429,8 @@ final class Generator {
         }
 
         @Override public void append(StringBuilder sb) {
+            boolean hExpand = atom.element() == Element.Hydrogen &&
+                              g.degree(idx) == 0;
             sb.append('[');
             if (atom.isotope() >= 0)
                 sb.append(atom.isotope());
@@ -425,9 +441,9 @@ final class Generator {
                                             .symbol());
             if (c != Configuration.UNKNOWN)
                 sb.append(c.shorthand().symbol());
-            if (atom.hydrogens() > 0)
+            if (atom.hydrogens() > 0 && !hExpand)
                 sb.append(Element.Hydrogen.symbol());
-            if (atom.hydrogens() > 1)
+            if (atom.hydrogens() > 1 && !hExpand)
                 sb.append(atom.hydrogens());
             if (atom.charge() != 0) {
                 sb.append(atom.charge() > 0 ? '+' : '-');
@@ -438,10 +454,19 @@ final class Generator {
             if (atom.atomClass() != 0)
                 sb.append(':').append(atom.atomClass());
             sb.append(']');
+            if (hExpand) {
+                int h = atom.hydrogens();
+                while (h > 1) {
+                    sb.append("([H])");
+                    h--;
+                }
+                if (h > 0)
+                    sb.append("[H]");
+            }
         }
     }
 
-    static abstract class TokenAdapter implements AtomToken {
+    static abstract class TokenAdapter extends AtomToken {
 
         private AtomToken parent;
 
