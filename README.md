@@ -1,5 +1,7 @@
 # Beam
 
+[![DOI](https://zenodo.org/badge/12061606.svg)](https://zenodo.org/badge/latestdoi/12061606)
+
 Beam - _to express by means of a radiant smile_ 
 
 Beam is a free toolkit dedicated to parsing and generating Simplified
@@ -173,9 +175,8 @@ The views and conclusions contained in the software and documentation are those 
 
 ## How to cite
 
-John Mayfield, BEAM v1.0, 2017, www.github.com/johnmay/beam
-[![DOI](https://zenodo.org/badge/12061606.svg)](https://zenodo.org/badge/latestdoi/12061606)
-
+Use the DOI at the top of this README or: 
+  John Mayfield, BEAM v1.0, 2017, www.github.com/johnmay/beam
 
 ---------------------------------------
 
