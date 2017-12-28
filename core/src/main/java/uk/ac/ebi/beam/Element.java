@@ -41,7 +41,7 @@ import java.util.Map;
 /**
  * Enumeration of valid OpenSMILES elements.
  *
- * <h4>Organic subsets</h4> Several of the elements belong to the organic
+ * <h1>Organic subsets</h1> Several of the elements belong to the organic
  * subset. Atoms of an organic element type can be written just as their symbol
  * (see. <a href="http://www.opensmiles.org/opensmiles.html#orgsbst">Organic
  * Subset, OpenSMILES Specification</a>).
@@ -52,7 +52,7 @@ import java.util.Map;
  * #Sulfur}</li> <li>{@link #Chlorine}</li> <li>{@link #Bromine}</li> <li>{@link
  * #Iodine}</li> </ul>
  *
- * <h4>Usage</h4>
+ * <h1>Usage</h1>
  *
  * Elements can be created by either using the value directly or by looking up
  * it's symbol. If the element may be aromatic the lower-case symbol can also be
@@ -68,14 +68,14 @@ import java.util.Map;
  * When the symbol is invalid the result wil be null.
  * <blockquote><pre>
  * Element e = Element.ofSymbol("R1"); // e = null
- * </blockquote></pre>
+ * </pre></blockquote>
  *
  * The {@link Element#Unknown} element can be used to represent generic/alias
  * atoms.
  * <blockquote><pre>
  * Element e = Element.Unknown;
  * Element e = Element.ofSymbol("*");
- * </blockquote></pre>
+ * </pre></blockquote>
  *
  * To access the symbol of an already created element. Use {@link
  * Element#symbol()}.
@@ -85,7 +85,7 @@ import java.util.Map;
  * Element e = a.element();
  *
  * String  symbol = e.symbol();
- * </blockquote></pre>
+ * </pre></blockquote>
  *
  * @author John May
  * @see <a href="http://www.opensmiles.org/opensmiles.html#inatoms">Atoms,

@@ -32,10 +32,10 @@ package uk.ac.ebi.beam;
 /**
  * Enumeration of valid {@link Edge} labels. The connections include all the
  * valid undirected and directed bond types and {@link #DOT}. Opposed to the
- * other types, {@link #DOT} indicates that two atoms are not connected. <p/>
+ * other types, {@link #DOT} indicates that two atoms are not connected. <br>
  *
- * <table style="font-family: Courier, monospace;"> <tr><th>{@link
- * Bond}</th><th>{@link #token()}</th><th>{@link #electrons()}</th><th>{@link
+ * <table summary="" style="font-family: Courier, monospace;"> <tr><th>{@link
+ * Bond}</th><th>{@link #token()}</th><th>{@link #order()}</th><th>{@link
  * #inverse()}</th></tr> <tr><td>{@link #DOT}</td><td>.</td><td>0</td><td></td></tr>
  * <tr><td>{@link #IMPLICIT}</td><td></td><td>undefined (2 or
  * 3)</td><td></td></tr> <tr><td>{@link #SINGLE}</td><td>-</td><td>2</td><td></td></tr>
@@ -170,7 +170,7 @@ public enum Bond {
         return false;
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public final String toString() {
         return token;
     }

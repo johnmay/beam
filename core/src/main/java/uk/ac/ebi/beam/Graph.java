@@ -366,11 +366,11 @@ public final class Graph {
     /**
      * Provides the stereo-configuration of the atom label at vertex 'u'. The
      * configuration describes the relative-stereo as though the atoms were
-     * arranged by atom number. <br/><br/>
+     * arranged by atom number. <br><br>
      *
      * <b>Further Explanation for Tetrahedral Centres</b> As an example the
      * molecule {@code O[C@]12CCCC[C@@]1(O)CCCC2} has two tetrahedral centres.
-     * <br/> 1. The first one is on vertex '1' and looking from vertex '0' the
+     * <br> 1. The first one is on vertex '1' and looking from vertex '0' the
      * other neighbors [6, 11, 2] proceed anti-clockwise ('@') - note ring
      * bonds. It is easy to see that if we use the natural order of the molecule
      * and order the neighbor [2, 6, 11] the winding is still anti-clockwise and
@@ -440,7 +440,7 @@ public final class Graph {
      * @return the SMILES string for the molecule.
      * @throws IOException a SMILES string could not be generated
      */
-    public String toSmiles() throws InvalidSmilesException {
+    public String toSmiles() throws IOException {
         return Generator.generate(this);
     }
 
@@ -453,7 +453,7 @@ public final class Graph {
      * @return the SMILES string
      * @throws IOException a SMILES string could not be generated
      */
-    public String toSmiles(int[] visitedAt) throws InvalidSmilesException {
+    public String toSmiles(int[] visitedAt) throws IOException {
         return Generator.generate(this, visitedAt);
     }
 
@@ -498,7 +498,7 @@ public final class Graph {
      * If the graph could not be converted to a kekulé representation then a
      * checked exception is thrown. Graphs cannot be converted if their
      * structures are erroneous and there is no valid way to assign the
-     * delocalised electrons. <p/>
+     * delocalised electrons. <br>
      *
      * Some reasons are shown below.
      *
@@ -711,7 +711,7 @@ public final class Graph {
     public static final class VisitHydrogenFirst implements EdgeComparator {
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         @Override public boolean less(Graph g, int u, Edge e, Edge f) {
             
@@ -737,7 +737,7 @@ public final class Graph {
     public static final class VisitHighOrderFirst implements EdgeComparator {
         
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         @Override public boolean less(Graph g, int u, Edge e, Edge f) {
             return e.bond().order() > f.bond().order();

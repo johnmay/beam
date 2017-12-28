@@ -265,7 +265,7 @@ public final class AtomBuilder {
      * Assign the isotope number to the atom which will be created. An isotope
      * number of '-1' means unspecified (default).
      *
-     * @param isotope isotope number >= 0.
+     * @param isotope isotope number &ge; 0.
      * @return an atom builder to configure additional properties
      */
     public AtomBuilder isotope(int isotope) {

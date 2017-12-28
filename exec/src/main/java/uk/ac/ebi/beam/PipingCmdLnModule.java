@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * An abstract module providing much of the boiler plate to implement a simple command line module
- * that consumes from one file (or stream) out produces another. <p/> To use the module simply
+ * that consumes from one file (or stream) out produces another. <br> To use the module simply
  * extend it and implement the {@link #process(BufferedReader, BufferedWriter, InputCounter,
  * OptionSet)} method.
  */
@@ -37,7 +37,7 @@ public abstract class PipingCmdLnModule implements CmdLnModule {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public final String name() {
@@ -45,7 +45,7 @@ public abstract class PipingCmdLnModule implements CmdLnModule {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public final String getHelpInfo() {
@@ -61,7 +61,7 @@ public abstract class PipingCmdLnModule implements CmdLnModule {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public final void exec(String[] args) {

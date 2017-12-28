@@ -158,7 +158,7 @@ public final class Edge {
                 (u == o.v && v == o.u && bond.equals(o.bond.inverse()));
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     @Override public String toString() {
         return new StringBuilder(20).append('{')
                                     .append(u)
