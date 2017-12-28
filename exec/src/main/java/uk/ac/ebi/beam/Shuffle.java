@@ -51,7 +51,7 @@ public class Shuffle extends PipingCmdLnModule {
             report("%d => %d\n", cnt, gencnt);
     }
 
-    private Set<String> generate(String str, int n, int m) throws InvalidSmilesException {
+    private Set<String> generate(String str, int n, int m) throws IOException {
 
         final Set<String> smis = new HashSet<String>();
 

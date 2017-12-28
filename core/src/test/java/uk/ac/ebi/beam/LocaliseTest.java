@@ -2,6 +2,8 @@ package uk.ac.ebi.beam;
 
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -403,7 +405,7 @@ public class LocaliseTest {
     }
 
 
-    @Test public void biphenylene() throws InvalidSmilesException
+    @Test public void biphenylene() throws IOException
     {
         String smi = "c1cccc2-c3ccccc3-c12";
         assertThat(Graph.fromSmiles(smi).kekule().toSmiles(),

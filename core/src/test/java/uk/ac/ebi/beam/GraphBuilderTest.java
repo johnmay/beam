@@ -32,6 +32,8 @@ package uk.ac.ebi.beam;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static uk.ac.ebi.beam.Configuration.DoubleBond.OPPOSITE;
@@ -42,7 +44,7 @@ import static uk.ac.ebi.beam.Configuration.DoubleBond.OPPOSITE;
 public class GraphBuilderTest {
 
     @Test
-    public void clockwise_parity() throws InvalidSmilesException {
+    public void clockwise_parity() throws IOException {
 
         GraphBuilder gb = GraphBuilder.create(5);
         Graph g = gb.add(AtomBuilder.aliphatic("C").build())
@@ -64,7 +66,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void anticlockwise_parity() throws InvalidSmilesException {
+    public void anticlockwise_parity() throws IOException {
 
         GraphBuilder gb = GraphBuilder.create(5);
         Graph g = gb.add(AtomBuilder.aliphatic("C").build())
@@ -86,7 +88,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void e_1_2_difluroethene() throws InvalidSmilesException {
+    public void e_1_2_difluroethene() throws IOException {
         GraphBuilder gb = GraphBuilder.create(5);
         Graph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
                     .add(AtomImpl.AliphaticSubset.Carbon)
@@ -101,7 +103,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void z_1_2_difluroethene() throws InvalidSmilesException {
+    public void z_1_2_difluroethene() throws IOException {
         GraphBuilder gb = GraphBuilder.create(5);
         Graph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
                     .add(AtomImpl.AliphaticSubset.Carbon)
@@ -117,7 +119,7 @@ public class GraphBuilderTest {
 
 
     @Test
-    public void conjugated_consider_existing() throws InvalidSmilesException {
+    public void conjugated_consider_existing() throws IOException {
         // the second configuration considers the existing configuration
         GraphBuilder gb = GraphBuilder.create(5);
         Graph g = gb.add(AtomImpl.AliphaticSubset.Fluorine)
@@ -138,7 +140,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void conjugated_resolve_conflict() throws InvalidSmilesException {
+    public void conjugated_resolve_conflict() throws IOException {
         // assigning the second one first means we have to consider this
         // on the first one
         GraphBuilder gb = GraphBuilder.create(5);
@@ -160,7 +162,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void conjugated_resolve_conflict2() throws InvalidSmilesException {
+    public void conjugated_resolve_conflict2() throws IOException {
         // we assign the first, third then second - the second one cause
         // a conflict and we must flip one of the others
         GraphBuilder gb = GraphBuilder.create(5);
@@ -213,7 +215,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void all_trans_octatetraene() throws InvalidSmilesException {
+    public void all_trans_octatetraene() throws IOException {
         GraphBuilder gb = GraphBuilder.create(5);
         Graph g = gb.add(AtomImpl.AliphaticSubset.Carbon)
                     .add(AtomImpl.AliphaticSubset.Carbon)
@@ -240,7 +242,7 @@ public class GraphBuilderTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void impossible_octatetraene() throws InvalidSmilesException {
+    public void impossible_octatetraene() throws IOException {
         GraphBuilder gb = GraphBuilder.create(5);
         Graph g = gb.add(AtomImpl.AliphaticSubset.Carbon)
                     .add(AtomImpl.AliphaticSubset.Carbon)
@@ -302,7 +304,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void suppress_benzene() throws InvalidSmilesException {
+    public void suppress_benzene() throws IOException {
         GraphBuilder gb = GraphBuilder.create(5);
         assertThat(gb.add(Element.Carbon, 1)
                             .add(Element.Carbon, 1)
@@ -320,7 +322,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void buildExtendedTetrahedral() throws InvalidSmilesException {
+    public void buildExtendedTetrahedral() throws IOException {
         GraphBuilder gb = GraphBuilder.create(4);
         gb = gb.add(Element.Carbon, 3)
                .add(Element.Carbon, 1)

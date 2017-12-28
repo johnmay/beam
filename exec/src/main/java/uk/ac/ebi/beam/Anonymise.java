@@ -6,6 +6,8 @@ package uk.ac.ebi.beam;
 
 import joptsimple.OptionSet;
 
+import java.io.IOException;
+
 /**
  * Anonymise SMILES input to all '*' atoms. Bond orders can optionally be emitted.
  */
@@ -23,7 +25,7 @@ public final class Anonymise extends FunctorCmdLnModule {
         final boolean bondorders = optionSet.has("bo");
         return new Functor() {
             @Override
-            String map(String str) throws InvalidSmilesException {
+            String map(String str) throws IOException {
 
                 Graph g = Graph.fromSmiles(str);
 

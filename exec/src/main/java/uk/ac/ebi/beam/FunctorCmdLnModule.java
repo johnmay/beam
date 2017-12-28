@@ -284,6 +284,6 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
     }
 
     abstract class Functor {
-        abstract String map(String str) throws InvalidSmilesException;
+        abstract String map(String str) throws IOException;
     }
 }

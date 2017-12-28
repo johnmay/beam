@@ -33,6 +33,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -492,7 +493,7 @@ public class GraphTest {
                    containsString("C1C[N@@]2CC[C@H]1C2"));
     }
 
-    @Test public void cisplatin() throws InvalidSmilesException {
+    @Test public void cisplatin() throws IOException {
         Graph g = Graph.fromSmiles("[NH3][Pt@SP1]([NH3])(Cl)Cl");
         assertThat(g.topologyOf(1).type(),
                    is(Configuration.Type.SquarePlanar));
@@ -501,7 +502,7 @@ public class GraphTest {
                    is("[NH3][Pt@SP3]([NH3])(Cl)Cl"));
     }
 
-    @Test public void trigonalBipyramidal() throws InvalidSmilesException {
+    @Test public void trigonalBipyramidal() throws IOException {
         Graph g = Graph.fromSmiles("S[As@TB1](F)(Cl)(Br)N");
         assertThat(g.topologyOf(1).type(),
                    is(Configuration.Type.TrigonalBipyramidal));
@@ -510,7 +511,7 @@ public class GraphTest {
                    is("S[As@@](F)(Br)(Cl)N"));
     }
 
-    @Test public void trigonalBipyramidal2() throws InvalidSmilesException {
+    @Test public void trigonalBipyramidal2() throws IOException {
         Graph g = Graph.fromSmiles("S[As@TB2](F)(Cl)(Br)N");
         assertThat(g.topologyOf(1).type(),
                    is(Configuration.Type.TrigonalBipyramidal));
@@ -519,7 +520,7 @@ public class GraphTest {
                    is("S[As@](F)(Br)(Cl)N"));
     }
 
-    @Test public void trigonalBipyramidal15() throws InvalidSmilesException {
+    @Test public void trigonalBipyramidal15() throws IOException {
         Graph g = Graph.fromSmiles("F[As@TB15](Cl)(S)(Br)N");
         assertThat(g.topologyOf(1).type(),
                    is(Configuration.Type.TrigonalBipyramidal));
@@ -528,7 +529,7 @@ public class GraphTest {
                    is("F[As@TB17](Cl)(Br)(S)N"));
     }
 
-    @Test public void octahedral1() throws InvalidSmilesException {
+    @Test public void octahedral1() throws IOException {
         Graph g = Graph.fromSmiles("C[Co@](F)(Cl)(Br)(I)S");
         assertThat(g.topologyOf(1).type(),
                    is(Configuration.Type.Octahedral));
