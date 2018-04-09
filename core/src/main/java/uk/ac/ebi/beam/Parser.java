@@ -268,7 +268,7 @@ final class Parser {
                     if (e.bond().order() == 1) us[i++] = x;
                 }
                 if (i < 2) {
-                    if (start.contains(u)) {
+                    if (v < us[0]) {
                         us[i++] = us[0];
                         us[0] = v;
                     } else {
@@ -317,7 +317,7 @@ final class Parser {
                     if (e.bond().order() == 1) us[i++] = x;
                 }
                 if (i < 2) {
-                    if (start.contains(u)) {
+                    if (v < us[0]) {
                         us[i++] = us[0];
                         us[0] = v;
                     } else {
