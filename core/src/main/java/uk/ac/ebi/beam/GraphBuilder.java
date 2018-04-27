@@ -35,9 +35,11 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import static uk.ac.ebi.beam.Configuration.DoubleBond.OPPOSITE;
 import static uk.ac.ebi.beam.Configuration.DoubleBond.TOGETHER;
 
 /**
@@ -64,8 +66,8 @@ public final class GraphBuilder {
     /** Current we just use the non-public methods of the actual graph object. */
     private final Graph g;
 
-    private final List<GeometricBuilder> builders = new ArrayList<GeometricBuilder>(2);
-    
+    private final List<GeometricBuilder> builders  = new ArrayList<GeometricBuilder>(2);
+
     private int[] valence;
 
     /**
@@ -202,7 +204,9 @@ public final class GraphBuilder {
 
     /** Start building the geometric configuration of the double bond 'u' / 'v'. */
     public GeometricBuilder geometric(int u, int v) {
-        return new GeometricBuilder(this, u, v);
+        GeometricBuilder builder = new GeometricBuilder(this, u, v);
+        builder.extended = false;
+        return builder;
     }
 
     /**
@@ -214,6 +218,14 @@ public final class GraphBuilder {
      */
     public ExtendedTetrahedralBuilder extendedTetrahedral(int u) {
         return new ExtendedTetrahedralBuilder(this, u);
+    }
+
+    /** Start building the extended geometric configuration of a set of cumulated
+     *  double bonds between 'u' and 'v'. */
+    public GeometricBuilder extendedGeometric(int u, int v) {
+        GeometricBuilder builder = new GeometricBuilder(this, u, v);
+        builder.extended = true;
+        return builder;
     }
 
     /**
@@ -238,8 +250,94 @@ public final class GraphBuilder {
                 g.addFlags(Graph.HAS_AROM);
         }
     }
+
+    private Edge findDoubleBond(Graph g, int i) {
+        Edge res = null;
+        for (Edge e : g.edges(i)) {
+            if (e.bond() != Bond.DOUBLE)
+                continue;
+            if (res != null)
+                return null;
+            res = e;
+        }
+        return res;
+    }
+
+    private Edge findBondToLabel(Graph g, int i) {
+        Edge res = null;
+        for (Edge e : g.edges(i)) {
+            if (e.bond().order() != 1)
+                continue;
+            if (res == null)
+                res = e;
+            else if (e.bond().directional() && !res.bond().directional())
+                res = e;
+        }
+        return res;
+    }
+
+    private void setDirection(Edge e, int u, Bond b) {
+        if (e.either() == u)
+            e.bond(b);
+        else
+            e.bond(b.inverse());
+    }
     
     private void assignDirectionalLabels() {
+
+        if (builders.isEmpty())
+            return;
+
+        // handle extended geometric configurations first
+        Iterator<GeometricBuilder> iter = builders.iterator();
+        while (iter.hasNext()) {
+            GeometricBuilder builder = iter.next();
+            if (!builder.extended)
+                continue;
+            iter.remove();
+            Edge e = findDoubleBond(g, builder.u);
+            Edge f = findDoubleBond(g, builder.v);
+            if (e == null || f == null)
+                continue;
+            Edge eRef = g.edge(builder.u, builder.x);
+            Edge fRef = g.edge(builder.v, builder.y);
+
+            Edge eLab = findBondToLabel(g, builder.u);
+            Edge fLab = findBondToLabel(g, builder.v);
+
+            // adjust for reference
+            Configuration.DoubleBond config = builder.c;
+            if ((eLab == eRef) != (fRef == fLab)) {
+              if (config == TOGETHER)
+                config = OPPOSITE;
+              else if (config == OPPOSITE)
+                config = TOGETHER;
+            }
+
+            if (eLab.bond().directional()) {
+              if (fLab.bond().directional()) {
+                // can't do anything, may be incorrect
+              } else {
+                if (config == TOGETHER)
+                  setDirection(fLab, builder.v, eLab.bond(builder.u));
+                else if (config == OPPOSITE)
+                  setDirection(fLab, builder.v, eLab.bond(builder.u));
+              }
+            } else {
+              if (fLab.bond().directional()) {
+                if (config == TOGETHER)
+                  setDirection(eLab, builder.v, fLab.bond(builder.u));
+                else if (config == OPPOSITE)
+                  setDirection(eLab, builder.v, fLab.bond(builder.u));
+              } else {
+                setDirection(eLab, builder.u, Bond.DOWN);
+                if (config == TOGETHER)
+                  setDirection(fLab, builder.v, Bond.DOWN);
+                else if (config == OPPOSITE)
+                  setDirection(fLab, builder.v, Bond.UP);
+              }
+            }
+        }
 
         if (builders.isEmpty())
             return;
@@ -770,6 +868,7 @@ public final class GraphBuilder {
         final GraphBuilder gb;
         final int          u, v;
         int x, y;
+        boolean extended;
         Configuration.DoubleBond c;
 
         public GeometricBuilder(GraphBuilder gb, int u, int v) {

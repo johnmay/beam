@@ -451,4 +451,23 @@ public class GraphBuilderTest {
                    is("CC(C)NC(C=1C=CC=2C(C1)=N\\C(=C3\\C=CC(/C=C3)=C\\4C=C/C(=C/5C=C/C(C=C5)=C/6\\N=C7C=CC(=CC7=N6)C(=N)NC(C)C)/O4)\\N2)=N.Cl"));
     }
 
+    @Test
+    public void extendedCisTrans() throws IOException {
+        GraphBuilder gb = GraphBuilder.create(6)
+                                      .add(AtomImpl.AliphaticSubset.Carbon)
+                                      .add(AtomImpl.AliphaticSubset.Carbon)
+                                      .add(AtomImpl.AliphaticSubset.Carbon)
+                                      .add(AtomImpl.AliphaticSubset.Carbon)
+                                      .add(AtomImpl.AliphaticSubset.Carbon)
+                                      .add(AtomImpl.AliphaticSubset.Carbon)
+                                      .singleBond(0,1)
+                                      .doubleBond(1,2)
+                                      .doubleBond(2,3)
+                                      .doubleBond(3,4)
+                                      .singleBond(4,5)
+                                      .extendedGeometric(1,4)
+                                      .configure(0, 5, Configuration.DoubleBond.TOGETHER);
+        assertThat(gb.build().toSmiles(), is("C/C=C=C=C\\C"));
+    }
+
 }
