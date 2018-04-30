@@ -229,11 +229,23 @@ public class ParserTest {
         Graph g = Parser.parse("CCO\tethanol\n");
         assertThat(g.getTitle(), is("ethanol"));
     }
-    
+
+    // extended TH over 7 atoms, super rare (and probably never
+    // encountered) but valid
+    @Test
+    public void parseTH7() throws Exception {
+        Graph g = Parser.parse("CC=C=C=[C@]=C=C=CC");
+        assertThat(g.topologyOf(4).configuration(),
+                   is(Configuration.AL1));
+        assertThat(g.permute(new int[]{1,0,2,3,4,5,6,7,8})
+                            .toSmiles(),
+                   is("C(C)=C=C=[C@@]=C=C=CC"));
+    }
+
     // this one has been mistreated... ignore for now
     @Ignore
     @Test(expected = InvalidSmilesException.class)
-    public void chembl345045Mangleded() throws Exception {
+    public void chembl345045Mangled() throws Exception {
         Parser.parse("c1c(ccc(c1)F)c2/c3n/c(c(\\c4[nH]c(/c(c/5\\nc(/c(c/6\\s\\c2\\cc6)/c7ccc(cc7)F)C=C5)/c8ccc(cc8)S(=O)(=O)[O-])cc4)/c9ccc(cc9)S(=O)(=O)[O-])/C=C3.[Na+].[Na+] CHEMBL345045");
     }
 

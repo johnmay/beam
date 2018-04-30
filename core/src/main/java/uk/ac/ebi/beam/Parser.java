@@ -231,6 +231,36 @@ final class Parser {
         return edges;
     }
 
+    private int getOtherDb(int u, int v) {
+        for (Edge e : getEdges(arrangement.get(u), u)) {
+            if (e.bond() != Bond.DOUBLE)
+                continue;
+            int nbr = e.other(u);
+            if (nbr == v)
+                continue;
+            return nbr;
+        }
+        return -1;
+    }
+
+    private int[] findExtendedTetrahedralEnds(int focus) {
+        List<Edge> es = getEdges(arrangement.get(focus), focus);
+        int prevEnd1 = focus;
+        int prevEnd2 = focus;
+        int end1 = es.get(0).other(prevEnd2);
+        int end2 = es.get(1).other(prevEnd2);
+        int tmp;
+        while (end1 >= 0 && end2 >= 0) {
+            tmp = getOtherDb(end1, prevEnd1);
+            prevEnd1 = end1;
+            end1 = tmp;
+            tmp = getOtherDb(end2, prevEnd2);
+            prevEnd2 = end2;
+            end2 = tmp;
+        }
+        return new int[]{prevEnd1, prevEnd2};
+    }
+
     /**
      * Add a topology for vertex 'u' with configuration 'c'. If the atom 'u' was
      * involved in a ring closure the local arrangement is used instead of the
@@ -257,8 +287,9 @@ final class Parser {
                 g.addFlags(Graph.HAS_EXT_STRO);
                 // Extended tetrahedral is a little more complicated, note
                 // following presumes the end atoms are not in ring closures
-                int v = es.get(0).other(u);
-                int w = es.get(1).other(u);
+                int[] ends = findExtendedTetrahedralEnds(u);
+                int v = ends[0];
+                int w = ends[1];
                 List<Edge> vs = getEdges(arrangement.get(v), v);
                 List<Edge> ws = getEdges(arrangement.get(w), w);
                 us = new int[4];
@@ -306,8 +337,9 @@ final class Parser {
                 g.addFlags(Graph.HAS_EXT_STRO);
                 // Extended tetrahedral is a little more complicated, note
                 // following presumes the end atoms are not in ring closures
-                int v = es.get(0).other(u);
-                int w = es.get(1).other(u);
+                int[] ends = findExtendedTetrahedralEnds(u);
+                int v = ends[0];
+                int w = ends[1];
                 List<Edge> vs = getEdges(arrangement.get(v), v);
                 List<Edge> ws = getEdges(arrangement.get(w), w);
                 us = new int[4];
@@ -334,7 +366,6 @@ final class Parser {
                 if (i != 4)
                     return;
             }
-
             g.addTopology(Topology.create(u, us, es, c));
         }
     }
