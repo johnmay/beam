@@ -232,7 +232,7 @@ final class Parser {
     }
 
     private int getOtherDb(int u, int v) {
-        for (Edge e : getEdges(arrangement.get(u), u)) {
+        for (Edge e : getLocalEdges(u)) {
             if (e.bond() != Bond.DOUBLE)
                 continue;
             int nbr = e.other(u);
@@ -244,7 +244,7 @@ final class Parser {
     }
 
     private int[] findExtendedTetrahedralEnds(int focus) {
-        List<Edge> es = getEdges(arrangement.get(focus), focus);
+        List<Edge> es = getLocalEdges(focus);
         int prevEnd1 = focus;
         int prevEnd2 = focus;
         int end1 = es.get(0).other(prevEnd2);
@@ -259,6 +259,57 @@ final class Parser {
             end2 = tmp;
         }
         return new int[]{prevEnd1, prevEnd2};
+    }
+
+    /** Access the local edges in order. */
+    private List<Edge> getLocalEdges(int end) {
+        return getEdges(arrangement.get(end), end);
+    }
+
+    /**
+     * Complicated process to get correct Allene neighbors.
+     * @param focus the focus (central cumualted atom)
+     * @return the carrier list
+     */
+    public int[] getAlleneCarriers(int focus) {
+        int[] carriers = new int[4];
+        int     i     = 0;
+        int[]   ends  = findExtendedTetrahedralEnds(focus);
+        int     beg   = ends[0];
+        int     end   = ends[1];
+        boolean begh = g.implHCount(beg) == 1;
+        boolean endh = g.implHCount(end) == 1;
+        List<Edge> begEdges = new ArrayList<>(getLocalEdges(beg));
+        if (begh)
+            begEdges.add(start.contains(beg) ? 0 : 1, null);
+        for (Edge bEdge : getLocalEdges(beg)) {
+            if (bEdge == null) {
+                carriers[i++] = beg;
+                continue;
+            }
+            int bnbr = bEdge.other(beg);
+            if (beg < bnbr && begh) {
+                carriers[i++] = beg;
+                begh = false;
+            }
+            if (bEdge.bond() == Bond.DOUBLE) {
+                // neighbors next to end
+                List<Edge> endEdges = new ArrayList<>(getLocalEdges(end));
+                if (endh)
+                    endEdges.add(1, null);
+                for (Edge eEdge : endEdges) {
+                    if (eEdge == null)
+                        carriers[i++] = end;
+                    else if (eEdge.bond() != Bond.DOUBLE)
+                        carriers[i++] = eEdge.other(end);
+                }
+            } else {
+                carriers[i++] = bnbr;
+            }
+        }
+        if (i != 4)
+            return null;
+        return carriers;
     }
 
     /**
@@ -277,7 +328,7 @@ final class Parser {
         // stereo on ring closure - use local arrangement
         if (arrangement.containsKey(u)) {
             int[] us = arrangement.get(u).toArray();
-            List<Edge> es = getEdges(arrangement.get(u), u);
+            List<Edge> es = getLocalEdges(u);
 
             if (c.type() == Configuration.Type.Tetrahedral)
                 us = insertThImplicitRef(u, us); // XXX: temp fix
@@ -285,40 +336,9 @@ final class Parser {
                 us = insertDbImplicitRef(u, us); // XXX: temp fix
             else if (c.type() == Configuration.Type.ExtendedTetrahedral) {
                 g.addFlags(Graph.HAS_EXT_STRO);
-                // Extended tetrahedral is a little more complicated, note
-                // following presumes the end atoms are not in ring closures
-                int[] ends = findExtendedTetrahedralEnds(u);
-                int v = ends[0];
-                int w = ends[1];
-                List<Edge> vs = getEdges(arrangement.get(v), v);
-                List<Edge> ws = getEdges(arrangement.get(w), w);
-                us = new int[4];
-                int i = 0;
-                for (Edge e : vs) {
-                    int x = e.other(v);
-                    if (e.bond().order() == 1) us[i++] = x;
-                }
-                if (i < 2) {
-                    if (v < us[0]) {
-                        us[i++] = us[0];
-                        us[0] = v;
-                    } else {
-                        us[i++] = v;
-                    }
-                }
-                if (i != 2) return;
-                for (Edge e : ws) {
-                    int x = e.other(w);
-                    if (e.bond().order() == 1) us[i++] = x;
-                }
-                if (i < 4) {
-                    us[i++] = us[2];
-                    us[u] = w;
-                }
-                if (i != 4)
+                if ((us = getAlleneCarriers(u)) == null)
                     return;
             }
-
             g.addTopology(Topology.create(u, us, es, c));
         }
         else {
@@ -335,35 +355,7 @@ final class Parser {
             }
             else if (c.type() == Configuration.Type.ExtendedTetrahedral) {
                 g.addFlags(Graph.HAS_EXT_STRO);
-                // Extended tetrahedral is a little more complicated, note
-                // following presumes the end atoms are not in ring closures
-                int[] ends = findExtendedTetrahedralEnds(u);
-                int v = ends[0];
-                int w = ends[1];
-                List<Edge> vs = getEdges(arrangement.get(v), v);
-                List<Edge> ws = getEdges(arrangement.get(w), w);
-                us = new int[4];
-                int i = 0;
-                for (Edge e : vs) {
-                    int x = e.other(v);
-                    if (e.bond().order() == 1) us[i++] = x;
-                }
-                if (i < 2) {
-                    if (v < us[0]) {
-                        us[i++] = us[0];
-                        us[0] = v;
-                    } else {
-                        us[i++] = v;
-                    }
-                }
-                if (i != 2) return;
-                if (ws.size() < 3)
-                    us[i++] = w;
-                for (Edge e : ws) {
-                    int x = e.other(w);
-                    if (e.bond().order() == 1) us[i++] = x;
-                }
-                if (i != 4)
+                if ((us = getAlleneCarriers(u)) == null)
                     return;
             }
             g.addTopology(Topology.create(u, us, es, c));

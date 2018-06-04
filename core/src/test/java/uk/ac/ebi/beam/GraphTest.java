@@ -537,4 +537,9 @@ public class GraphTest {
         assertThat(g.permute(new int[]{0, 1, 2, 4, 3, 5, 6}).toSmiles(),
                    is("C[Co@OH8](F)(Br)(Cl)(I)S"));
     }
+
+    @Test public void extendedTetrahedralRingClosures() throws InvalidSmilesException {
+        Graph g = Graph.fromSmiles("[CH3:3]1.[CH3:1]C(=[C@@]=[CH:2]1)[CH2:4]C");
+        Assert.assertThat(g.topologyOf(3).configuration(), is(Configuration.AL2));
+    }
 }
