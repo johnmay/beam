@@ -1,8 +1,6 @@
 package uk.ac.ebi.beam;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Collection of utilities for transforming chemical graphs.
@@ -153,6 +151,17 @@ public final class Functions {
         for (int i = 0; i < is.length; i++)
             p[is[i]] = i;
         return g.permute(p);
+    }
+
+    /**
+     * Renumbers atom-atom maps using a depth-first traversal. Note this function
+     * modifies the input graph.
+     * @param g the graph
+     * @return the input graph
+     */
+    public static Graph renumberAtomMaps(final Graph g) {
+        RenumberAtomMaps.renumber(g);
+        return g;
     }
 
     private static int[] random(int n) {
