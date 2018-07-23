@@ -36,6 +36,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -272,5 +273,17 @@ public class ParserTest {
     @Test(expected = InvalidSmilesException.class)
     public void nonSmiles() throws InvalidSmilesException {
         Graph.fromSmiles("50-00-0");
+    }
+
+    @Test
+    public void outOfOrderTetrahedral1() throws IOException {
+        assertEquals("[C@@](Cl)(F)(I)Br",
+                Graph.fromSmiles("[C@@](Cl)(F)(I)1.Br1").toSmiles());
+    }
+
+    @Test
+    public void outOfOrderTetrahedral2() throws IOException {
+        assertEquals("[C@@](Cl)(F)(I)Br",
+                Graph.fromSmiles("[C@](Cl)(F)1I.Br1").toSmiles());
     }
 }

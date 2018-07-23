@@ -404,13 +404,12 @@ final class Parser {
                     checkDirectionalBonds.set(v);
                 }
                 g.addEdge(new Edge(u, v, bond));
+                if (arrangement.containsKey(u))
+                    arrangement.get(u).add(v);
             }
             else {
                 start.add(v); // start of a new run
             }
-            if (arrangement.containsKey(u))
-                arrangement.get(u).add(v);
-
         }
         stack.push(v);
         bond = Bond.IMPLICIT;
