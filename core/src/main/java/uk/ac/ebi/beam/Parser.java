@@ -665,7 +665,7 @@ final class Parser {
             g.addFlags(Graph.HAS_AROM);
 
         // element isn't aromatic as per the OpenSMILES specification
-        if (strict && !element.aromatic(Element.AromaticSpecification.OpenSmiles))
+        if (strict && aromatic && !element.aromatic(Element.AromaticSpecification.OpenSmiles))
             throw new InvalidSmilesException("abnormal aromatic element", buffer);
 
         if (element == null) {

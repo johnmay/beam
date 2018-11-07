@@ -139,6 +139,11 @@ public class ParserTest {
         Graph g = Parser.strict("TT");
     }
 
+    @Test
+    public void hydrogen_strict_okay() throws IOException {
+        Graph g = Parser.strict("[H][H]");
+    }
+
     @Test public void tellurium() throws IOException {
         Graph g = Parser.losse("[te]");
         assertTrue(g.atom(0).aromatic());
