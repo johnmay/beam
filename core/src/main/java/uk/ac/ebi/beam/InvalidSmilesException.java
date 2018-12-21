@@ -74,6 +74,20 @@ final class InvalidSmilesException extends IOException {
         return sb.toString();
     }
 
+    static String display(final CharBuffer buffer, int offset, int offset2) {
+        StringBuilder sb = new StringBuilder();
+        sb.append('\n');
+        sb.append(buffer);
+        sb.append('\n');
+        for (int i = 1; i < buffer.length(); i++) {
+            if (i == buffer.position+offset || i == buffer.position+offset2)
+                sb.append('^');
+            else
+                sb.append(' ');
+        }
+        return sb.toString();
+    }
+
     /**
      * Utility for invalid bracket atom error.
      *
