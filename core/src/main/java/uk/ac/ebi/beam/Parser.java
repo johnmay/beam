@@ -569,6 +569,7 @@ final class Parser {
                     if (strict && num < 10)
                         throw new InvalidSmilesException("two digits must follow '%'", buffer);
                     ring(num, buffer);
+                    lastBondPos = buffer.position();
                     break;
 
                 // bond/dot
@@ -576,27 +577,32 @@ final class Parser {
                     if (bond != Bond.IMPLICIT)
                         throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.SINGLE;
+                    lastBondPos = buffer.position();
                     break;
                 case '=':
                     if (bond != Bond.IMPLICIT)
                         throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.DOUBLE;
+                    lastBondPos = buffer.position();
                     break;
                 case '#':
                     if (bond != Bond.IMPLICIT)
                         throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.TRIPLE;
+                    lastBondPos = buffer.position();
                     break;
                 case '$':
                     if (bond != Bond.IMPLICIT)
                         throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.QUADRUPLE;
+                    lastBondPos = buffer.position();
                     break;
                 case ':':
                     if (bond != Bond.IMPLICIT)
                         throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     g.addFlags(Graph.HAS_AROM);
                     bond = Bond.AROMATIC;
+                    lastBondPos = buffer.position();
                     break;
                 case '/':
                     if (bond != Bond.IMPLICIT)
