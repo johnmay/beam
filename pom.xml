@@ -7,7 +7,7 @@
     <description>SMILES parsing and generation library for cheminformatics</description>
     <url>http://www.github.com/johnmay/beam/</url>
     <packaging>pom</packaging>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.3.1</version>
     <modules>
         <module>core</module>
         <module>func</module>
