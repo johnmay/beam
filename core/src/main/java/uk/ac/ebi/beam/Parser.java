@@ -29,14 +29,7 @@
 
 package uk.ac.ebi.beam;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static java.util.Map.Entry;
 
@@ -91,6 +84,8 @@ final class Parser {
     private final boolean strict;
 
     private BitSet checkDirectionalBonds = new BitSet();
+
+    private List<String> warnings = new ArrayList<>();
 
     /**
      * Create a new parser for the specified buffer.
@@ -206,18 +201,20 @@ final class Parser {
                 }
             }
 
-            if (nUpV + nDownV == 0 || nUpW + nDownW == 0) {
+            if (nUpV + nDownV == 0 || nUpW + nDownW == 0)
                 continue;
-            }
 
-            if (nUpV > 1)
-                throw new InvalidSmilesException("Multiple directional bonds on atom " + v, buffer);
-            if (nDownV > 1)
-                throw new InvalidSmilesException("Multiple directional bonds on atom " + v, buffer);
-            if (nUpW > 1)
-                throw new InvalidSmilesException("Multiple directional bonds on atom " + w, buffer);
-            if (nDownW > 1)
-                throw new InvalidSmilesException("Multiple directional bonds on atom " + w, buffer);
+            if (strict) {
+                if (nUpV > 1 || nDownV > 1)
+                    throw new InvalidSmilesException("Multiple directional bonds on atom " + v, buffer);
+                if (nUpW > 1 || nDownW > 1)
+                    throw new InvalidSmilesException("Multiple directional bonds on atom " + w, buffer);
+            } else {
+                if (nUpV > 1 || nDownV > 1)
+                    warnings.add("Multiple directional bonds on atom: " + v);
+                if (nUpW > 1 || nDownW > 1)
+                    warnings.add("Multiple directional bonds on atom: " + w);
+            }
         }
     }
 
@@ -805,12 +802,10 @@ final class Parser {
                                              buffer,
                                              buffer.position());
 
-        if (rings.length <= rnum || rings[rnum] == null) {
-            openRing(rnum);
-        }
-        else {
+        if (rings.length <= rnum || rings[rnum] == null)
+            openRing(rnum, buffer);
+        else
             closeRing(rnum, buffer);
-        }
     }
 
     /**
@@ -818,7 +813,7 @@ final class Parser {
      *
      * @param rnum ring number
      */
-    private void openRing(int rnum) {
+    private void openRing(int rnum, CharBuffer buf) {
         if (rnum >= rings.length)
             rings = Arrays.copyOf(rings,
                                   Math.min(100, rnum * 2)); // max rnum: 99
@@ -826,7 +821,7 @@ final class Parser {
         int u = stack.peek();
 
         // create a ring bond
-        rings[rnum] = new RingBond(u, bond);
+        rings[rnum] = new RingBond(u, bond, buf.position());
 
         // keep track of arrangement (important for stereo configurations)
         createArrangement(u).add(-rnum);
@@ -876,7 +871,7 @@ final class Parser {
             throw new InvalidSmilesException("Endpoints of ringbond are already connected - multi-edges are not allowed",
                                              buffer);
 
-        bond = decideBond(rbond.bond, bond.inverse(), buffer);
+        bond = decideBond(rbond.bond, bond.inverse(), rbond.pos, buffer);
 
         if (bond.directional()) {
             checkDirectionalBonds.set(u);
@@ -906,21 +901,25 @@ final class Parser {
      *
      * @param a a bond
      * @param b other bond
+     * @param pos the position in the string of bond a
+     * @param buffer the buffer and it's current position
      * @return the bond to use for this edge
      * @throws InvalidSmilesException ring bonds did not match
      */
-    static Bond decideBond(final Bond a, final Bond b, CharBuffer buffer) throws
-                                                                          InvalidSmilesException {
+    Bond decideBond(final Bond a, final Bond b, int pos, CharBuffer buffer) throws InvalidSmilesException {
         if (a == b)
             return a;
         else if (a == Bond.IMPLICIT)
             return b;
         else if (b == Bond.IMPLICIT)
             return a;
-        throw new InvalidSmilesException("Ring closure bonds did not match. Ring was opened with '" + a + "' and closed with '" + b + "'." +
-                                                 " Note - directional bonds ('/','\\') are relative.",
-                                         buffer,
-                                         -1);
+        if (strict || a.inverse() != b)
+            throw new InvalidSmilesException("Ring closure bonds did not match,  '" + a + "'!='" + b + "':" +
+                                             InvalidSmilesException.display(buffer,
+                                                                            pos-buffer.position-1, -1));
+        warnings.add("Ignored invalid Cis/Trans on ring closure, should flip:" +
+                      InvalidSmilesException.display(buffer, pos-buffer.position-1, -1));
+        return Bond.IMPLICIT;
     }
 
     /**
@@ -936,16 +935,26 @@ final class Parser {
     }
 
     /**
+     * Access any warning messages from parsing the SMILES.
+     * @return the warnings.
+     */
+    public Collection<? extends String> getWarnings() {
+        return Collections.unmodifiableCollection(warnings);
+    }
+
+    /**
      * Hold information about ring open/closures. The ring bond can optionally
      * specify the bond type.
      */
     private static final class RingBond {
         int  u;
         Bond bond;
+        int  pos;
 
-        private RingBond(int u, Bond bond) {
+        private RingBond(int u, Bond bond, int pos) {
             this.u = u;
             this.bond = bond;
+            this.pos = pos;
         }
     }
 

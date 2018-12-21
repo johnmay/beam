@@ -214,7 +214,7 @@ public class AddDirectionalLabelsTest {
     static void transform(String smi, String exp) throws
                                                   InvalidSmilesException {
         Assert.assertThat(Generator.generate(new AddDirectionalLabels()
-                                                     .apply(Parser.parse(smi))), CoreMatchers
+                                                     .apply(Parser.strict(smi))), CoreMatchers
                 .is(exp));
     }
 }

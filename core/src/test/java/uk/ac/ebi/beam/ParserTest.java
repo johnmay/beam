@@ -45,14 +45,14 @@ public class ParserTest {
 
     @Test(expected = InvalidSmilesException.class)
     public void ringBondMismatch() throws InvalidSmilesException {
-        Parser.decideBond(Bond.SINGLE, Bond.DOUBLE, CharBuffer.fromString(""));
+        new Parser("").decideBond(Bond.SINGLE, Bond.DOUBLE, -1, CharBuffer.fromString(""));
     }
 
     @Test
     public void ringBondDecision() throws InvalidSmilesException {
-        assertThat(Parser.decideBond(Bond.DOUBLE, Bond.DOUBLE, CharBuffer.fromString("")), is(Bond.DOUBLE));
-        assertThat(Parser.decideBond(Bond.DOUBLE, Bond.IMPLICIT, CharBuffer.fromString("")), is(Bond.DOUBLE));
-        assertThat(Parser.decideBond(Bond.IMPLICIT, Bond.DOUBLE, CharBuffer.fromString("")), is(Bond.DOUBLE));
+        assertThat(new Parser("").decideBond(Bond.DOUBLE, Bond.DOUBLE, -1, CharBuffer.fromString("")), is(Bond.DOUBLE));
+        assertThat(new Parser("").decideBond(Bond.DOUBLE, Bond.IMPLICIT, -1, CharBuffer.fromString("")), is(Bond.DOUBLE));
+        assertThat(new Parser("").decideBond(Bond.IMPLICIT, Bond.DOUBLE, -1, CharBuffer.fromString("")), is(Bond.DOUBLE));
     }
 
     @Test public void invalidTetrahedral() throws InvalidSmilesException {
@@ -210,7 +210,7 @@ public class ParserTest {
 
     @Test(expected = InvalidSmilesException.class)
     public void rejectMultipleUpBonds() throws Exception {
-        Parser.parse("C/C=C(/C)/C");
+        Parser.strict("C/C=C(/C)/C");
     }
 
     @Test
@@ -283,12 +283,36 @@ public class ParserTest {
     @Test
     public void outOfOrderTetrahedral1() throws IOException {
         assertEquals("[C@@](Cl)(F)(I)Br",
-                Graph.fromSmiles("[C@@](Cl)(F)(I)1.Br1").toSmiles());
+                     Graph.fromSmiles("[C@@](Cl)(F)(I)1.Br1").toSmiles());
     }
 
     @Test
     public void outOfOrderTetrahedral2() throws IOException {
         assertEquals("[C@@](Cl)(F)(I)Br",
                 Graph.fromSmiles("[C@](Cl)(F)1I.Br1").toSmiles());
+    }
+
+    @Test
+    public void acceptableDoubleBondLabels() throws IOException {
+        assertEquals("CC=C(/C=C/C)/C=C/C",
+                     Graph.fromSmiles("CC=C(/C=C/C)/C=C/C").toSmiles());
+    }
+
+    @Test
+    public void ignoreMismatchRingBonds() throws IOException {
+        assertEquals("C/C=CC",
+                     Graph.fromSmiles("C/C=C/1.C/1").toSmiles());
+    }
+
+    @Test
+    public void badBonds() throws IOException {
+        assertEquals("C/C=C(/C)/F",
+                     Graph.fromSmiles("C/C=C(/C)/F").toSmiles());
+    }
+
+    @Test(expected = InvalidSmilesException.class)
+    public void mismatchRingBonds() throws IOException {
+        assertEquals("CC=CC",
+                     Graph.fromSmiles("CC=C-1.C=1").toSmiles());
     }
 }

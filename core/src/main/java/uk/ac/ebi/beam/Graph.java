@@ -33,10 +33,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import static uk.ac.ebi.beam.Element.Hydrogen;
 
@@ -431,6 +429,14 @@ public final class Graph {
         if (smi == null)
             throw new NullPointerException("no SMILES provided");
         return Parser.parse(smi);
+    }
+
+    public static Graph parse(String smi, boolean strict, Set<String> warnings) throws InvalidSmilesException {
+        if (smi == null)
+            throw new NullPointerException("no SMILES provided");
+        Parser parser = new Parser(CharBuffer.fromString(smi), strict);
+        warnings.addAll(parser.getWarnings());
+        return parser.molecule();
     }
 
     /**
