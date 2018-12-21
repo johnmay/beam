@@ -85,6 +85,9 @@ final class Parser {
 
     private BitSet checkDirectionalBonds = new BitSet();
 
+    private int lastBondPos = -1;
+    private Map<Edge,Integer> bondStrPos = new HashMap<>();
+
     private List<String> warnings = new ArrayList<>();
 
     /**
@@ -204,16 +207,39 @@ final class Parser {
             if (nUpV + nDownV == 0 || nUpW + nDownW == 0)
                 continue;
 
-            if (strict) {
-                if (nUpV > 1 || nDownV > 1)
-                    throw new InvalidSmilesException("Multiple directional bonds on atom " + v, buffer);
-                if (nUpW > 1 || nDownW > 1)
-                    throw new InvalidSmilesException("Multiple directional bonds on atom " + w, buffer);
-            } else {
-                if (nUpV > 1 || nDownV > 1)
-                    warnings.add("Multiple directional bonds on atom: " + v);
-                if (nUpW > 1 || nDownW > 1)
-                    warnings.add("Multiple directional bonds on atom: " + w);
+            if (nUpV > 1 || nDownV > 1) {
+                int offset1 = -1, offset2 = -1;
+                for (Edge e : g.edges(v)) {
+                    if (e.bond().directional())
+                        if (offset1 < 0)
+                            offset1 = bondStrPos.get(e);
+                        else
+                            offset2 = bondStrPos.get(e);
+                }
+                String errorPos = InvalidSmilesException.display(buffer,
+                                                                 offset1-buffer.length(),
+                                                                 offset2-buffer.length());
+                if (strict)
+                    throw new InvalidSmilesException("Ignored invalid Cis/Trans specification: " + errorPos);
+                else
+                    warnings.add("Ignored invalid Cis/Trans specification: " + errorPos);
+            }
+            if (nUpW > 1 || nDownW > 1) {
+                int offset1 = -1, offset2 = -1;
+                for (Edge e : g.edges(w)) {
+                    if (e.bond().directional())
+                        if (offset1 < 0)
+                            offset1 = bondStrPos.get(e);
+                        else
+                            offset2 = bondStrPos.get(e);
+                }
+                String errorPos = InvalidSmilesException.display(buffer,
+                                                                 offset1-buffer.length(),
+                                                                 offset2-buffer.length());
+                if (strict)
+                    throw new InvalidSmilesException("Ignored invalid Cis/Trans specification: " + errorPos);
+                else
+                    warnings.add("Ignored invalid Cis/Trans specification: " + errorPos);
             }
         }
     }
@@ -396,11 +422,13 @@ final class Parser {
         if (!stack.empty()) {
             int u = stack.pop();
             if (bond != Bond.DOT) {
+                Edge e = new Edge(u, v, bond);
                 if (bond.directional()) {
+                    bondStrPos.put(e, lastBondPos);
                     checkDirectionalBonds.set(u);
                     checkDirectionalBonds.set(v);
                 }
-                g.addEdge(new Edge(u, v, bond));
+                g.addEdge(e);
                 if (arrangement.containsKey(u))
                     arrangement.get(u).add(v);
             }
@@ -574,6 +602,7 @@ final class Parser {
                     if (bond != Bond.IMPLICIT)
                         throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.UP;
+                    lastBondPos = buffer.position();
                     g.addFlags(Graph.HAS_BND_STRO);
                     break;
                 case '\\':
@@ -581,6 +610,7 @@ final class Parser {
                     if (bond != Bond.IMPLICIT && bond != Bond.DOWN)
                         throw new InvalidSmilesException("Multiple bonds specified:", buffer);
                     bond = Bond.DOWN;
+                    lastBondPos = buffer.position();
                     g.addFlags(Graph.HAS_BND_STRO);
                     break;
                 case '.':
@@ -821,7 +851,7 @@ final class Parser {
         int u = stack.peek();
 
         // create a ring bond
-        rings[rnum] = new RingBond(u, bond, buf.position());
+        rings[rnum] = new RingBond(u, bond, lastBondPos);
 
         // keep track of arrangement (important for stereo configurations)
         createArrangement(u).add(-rnum);
@@ -873,12 +903,16 @@ final class Parser {
 
         bond = decideBond(rbond.bond, bond.inverse(), rbond.pos, buffer);
 
+        Edge e = new Edge(u, v, bond);
         if (bond.directional()) {
             checkDirectionalBonds.set(u);
             checkDirectionalBonds.set(v);
+            if (rbond.bond.directional())
+                bondStrPos.put(e, rbond.pos);
+            else
+                bondStrPos.put(e, lastBondPos);
         }
-
-        g.addEdge(new Edge(u, v, bond));
+        g.addEdge(e);
         bond = Bond.IMPLICIT;
         // adjust the arrangement replacing where this ring number was openned
         arrangement.get(rbond.u).replace(-rnum, stack.peek());
@@ -916,9 +950,11 @@ final class Parser {
         if (strict || a.inverse() != b)
             throw new InvalidSmilesException("Ring closure bonds did not match,  '" + a + "'!='" + b + "':" +
                                              InvalidSmilesException.display(buffer,
-                                                                            pos-buffer.position-1, -1));
+                                                                            pos-buffer.position,
+                                                     lastBondPos-buffer.position));
         warnings.add("Ignored invalid Cis/Trans on ring closure, should flip:" +
-                      InvalidSmilesException.display(buffer, pos-buffer.position-1, -1));
+                      InvalidSmilesException.display(buffer, pos-buffer.position,
+                                                     lastBondPos-buffer.position));
         return Bond.IMPLICIT;
     }
 

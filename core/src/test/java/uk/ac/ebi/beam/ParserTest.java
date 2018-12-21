@@ -310,6 +310,15 @@ public class ParserTest {
                      Graph.fromSmiles("C/C=C(/C)/F").toSmiles());
     }
 
+//  Testing warning mesgs
+//    @Test
+//    public void badBonds2() throws IOException {
+//        Graph.fromSmiles("C/C=C(/1)/F.C\\1");
+//        Graph.fromSmiles("C/C=C(/1)/F.C1");
+//        Graph.fromSmiles("C/C=C(1)/F.CCCCC\\1CCC");
+//        Graph.fromSmiles("C/C=C(/%12).C/%12");
+//    }
+
     @Test(expected = InvalidSmilesException.class)
     public void mismatchRingBonds() throws IOException {
         assertEquals("CC=CC",
