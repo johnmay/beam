@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public final class Anonymise extends FunctorCmdLnModule {
 
-    private final Atom UNKN_ATOM = AtomImpl.AliphaticSubset.Unknown;
+    private final Atom UNKN_ATOM = AtomImpl.AliphaticSubset.Any;
 
     public Anonymise() {
         super("anon");
