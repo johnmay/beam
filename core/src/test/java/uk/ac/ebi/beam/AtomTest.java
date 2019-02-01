@@ -24,9 +24,4 @@ public class AtomTest {
             assertThat(AtomImpl.AromaticSubset.ofElement(a.element()), is(a));
         }
     }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void aromaticSubsetInvalidElement() {
-        AtomImpl.AromaticSubset.ofElement(Element.Unknown);
-    }
 }

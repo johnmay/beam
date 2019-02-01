@@ -90,6 +90,8 @@ final class Parser {
 
     private List<String> warnings = new ArrayList<>();
 
+    private boolean hasAstrix = false;
+
     /**
      * Create a new parser for the specified buffer.
      *
@@ -107,6 +109,19 @@ final class Parser {
         start.add(0); // always include first vertex as start
         if (g.getFlags(Graph.HAS_STRO) != 0) {
             createTopologies(buffer);
+        }
+        if (hasAstrix) {
+            for (int i = 0; i < g.order(); i++) {
+                if (g.atom(i) == AtomImpl.AliphaticSubset.Any) {
+                    int nArom = 0;
+                    for (Edge e : g.edges(i)) {
+                        if (e.bond() == Bond.IMPLICIT && g.atom(e.other(i)).aromatic())
+                            nArom++;
+                    }
+                    if (nArom >= 2)
+                        g.setAtom(i, AtomImpl.AromaticSubset.Any);
+                }
+            }
         }
     }
 
@@ -462,7 +477,8 @@ final class Parser {
 
                 // aliphatic subset
                 case '*':
-                    addAtom(AtomImpl.AliphaticSubset.Unknown, buffer);
+                    hasAstrix = true;
+                    addAtom(AtomImpl.AliphaticSubset.Any, buffer);
                     break;
                 case 'B':
                     if (buffer.getIf('r'))

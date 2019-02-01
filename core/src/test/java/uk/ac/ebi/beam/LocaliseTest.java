@@ -381,6 +381,10 @@ public class LocaliseTest {
         assertFalse(Localise.inSmallRing(g, g.edge(3, 6)));
     }
 
+    @Test public void anyatom() throws Exception {
+        test("*1ccccc1", "*1=CC=CC=C1");
+    }
+
     static void test(String delocalised, String localised) throws Exception {
         Graph g = Graph.fromSmiles(delocalised);
         Graph h = Localise.localise(g);

@@ -41,7 +41,7 @@ import java.util.Map;
 final class AtomImpl {
 
     static enum AliphaticSubset implements Atom {
-        Unknown(Element.Unknown),
+        Any(Element.Unknown),
         Boron(Element.Boron),
         Carbon(Element.Carbon),
         Nitrogen(Element.Nitrogen),
@@ -125,6 +125,7 @@ final class AtomImpl {
     }
 
     static enum AromaticSubset implements Atom {
+        Any(Element.Unknown),
         Boron(Element.Boron),
         Carbon(Element.Carbon),
         Nitrogen(Element.Nitrogen),
