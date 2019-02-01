@@ -112,14 +112,26 @@ final class Parser {
         }
         if (hasAstrix) {
             for (int i = 0; i < g.order(); i++) {
-                if (g.atom(i) == AtomImpl.AliphaticSubset.Any) {
+                Atom atom = g.atom(i);
+                if (atom.element() == Element.Unknown) {
                     int nArom = 0;
                     for (Edge e : g.edges(i)) {
                         if (e.bond() == Bond.IMPLICIT && g.atom(e.other(i)).aromatic())
                             nArom++;
                     }
-                    if (nArom >= 2)
-                        g.setAtom(i, AtomImpl.AromaticSubset.Any);
+                    if (nArom >= 2) {
+                        if (atom == AtomImpl.AliphaticSubset.Any)
+                            g.setAtom(i, AtomImpl.AromaticSubset.Any);
+                        else
+                            g.setAtom(i,
+                                    new AtomImpl.BracketAtom(-1,
+                                                             Element.Unknown,
+                                                             atom.label(),
+                                                             atom.hydrogens(),
+                                                             atom.charge(),
+                                                             atom.atomClass(),
+                                                             true));
+                    }
                 }
             }
         }
@@ -706,6 +718,8 @@ final class Parser {
         final int isotope = buffer.getNumber();
         final boolean aromatic = buffer.next() >= 'a' && buffer.next() <= 'z';
         final Element element = Element.read(buffer);
+        if (element == Element.Unknown)
+            hasAstrix = true;
 
         if (strict && element == null)
             throw new InvalidSmilesException("unrecognised element symbol, SMILES may be truncated: ", buffer);
@@ -755,6 +769,7 @@ final class Parser {
                                                  buffer,
                                                  buffer.position - 1);
             String label = buffer.substr(start, end);
+            hasAstrix = true;
             return new AtomImpl.BracketAtom(label);
         }
 
