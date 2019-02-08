@@ -33,7 +33,6 @@ import java.util.*;
 
 import static java.util.Map.Entry;
 
-
 /**
  * Parse a SMILES string and create a {@link Graph}. A new parser should be
  * created for each invocation, for convenience {@link #parse(String)} is
@@ -116,7 +115,8 @@ final class Parser {
                 if (atom.element() == Element.Unknown) {
                     int nArom = 0;
                     for (Edge e : g.edges(i)) {
-                        if (e.bond() == Bond.IMPLICIT && g.atom(e.other(i)).aromatic())
+                        if (e.bond() == Bond.AROMATIC ||
+                                e.bond() == Bond.IMPLICIT && g.atom(e.other(i)).aromatic())
                             nArom++;
                     }
                     if (nArom >= 2) {
