@@ -78,7 +78,7 @@ final class KececiogluMatching {
      *
      * @return an augmenting path was found
      */
-	boolean Search (int V, Graph G)
+	private boolean Search (int V, Graph G)
 	{
 		// label current vertex as even and record its age
 		Label[V] = EvenLabel;
