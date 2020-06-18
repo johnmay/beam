@@ -352,4 +352,27 @@ final class KececiogluMatching {
     	KececiogluMatching mm = new KececiogluMatching(g, m, n, s);
         return mm.nMatched;
     }
+    
+    /**
+     * Utility to maximise an existing matching of the provided graph.
+     *
+     * @param g a graph
+     * @param m matching on the graph
+     * @return the maximal matching on the graph
+     */
+    static int maximise(Graph g, Matching m, int n) {
+        return maximise(g, m, n, IntSet.universe());
+    }
+
+    /**
+     * Utility to get the maximal matching of the specified graph.
+     *
+     * @param g a graph
+     * @return the maximal matching on the graph
+     */
+    static Matching maximal(Graph g) {
+        Matching m = Matching.empty(g);
+        maximise(g, m, 0);
+        return m;
+    }
 }
