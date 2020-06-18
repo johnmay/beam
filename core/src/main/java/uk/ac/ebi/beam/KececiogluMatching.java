@@ -25,12 +25,12 @@ final class KececiogluMatching {
 	private final int nMatched;
 	private final Matching matching;
 	private final IntSet subset;
-	private int Time;
+	private int time;
 
-	private boolean IsReached(int V) {return label[V] != UnreachedLabel;}
-	private boolean IsEven(int V)    {return label[V] == EvenLabel;}
-	private boolean IsOdd(int V)     {return label[V] == OddLabel;}
-	private int Other(Edge E, int V) {return ((E) == null) ? nil : E.other(V);}
+	private boolean isReached(int v) {return label[v] != UnreachedLabel;}
+	private boolean isEven(int v)    {return label[v] == EvenLabel;}
+	private boolean isOdd(int v)     {return label[v] == OddLabel;}
+	private int other(Edge e, int v) {return ((e) == null) ? nil : e.other(v);}
 
 	/**
 	 *
@@ -39,22 +39,22 @@ final class KececiogluMatching {
 	 * "Computing maximum-cardinality matchings in sparse general graphs."
 	 * Proceedings of the 2nd Workshop on Algorithm Engineering, 121-132, 1998.
 	 * and from their C implementation at 
-	 * https://www2.cs.arizona.edu/~kece/Research/code/matching1.sh.Z
+	 * https://www2.cs.arizona.edu/~kece/Research/code/matching1.sh.z
 	 * 
 	 * @author Ben Wolfe
 	 */
-	KececiogluMatching(Graph G, Matching M, int nMatched, IntSet subset)
+	KececiogluMatching(Graph g, Matching M, int nMatched, IntSet subset)
 	{
-		this.Time = 1;
-		this.label = new int[G.order()];
-		this.age = new int[G.order()];
-		this.shore = new int[G.order()];
-		this.tree = new Edge[G.order()];
-		this.bridge = new Edge[G.order()];
-		this.base = new int[G.order()];
-		this.alternatingTree = new ArrayDeque<Integer>(G.order());
-		this.path = new ArrayDeque<Edge>(G.order());
-		this.searchStack = new ArrayDeque<Edge>(G.order());
+		this.time = 1;
+		this.label = new int[g.order()];
+		this.age = new int[g.order()];
+		this.shore = new int[g.order()];
+		this.tree = new Edge[g.order()];
+		this.bridge = new Edge[g.order()];
+		this.base = new int[g.order()];
+		this.alternatingTree = new ArrayDeque<Integer>(g.order());
+		this.path = new ArrayDeque<Edge>(g.order());
+		this.searchStack = new ArrayDeque<Edge>(g.order());
 		
 		this.matching = M;
 		this.subset =subset;
@@ -63,9 +63,9 @@ final class KececiogluMatching {
 		Arrays.fill(label, UnreachedLabel);
 		Arrays.fill(age, 0);
 
-		for (int V = 0; V < G.order(); V++ ) {
-			if (subset.contains(V) && matching.unmatched(V) && Search(V, G)) {
-				Augment(path, alternatingTree);
+		for (int v = 0; v < g.order(); v++ ) {
+			if (subset.contains(v) && matching.unmatched(v) && search(v, g)) {
+				augment(path, alternatingTree);
 				nMatched += 2;	
 			}
 		}
@@ -76,171 +76,175 @@ final class KececiogluMatching {
      * Find an augmenting path. If an augmenting path
      * was found then the search must be restarted. If a blossom was detected
      * the blossom is contracted and the search continues.
-     *
+     * @param v a free node in the graph from which to begin depth-first search
+     * @param g the graph in which to begin depth-first search
      * @return an augmenting path was found
      */
-	private boolean Search (int V, Graph G)
+	private boolean search (int v, Graph g)
 	{
 		// label current vertex as even and record its age
-		label[V] = EvenLabel;
-		age[V] = Time++;
-		boolean Found = false;
+		label[v] = EvenLabel;
+		age[v] = time++;
+		boolean found = false;
 
 		// start alt tree with current vertex
-		alternatingTree.addFirst(V);
+		alternatingTree.addFirst(v);
 
 		// create list of edges connected to current vertex 
 		searchStack.clear();
-		int W;
+		int w;
 		
 		// add incident edges to our stack S 
-		for (Edge E : G.edges(V)) 
+		for (Edge e : g.edges(v)) 
 		{
-			if (!subset.contains(E.other(V)) || E.bond() == Bond.SINGLE) 
+			if (!subset.contains(e.other(v)) || e.bond() == Bond.SINGLE) 
 				continue;
 			
-			searchStack.addLast(E);
+			searchStack.addLast(e);
 
 			// peek ahead for an augmenting path and bail early if so
-			W = E.other(V);
-			if (!IsReached(W) && matching.unmatched(W))
+			w = e.other(v);
+			if (!isReached(w) && matching.unmatched(w))
 				break;
 		}
 		
-		while (!searchStack.isEmpty() && !Found)
+		while (!searchStack.isEmpty() && !found)
 		{
-			Edge E = searchStack.removeLast();
+			Edge e = searchStack.removeLast();
 
-			int X = Base(E.either());
-			int Y = Base(E.other(E.either()));
-			if (X == Y)
+			int X = find(e.either());
+			int y = find(e.other(e.either()));
+			if (X == y)
 				continue;
-			if (!IsEven(X))
+			if (!isEven(X))
 			{
-				int Z = X;
-				X = Y;
-				Y = Z;
+				int z = X;
+				X = y;
+				y = z;
 			}
 
 			// found an augmenting path
-			if (!IsReached(Y) && matching.unmatched(Y))
+			if (!isReached(y) && matching.unmatched(y))
 			{
-				label[Y] = OddLabel;
-				tree[Y] = E;
-				age[Y] = Time++;
-				alternatingTree.addFirst(Y);
-				Recover(Y);
-				Found = true;
+				label[y] = OddLabel;
+				tree[y] = e;
+				age[y] = time++;
+				alternatingTree.addFirst(y);
+				recover(y);
+				found = true;
 				break;
 
 			// found a matched edge, need to add nbrs of mate of edge to DFS	
-			} else if (!IsReached(Y) && matching.matched(Y))
+			} else if (!isReached(y) && matching.matched(y))
 			{
-				label[Y] = OddLabel;
-				tree[Y] = E;
-				age[Y] = Time++;
-				alternatingTree.addFirst(Y);
+				label[y] = OddLabel;
+				tree[y] = e;
+				age[y] = time++;
+				alternatingTree.addFirst(y);
 
-				Edge F = G.edge(Y, matching.other(Y));
-				int Z = F.other(Y);
-				label[Z] = EvenLabel;
-				age[Z] = Time++;
-				alternatingTree.addFirst(Z);
+				Edge f = g.edge(y, matching.other(y));
+				int z = f.other(y);
+				label[z] = EvenLabel;
+				age[z] = time++;
+				alternatingTree.addFirst(z);
 
-				for (Edge E2: G.edges(Z)) 
+				for (Edge e2: g.edges(z)) 
 				{
-					if (E2 != F && subset.contains(E2.other(Z)) && E2.bond() != Bond.SINGLE)
+					if (e2 != f && subset.contains(e2.other(z)) && e2.bond() != Bond.SINGLE)
 					{
-						searchStack.addLast(E2);
+						searchStack.addLast(e2);
 						
 						// peek ahead for an augmenting path and bail early if so
-						W = Other(E2, Z);
-						if (!IsReached(W) && matching.unmatched(W))
+						w = other(e2, z);
+						if (!isReached(w) && matching.unmatched(w))
 							break;
 					}
 				}
 			// found a blossom, need to shrink
-			} else if (IsEven(Y)) {
-				Shrink(E, G);
+			} else if (isEven(y)) {
+				shrink(e, g);
 			}
 		}
 
-		if (!Found)
+		if (!found)
 		{
 			alternatingTree.clear();
 		}
 
-		return Found;
+		return found;
 	}
 
-	private int Base(int i) {
-		return base[i] == nil ? i : (base[i] = Base(base[i]));
+	private int find(int i) {
+		return base[i] == nil ? i : (base[i] = find(base[i]));
 	}
 
 
 	/**
-	 *  Recover an augmenting path ending at vertex V by walking
+	 *  Recover an augmenting path ending at vertex v by walking
 	 *  up the tree back to the root.
 	 *
 	 * Records a list of the unmatched edges on Path.
-	 *
+	 * @param v the free node found indicating the discovery of an augmenting path
 	 */
-	private void Recover (int V)
+	private void recover (int v)
 	{
 		do
 		{
-			path.addFirst(tree[V]);
-			int W = Other(tree[V], V);
-			int B = Base(W);
-			Path(W, B, path);
+			path.addFirst(tree[v]);
+			int w = other(tree[v], v);
+			int b = find(w);
+			path(w, b, path);
 
-			V = matching.matched(B) ? matching.other(B) : nil;
+			v = matching.matched(b) ? matching.other(b) : nil;
 		}
-		while (V != nil);
+		while (v != nil);
 	}
 
 
 	/**
 	 * Recursively recover the even-length piece of an alternating path
-	 * that begins at vertex V with a matched edge and ends at base B
+	 * that begins at vertex v with a matched edge and ends at base b
 	 * of its blossom
 	 *
 	 * The unmatched edges on the path are added to list P, and are in arbitrary
 	 * order.
-	 *
+	 *@param v a node in the graph from which to walk to the root
+	 *@param b the root to walk back to
+	 *@param P a stack on which to place the unmatched edges along the walk
 	 */
-	private void Path ( int V, int B, Deque<Edge> P) {
+	private void path ( int v, int b, Deque<Edge> P) {
 
-		if (V != B)
-			if (IsOdd(V))
+		if (v != b)
+			if (isOdd(v))
 			{
-				Path(shore[V], matching.other(V), P);
-				P.addFirst(bridge[V]);
-				Path(Other(bridge[V], shore[V]), B, P);
+				path(shore[v], matching.other(v), P);
+				P.addFirst(bridge[v]);
+				path(other(bridge[v], shore[v]), b, P);
 			}
-			else if (IsEven(V))
+			else if (isEven(v))
 			{
-				int W = matching.other(V);
-				P.addFirst(tree[W]);
-				Path(Other(tree[W], W), B, P);
+				int w = matching.other(v);
+				P.addFirst(tree[w]);
+				path(other(tree[w], w), b, P);
 			}
 	}
 
 	/**
-	 * Given an edge E between two even blossoms, shrink the implied
+	 * Given an edge e between two even blossoms, shrink the implied
 	 * cycle in the alternating tree into a superblossom
 	 *
 	 * Edges incident to odd vertices on the blossom are added to the stack S
 	 * of search edges.
-	 *
+	 *	@param e a blossom-closing edge
+	 *  @param g the graph containing the discovered blossom
 	 */
-	private void Shrink(Edge E, Graph G)
+	private void shrink(Edge e, Graph g)
 	{
-		boolean    Found;
-		int V = E.either();
-		int W = E.other(V);
-		int baseV = Base(V);
-		int baseW = Base(W);
+		boolean    found;
+		int v = e.either();
+		int w = e.other(v);
+		int baseV = find(v);
+		int baseW = find(w);
 
 		if (age[baseW] > age[baseV])
 		{
@@ -248,60 +252,60 @@ final class KececiogluMatching {
 			baseW = baseV;
 			baseV = temp;
 
-			temp = V;
-			V = W;
-			W = temp;
+			temp = v;
+			v = w;
+			w = temp;
 		}
 
 		/*
-		 * Walk up the alternating tree from vertex V to vertex A, shrinking
+		 * Walk up the alternating tree from vertex v to vertex a, shrinking
 		 * the blossoms into a superblossom.  Edges incident to the odd vertices
-		 * on the path from V to A are pushed onto stack S, to later search from.
+		 * on the path from v to a are pushed onto stack S, to later search from.
 		 */
-		Found = false;
+		found = false;
 		while (baseV != baseW)
 		{
 			base[baseV] = baseW;
 			
-			// matched edge of B, 1 step back in DFS
-			Edge M = G.edge(baseV, matching.other(baseV));
-			// node previous to B in DFS, the odd node
-			W = Other(M, baseV);
+			// matched edge of b, 1 step back in DFS
+			Edge m = g.edge(baseV, matching.other(baseV));
+			// node previous to b in DFS, the odd node
+			w = other(m, baseV);
 
 			// bridge of w is the edge after its match in the DFS
-			bridge[W] = E;
+			bridge[w] = e;
 
 			// shore of w is node one step forward in DFS, 
-			// not necessarily the same as B which is the base of the blossom of V
-			shore[W] = V;
+			// not necessarily the same as b which is the base of the blossom of v
+			shore[w] = v;
 
 			// tree of w is the edge leading to w from previous node in DFS
-			//Edge T = Tree[W];
-			E = tree[W];
+			//Edge T = Tree[w];
+			e = tree[w];
 
 			// look for an unmatched nbr of vertex that is being shrunken into vertex and bail early if we find one
-			if (!Found) {
-				for (Edge F: G.edges(W)) {
-					if (F != M && F != E && subset.contains(F.other(W)) && F.bond() != Bond.SINGLE)
+			if (!found) {
+				for (Edge f: g.edges(w)) {
+					if (f != m && f != e && subset.contains(f.other(w)) && f.bond() != Bond.SINGLE)
 					{
-						searchStack.addLast(F);
+						searchStack.addLast(f);
 
-						int Z = F.other(W);
+						int z = f.other(w);
 						// peek ahead and bail early if we know we're going to find an augmenting path
-						if (!IsReached(Z) && matching.unmatched(Z))
+						if (!isReached(z) && matching.unmatched(z))
 						{
-							Found = true;
+							found = true;
 							break;
 						}
 					}
 				}
 			}
 
-			base[Base(W)] = baseW;
+			base[find(w)] = baseW;
 
-			// V is now the node before W in the DFS
-			V = E.other(W);
-			baseV = Base(V);
+			// v is now the node before w in the DFS
+			v = e.other(w);
+			baseV = find(v);
 		}
 	}
 
@@ -314,21 +318,24 @@ final class KececiogluMatching {
 	 * and that list T contains all vertices in all blossoms in the alternating
 	 * tree containing the augmenting path.
 	 *
+	 * @param path a stack of unmatched edges along the augmenting path
+	 * @param alternatingTree a stack of nodes in all the blossoms in the alternating tree
+	 * containing the augmenting path
 	 */
-	private void Augment(ArrayDeque<Edge> path, ArrayDeque<Integer> alternatingTree) {
-		Edge E = path.poll();
-		while (E != null)
+	private void augment(ArrayDeque<Edge> path, ArrayDeque<Integer> alternatingTree) {
+		Edge e = path.poll();
+		while (e != null)
 		{
-			matching.match(E.either(), E.other(E.either()));
-			E = path.poll();
+			matching.match(e.either(), e.other(e.either()));
+			e = path.poll();
 		}
 
-		Integer V = alternatingTree.poll();
-		while (V != null)
+		Integer v = alternatingTree.poll();
+		while (v != null)
 		{
-		    label[V] = UnreachedLabel;
-			base[V] = nil;
-			V = alternatingTree.poll();
+		    label[v] = UnreachedLabel;
+			base[v] = nil;
+			v = alternatingTree.poll();
 		}
 	}
     
