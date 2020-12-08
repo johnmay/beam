@@ -386,8 +386,34 @@ final class Parser {
                 us = insertDbImplicitRef(u, us); // XXX: temp fix
             else if (c.type() == Configuration.Type.ExtendedTetrahedral) {
                 g.addFlags(Graph.HAS_EXT_STRO);
-                if ((us = getAlleneCarriers(u)) == null)
-                    return;
+                if ((us = getAlleneCarriers(u)) == null) {
+                  if (strict)
+                    throw new InvalidSmilesException("Invalid Allene stereo");
+                  else
+                    warnings.add("Ignored invalid Allene stereochemistry");
+                  return;
+                }
+            } else if (c.type() == Configuration.Type.SquarePlanar &&
+                       us.length != 4) {
+              if (strict)
+                throw new InvalidSmilesException("SquarePlanar without 4 explicit neighbours");
+              else
+                warnings.add("SquarePlanar without 4 explicit neighbours");
+              return;
+            } else if (c.type() == Configuration.Type.TrigonalBipyramidal &&
+                       us.length != 5) {
+              if (strict)
+                throw new InvalidSmilesException("SquarePlanar without 5 explicit neighbours");
+              else
+                warnings.add("SquarePlanar without 5 explicit neighbours");
+              return;
+            } else if (c.type() == Configuration.Type.Octahedral &&
+                       us.length != 6) {
+              if (strict)
+                throw new InvalidSmilesException("SquarePlanar without 6 explicit neighbours");
+              else
+                warnings.add("SquarePlanar without 6 explicit neighbours");
+              return;
             }
             g.addTopology(Topology.create(u, us, es, c));
         }

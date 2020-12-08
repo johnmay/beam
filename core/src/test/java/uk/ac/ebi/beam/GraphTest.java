@@ -542,4 +542,10 @@ public class GraphTest {
         Graph g = Graph.fromSmiles("[CH3:3]1.[CH3:1]C(=[C@@]=[CH:2]1)[CH2:4]C");
         Assert.assertThat(g.topologyOf(3).configuration(), is(Configuration.AL2));
     }
+
+    @Test public void nofail() throws IOException {
+        Graph g = Graph.fromSmiles("CCCO[P@H]1(OC[C@@H]2[C@@H](O1)[C@@]([C@@H](O2)n3cnc4c3nc(nc4OCC)N)(C)F)O CHEMBL1630021");
+        assertThat(g.toSmiles(),
+                   CoreMatchers.is("CCCO[PH]1(OC[C@@H]2[C@@H](O1)[C@@]([C@@H](O2)n3cnc4c3nc(nc4OCC)N)(C)F)O"));
+    }
 }
