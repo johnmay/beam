@@ -37,7 +37,6 @@
         <sonar.organization>johnmay</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
-    </properties>
     <licenses>
         <license>
             <name>The BSD 2-Clause License</name>
