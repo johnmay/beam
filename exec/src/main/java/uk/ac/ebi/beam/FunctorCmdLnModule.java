@@ -27,7 +27,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
      * How much input we process at once, could be adjustable.
      */
     final int WORK_UNIT_SIZE = 15000;
-    final boolean debug = false;
+    static final boolean DEBUG = false;
 
     FunctorCmdLnModule(String name) {
         super(name);
@@ -89,7 +89,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
                                                elapsedMilli(tStart)), cnt);
                 }
             } catch (Exception | InternalError e) {
-                if (debug) e.printStackTrace();
+                if (DEBUG) e.printStackTrace();
                 if (showWarnings) {
                     report("error, " + e.getMessage() + "\nline:" + escapeForPrintf(line) + "\n");
                 }
@@ -199,7 +199,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
             System.err.println(e.getMessage());
-            if (debug) 
+            if (DEBUG)
                 e.printStackTrace();
         }
         return null;
@@ -270,7 +270,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
                 } catch (Exception e) {
                     if (warn) {
                         report("\nerror, " + e.getMessage() + "\nline:" + escapeForPrintf(lines.get(i)) + "\n");
-                        if (debug) e.printStackTrace();
+                        if (DEBUG) e.printStackTrace();
                     }
                     lines.set(i, null);
                 }
