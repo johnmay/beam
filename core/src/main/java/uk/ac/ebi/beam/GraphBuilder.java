@@ -304,6 +304,8 @@ public final class GraphBuilder {
 
             Edge eLab = findBondToLabel(g, builder.u);
             Edge fLab = findBondToLabel(g, builder.v);
+            if (eLab == null || fLab == null)
+                continue;
 
             // adjust for reference
             Configuration.DoubleBond config = builder.c;
