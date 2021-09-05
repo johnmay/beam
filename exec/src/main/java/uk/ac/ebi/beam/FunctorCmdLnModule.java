@@ -186,7 +186,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
         try {
             Thread.sleep(ms);
         } catch (InterruptedException e) {
-            // ignore
+            Thread.currentThread().interrupt();
         }
     }
     
@@ -197,7 +197,9 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
     private Result getResult(Future<Result> future) {
         try {
             return future.get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
             System.err.println(e.getMessage());
             if (DEBUG)
                 e.printStackTrace();
