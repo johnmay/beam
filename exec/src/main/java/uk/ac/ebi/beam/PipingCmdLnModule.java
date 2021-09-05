@@ -81,25 +81,24 @@ public abstract class PipingCmdLnModule implements CmdLnModule {
         final File fin = nonopt.size() > 0 ? new File(nonopt.get(0).toString()) 
                                            : null;
 
-        InputStream in = fin == null ? System.in : new CountingInputStream(fin);
-        OutputStream out = nonopt.size() < 2 ? System.out
-                                             : new FileOutputStream(nonopt.get(1).toString());
-
-
-        InputCounter nonFileCounter = new InputCounter() {
-            @Override public long count() {
-                return 0;
-            }
-
-            @Override public long total() {
-                return -1;
-            }
-        };
-        InputCounter inputCounter = fin == null ? nonFileCounter
-                                                : (CountingInputStream) in;
-
-        try (BufferedWriter bwtr = new BufferedWriter(new OutputStreamWriter(out, UTF_8));
+        try (InputStream in = fin == null ? System.in : new CountingInputStream(fin);
+             OutputStream out = nonopt.size() < 2 ? System.out : new FileOutputStream(nonopt.get(1).toString());
+             BufferedWriter bwtr = new BufferedWriter(new OutputStreamWriter(out, UTF_8));
              BufferedReader brdr = new BufferedReader(new InputStreamReader(in, UTF_8))) {
+
+            InputCounter nonFileCounter = new InputCounter() {
+                @Override public long count() {
+                    return 0;
+                }
+
+                @Override public long total() {
+                    return -1;
+                }
+            };
+            InputCounter inputCounter = fin == null
+                    ? nonFileCounter
+                    : (CountingInputStream) in;
+
             process(brdr, bwtr, inputCounter, optset);
         }
     }
