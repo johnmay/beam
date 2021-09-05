@@ -32,6 +32,8 @@ public final class Functions {
     
     private static final AddDirectionalLabels adl = new AddDirectionalLabels();
 
+    private static Random rand = new Random();
+
     /// non-instantiable
     private Functions() {
     }
@@ -164,12 +166,26 @@ public final class Functions {
         return g;
     }
 
-    private static int[] random(int n) {
+    /**
+     * Generate a random permutation.
+     * @param n size of the permutation
+     * @param rnd random number generator
+     * @return the permutation
+     */
+    private static int[] random(int n, Random rnd) {
         int[] p = ident(n);
-        Random rnd = new Random();
         for (int i = n; i > 1; i--)
             swap(p, i - 1, rnd.nextInt(i));
         return p;
+    }
+
+    /**
+     * Generate a random permutation using a shared RNG instance. The method is synchronized
+     * @param n size of the permutation
+     * @return the permutation
+     */
+    private synchronized static int[] random(int n) {
+      return random(n, rand);
     }
 
     private static int[] reverse(int n) {
