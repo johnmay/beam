@@ -131,7 +131,8 @@ public class ConfigurationTest {
     }
 
     @Test public void antiClockwise() throws InvalidSmilesException {
-        Configuration.read(CharBuffer.fromString("@H"));
+        assertThat(Configuration.read(CharBuffer.fromString("@H")),
+                   is(Configuration.ANTI_CLOCKWISE));
     }
 
     @Test(expected = InvalidSmilesException.class)

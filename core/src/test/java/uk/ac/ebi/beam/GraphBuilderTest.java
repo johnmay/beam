@@ -35,6 +35,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static uk.ac.ebi.beam.Configuration.DoubleBond.OPPOSITE;
 
@@ -212,6 +213,7 @@ public class GraphBuilderTest {
                     .geometric(7, 6).configure(8, 3, OPPOSITE)
                     .geometric(3, 4).configure(2, 5, OPPOSITE)
                     .build();
+        assertNotNull(g); // g builds okay
     }
 
     @Test
@@ -301,6 +303,7 @@ public class GraphBuilderTest {
                     .geometric(8, 9).opposite(4, 10)
                     .geometric(3, 4).opposite(2, 8)
                     .build();
+        assertNotNull(g); // builds okay
     }
 
     @Test
@@ -337,6 +340,7 @@ public class GraphBuilderTest {
                .neighbors(2, 3, 4)
                .winding(Configuration.AL1)
                .build();
+        assertNotNull(gb.build()); // builds okay
     }
 
     @Test
