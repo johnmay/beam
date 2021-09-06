@@ -45,79 +45,79 @@ public class GeneratorTest {
 
     @Test public void implicitHCentre() throws InvalidSmilesException {
 
-        roundTrip("[C@@H](N)(O)C");
+        assertRoundTrip("[C@@H](N)(O)C");
 
         // permutations
-        roundTrip("[C@@H](N)(O)C", new int[]{0, 1, 2, 3}, "[C@@H](N)(O)C");
-        roundTrip("[C@@H](N)(O)C", new int[]{0, 1, 3, 2}, "[C@H](N)(C)O");
-        roundTrip("[C@@H](N)(O)C", new int[]{0, 2, 1, 3}, "[C@H](O)(N)C");
-        roundTrip("[C@@H](N)(O)C", new int[]{0, 2, 3, 1}, "[C@@H](C)(N)O");
-        roundTrip("[C@@H](N)(O)C", new int[]{0, 3, 1, 2}, "[C@@H](O)(C)N");
-        roundTrip("[C@@H](N)(O)C", new int[]{0, 3, 2, 1}, "[C@H](C)(O)N");
+        assertRoundTrip("[C@@H](N)(O)C", new int[]{0, 1, 2, 3}, "[C@@H](N)(O)C");
+        assertRoundTrip("[C@@H](N)(O)C", new int[]{0, 1, 3, 2}, "[C@H](N)(C)O");
+        assertRoundTrip("[C@@H](N)(O)C", new int[]{0, 2, 1, 3}, "[C@H](O)(N)C");
+        assertRoundTrip("[C@@H](N)(O)C", new int[]{0, 2, 3, 1}, "[C@@H](C)(N)O");
+        assertRoundTrip("[C@@H](N)(O)C", new int[]{0, 3, 1, 2}, "[C@@H](O)(C)N");
+        assertRoundTrip("[C@@H](N)(O)C", new int[]{0, 3, 2, 1}, "[C@H](C)(O)N");
 
-        roundTrip("[C@@H](N)(O)C", new int[]{1, 0, 2, 3}, "N[C@H](O)C");
-        roundTrip("[C@@H](N)(O)C", new int[]{1, 0, 3, 2}, "N[C@@H](C)O");
+        assertRoundTrip("[C@@H](N)(O)C", new int[]{1, 0, 2, 3}, "N[C@H](O)C");
+        assertRoundTrip("[C@@H](N)(O)C", new int[]{1, 0, 3, 2}, "N[C@@H](C)O");
 
-        roundTrip("[C@@H](N)(O)C", new int[]{1, 2, 0, 3}, "O[C@@H](N)C");
-        roundTrip("[C@@H](N)(O)C", new int[]{1, 3, 0, 2}, "O[C@H](C)N");
+        assertRoundTrip("[C@@H](N)(O)C", new int[]{1, 2, 0, 3}, "O[C@@H](N)C");
+        assertRoundTrip("[C@@H](N)(O)C", new int[]{1, 3, 0, 2}, "O[C@H](C)N");
 
-        roundTrip("[C@@H](N)(O)C", new int[]{1, 2, 3, 0}, "C[C@H](N)O");
-        roundTrip("[C@@H](N)(O)C", new int[]{1, 3, 2, 0}, "C[C@@H](O)N");
+        assertRoundTrip("[C@@H](N)(O)C", new int[]{1, 2, 3, 0}, "C[C@H](N)O");
+        assertRoundTrip("[C@@H](N)(O)C", new int[]{1, 3, 2, 0}, "C[C@@H](O)N");
 
-        roundTrip("[C@H](N)(C)O");
+        assertRoundTrip("[C@H](N)(C)O");
 
-        roundTrip("[C@H](N)(C)O", new int[]{0, 1, 2, 3}, "[C@H](N)(C)O");
-        roundTrip("[C@H](N)(C)O", new int[]{0, 1, 3, 2}, "[C@@H](N)(O)C");
-        roundTrip("[C@H](N)(C)O", new int[]{0, 2, 1, 3}, "[C@@H](C)(N)O");
-        roundTrip("[C@H](N)(C)O", new int[]{0, 2, 3, 1}, "[C@H](O)(N)C");
-        roundTrip("[C@H](N)(C)O", new int[]{0, 3, 1, 2}, "[C@H](C)(O)N");
-        roundTrip("[C@H](N)(C)O", new int[]{0, 3, 2, 1}, "[C@@H](O)(C)N");
+        assertRoundTrip("[C@H](N)(C)O", new int[]{0, 1, 2, 3}, "[C@H](N)(C)O");
+        assertRoundTrip("[C@H](N)(C)O", new int[]{0, 1, 3, 2}, "[C@@H](N)(O)C");
+        assertRoundTrip("[C@H](N)(C)O", new int[]{0, 2, 1, 3}, "[C@@H](C)(N)O");
+        assertRoundTrip("[C@H](N)(C)O", new int[]{0, 2, 3, 1}, "[C@H](O)(N)C");
+        assertRoundTrip("[C@H](N)(C)O", new int[]{0, 3, 1, 2}, "[C@H](C)(O)N");
+        assertRoundTrip("[C@H](N)(C)O", new int[]{0, 3, 2, 1}, "[C@@H](O)(C)N");
 
-        roundTrip("[C@H](N)(C)O", new int[]{1, 0, 2, 3}, "N[C@@H](C)O");
-        roundTrip("[C@H](N)(C)O", new int[]{1, 0, 3, 2}, "N[C@H](O)C");
+        assertRoundTrip("[C@H](N)(C)O", new int[]{1, 0, 2, 3}, "N[C@@H](C)O");
+        assertRoundTrip("[C@H](N)(C)O", new int[]{1, 0, 3, 2}, "N[C@H](O)C");
 
-        roundTrip("[C@H](N)(C)O", new int[]{1, 2, 0, 3}, "C[C@H](N)O");
-        roundTrip("[C@H](N)(C)O", new int[]{1, 3, 0, 2}, "C[C@@H](O)N");
+        assertRoundTrip("[C@H](N)(C)O", new int[]{1, 2, 0, 3}, "C[C@H](N)O");
+        assertRoundTrip("[C@H](N)(C)O", new int[]{1, 3, 0, 2}, "C[C@@H](O)N");
 
-        roundTrip("[C@H](N)(C)O", new int[]{1, 2, 3, 0}, "O[C@@H](N)C");
-        roundTrip("[C@H](N)(C)O", new int[]{1, 3, 2, 0}, "O[C@H](C)N");
+        assertRoundTrip("[C@H](N)(C)O", new int[]{1, 2, 3, 0}, "O[C@@H](N)C");
+        assertRoundTrip("[C@H](N)(C)O", new int[]{1, 3, 2, 0}, "O[C@H](C)N");
 
-        roundTrip("N[C@@H](C)O");
-        roundTrip("N[C@@H](C)O");
-        roundTrip("N[C@H](O)C");
-        roundTrip("O[C@@H](N)C");
-        roundTrip("O[C@H](C)N");
-        roundTrip("C[C@@H](O)N");
-        roundTrip("C[C@H](N)O");
+        assertRoundTrip("N[C@@H](C)O");
+        assertRoundTrip("N[C@@H](C)O");
+        assertRoundTrip("N[C@H](O)C");
+        assertRoundTrip("O[C@@H](N)C");
+        assertRoundTrip("O[C@H](C)N");
+        assertRoundTrip("C[C@@H](O)N");
+        assertRoundTrip("C[C@H](N)O");
     }
 
     @Test public void ring_closures1() throws Exception {
-        roundTrip("C1=CN=CC2=NC=N[C@@H]21");
+        assertRoundTrip("C1=CN=CC2=NC=N[C@@H]21");
     }
 
     @Test public void ring_closures2() throws Exception {
-        roundTrip("C1=CN=CC2=NC=N[C@H]21");
+        assertRoundTrip("C1=CN=CC2=NC=N[C@H]21");
     }
 
     @Test public void ring_closures3() throws Exception {
-        roundTrip("C1=CC(=CC2=NC(=N[C@@H]21)C(F)(F)F)N");
+        assertRoundTrip("C1=CC(=CC2=NC(=N[C@@H]21)C(F)(F)F)N");
     }
 
     @Test public void ring_closures4() throws Exception {
-        roundTrip("C1=CC(=CC2=NC(=N[C@H]21)C(F)(F)F)N");
+        assertRoundTrip("C1=CC(=CC2=NC(=N[C@H]21)C(F)(F)F)N");
     }
 
 
     @Test public void lowRingNumberOrder() throws InvalidSmilesException {
-        roundTrip("C1=CC2=CC=CC=C2C=C1");
+        assertRoundTrip("C1=CC2=CC=CC=C2C=C1");
     }
 
     @Test public void multipleRingNumberOrder() throws InvalidSmilesException {
-        roundTrip("C1=CC2=C3C4=C5C(C=CC6=C5C7=C(C=C6)C=CC(C=C2)=C37)=CC=C14");
+        assertRoundTrip("C1=CC2=C3C4=C5C(C=CC6=C5C7=C(C=C6)C=CC(C=C2)=C37)=CC=C14");
     }
 
     @Test public void highRingNumberOrder() throws InvalidSmilesException {
-        roundTrip("C1CC2CCC3=C4C2=C5C1CCC6=C5C7=C8C(C=C9CCC%10CCC%11CCC%12=CC(=C3)C(C%13=C8C9=C%10C%11=C%12%13)=C47)=C6");
+        assertRoundTrip("C1CC2CCC3=C4C2=C5C1CCC6=C5C7=C8C(C=C9CCC%10CCC%11CCC%12=CC(=C3)C(C%13=C8C9=C%10C%11=C%12%13)=C47)=C6");
     }
 
     @Test public void bondTypeOnFirstAtom1() throws InvalidSmilesException {
@@ -166,11 +166,11 @@ public class GeneratorTest {
     }
 
     @Test public void sodiumChloride() throws InvalidSmilesException {
-        roundTrip("[Na+].[Cl-]");
+        assertRoundTrip("[Na+].[Cl-]");
     }
 
     @Test public void disconnected() throws InvalidSmilesException {
-        roundTrip("CCCC.OOOO.C[CH]C.CNO");
+        assertRoundTrip("CCCC.OOOO.C[CH]C.CNO");
     }
     
     @Test public void extendedTetrhedral_al1() throws Exception {
@@ -301,11 +301,11 @@ public class GeneratorTest {
         assertThat(g.toSmiles(), is("CC=[C@]=C1OCCCC1"));
     }
 
-    static void roundTrip(String smi) throws InvalidSmilesException {
+    static void assertRoundTrip(String smi) throws InvalidSmilesException {
         assertThat(Generator.generate(Parser.parse(smi)), is(smi));
     }
 
-    static void roundTrip(String smi, int[] p, String res) throws
+    static void assertRoundTrip(String smi, int[] p, String res) throws
                                                            InvalidSmilesException {
         assertThat(Generator.generate(Parser.parse(smi).permute(p)), is(res));
     }
