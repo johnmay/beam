@@ -706,7 +706,7 @@ final class Parser {
                         sb.append(c);
                     }
                     g.setTitle(sb.toString());
-
+                    return;
                 case '\n':
                 case '\r':
                     return;
