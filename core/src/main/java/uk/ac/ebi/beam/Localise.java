@@ -258,10 +258,12 @@ final class Localise {
 
                             if (hasAdjDirectionalLabels(g, e, cyclic) && !inSmallRing(g, e)) {
                                 other = -1;
+                                target = null;
                                 break;
                             }
                             if (vExtra > 1 && hasAdditionalCyclicDoubleBond(g, cyclic, u, v)) {
                                 other = -1;
+                                target = null;
                                 break;
                             }
                             if (other == -1) {
@@ -269,6 +271,7 @@ final class Localise {
                                 target = e;
                             } else {
                                 other = -2; // found more than one
+                                target = null;
                             }
                         }
                         // only one double bond don't check any more
@@ -277,7 +280,7 @@ final class Localise {
                     }
                 }
 
-                if (other >= 0) {
+                if (target != null) {
                     subset.set(u);
                     subset.set(other);
                     target.bond(Bond.IMPLICIT);
