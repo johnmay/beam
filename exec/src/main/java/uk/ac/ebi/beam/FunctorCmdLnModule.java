@@ -89,7 +89,6 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
                                                elapsedMilli(tStart)), cnt);
                 }
             } catch (Exception | InternalError e) {
-                if (DEBUG) e.printStackTrace();
                 if (showWarnings) {
                     report("error, " + e.getMessage() + "\nline:" + escapeForPrintf(line) + "\n");
                 }
@@ -201,8 +200,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
             System.err.println(e.getMessage());
-            if (DEBUG)
-                e.printStackTrace();
+
         }
         return null;
     }
@@ -223,7 +221,7 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
             }
             return cnt;
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IO Error: " + e.getMessage());
         }
         return 0;
     }
@@ -272,7 +270,6 @@ abstract class FunctorCmdLnModule extends PipingCmdLnModule {
                 } catch (Exception e) {
                     if (warn) {
                         report("\nerror, " + e.getMessage() + "\nline:" + escapeForPrintf(lines.get(i)) + "\n");
-                        if (DEBUG) e.printStackTrace();
                     }
                     lines.set(i, null);
                 }

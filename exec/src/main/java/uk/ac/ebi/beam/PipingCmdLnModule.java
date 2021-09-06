@@ -68,7 +68,7 @@ public abstract class PipingCmdLnModule implements CmdLnModule {
         try {
             process(args);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Execution error: " + e.getMessage());
         }
     }
 
