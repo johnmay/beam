@@ -36,9 +36,8 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 /** @author John May */
 public class ParserTest {
@@ -96,7 +95,9 @@ public class ParserTest {
     }
 
     @Test public void tellurophene() throws InvalidSmilesException {
-        Parser.parse("c1cc[te]c1");
+        Graph g = Parser.parse("c1cc[te]c1");
+        assertThat(g.order(), is(5));
+        assertThat(g.size(), is(5));
     }
 
     @Test public void mixingAromaticAndKekule() throws InvalidSmilesException {
@@ -142,6 +143,8 @@ public class ParserTest {
     @Test
     public void hydrogen_strict_okay() throws IOException {
         Graph g = Parser.strict("[H][H]");
+        assertNotNull(g);
+        assertThat(g.order(), is(2));
     }
 
     @Test public void tellurium() throws IOException {
@@ -157,6 +160,8 @@ public class ParserTest {
 
     @Test public void largeRnum() throws Exception {
         Graph g = Parser.parse("C%99CCCC%99");
+        assertThat(g.order(), is(6));
+        assertThat(g.size(), is(6));
     }
 
     // not part of spec
@@ -215,7 +220,7 @@ public class ParserTest {
 
     @Test
     public void acceptMultipleBonds() throws Exception {
-        Parser.parse("C/C=C/C\\C=C/C");
+        assertNotNull(Parser.parse("C/C=C/C\\C=C/C"));
     }
     
     @Test

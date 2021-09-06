@@ -220,7 +220,9 @@ public class GraphTest {
     @Test public void addUnknownTopology() {
         Topology t = Topology.unknown();
         Graph g = new Graph(5);
-        g.addTopology(t);
+        g.addTopology(t); // don't fail
+        assertThat(g.order(), is(0));
+        assertThat(g.size(), is(0));
     }
 
     @Test public void defaultTopology() {
@@ -479,6 +481,7 @@ public class GraphTest {
     
     @Test public void CHEMBL1215012() throws Exception {
         Graph g = Graph.fromSmiles("[Na+].[Na+].CC(C)c1c(O)c(O)c(\\C=N\\[C@H]2[C@H]3SC(C)(C)[C@@H](N3C2=O)C(=O)[O-])c4C(=O)C(=C(C)C(=O)c14)C5=C(C)C(=O)c6c(C(C)C)c(O)c(O)c(\\C=N\\[C@H]7[C@H]8SC(C)(C)[C@@H](N8C7=O)C(=O)[O-])c6C5=O CHEMBL1215012");
+        Assert.assertNotNull(g);
     }
 
     @Test public void nitgrogenStereochemistry() throws Exception {
