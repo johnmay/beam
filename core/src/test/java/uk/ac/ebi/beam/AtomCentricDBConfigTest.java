@@ -77,17 +77,17 @@ public class AtomCentricDBConfigTest {
     }
 
     @Test public void difluoroethene() throws InvalidSmilesException {
-        GeneratorTest.roundTrip("F[C@H]=[C@H]F");
-        GeneratorTest.roundTrip("F[C@@H]=[C@@H]F");
-        GeneratorTest.roundTrip("F[C@H]=[C@@H]F");
-        GeneratorTest.roundTrip("F[C@@H]=[C@H]F");
+        GeneratorTest.assertRoundTrip("F[C@H]=[C@H]F");
+        GeneratorTest.assertRoundTrip("F[C@@H]=[C@@H]F");
+        GeneratorTest.assertRoundTrip("F[C@H]=[C@@H]F");
+        GeneratorTest.assertRoundTrip("F[C@@H]=[C@H]F");
     }
 
     @Test public void difluoroethene_permute() throws InvalidSmilesException {
-        GeneratorTest.roundTrip("F[C@H]=[C@H]F",
+        GeneratorTest.assertRoundTrip("F[C@H]=[C@H]F",
                                 new int[]{1, 0, 2, 3},
                                 "[C@@H](F)=[C@H]F");
-        GeneratorTest.roundTrip("[C@@H](F)=[C@H]F",
+        GeneratorTest.assertRoundTrip("[C@@H](F)=[C@H]F",
                                 new int[]{1, 0, 2, 3},
                                 "F[C@H]=[C@H]F");
     }
