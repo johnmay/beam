@@ -160,8 +160,8 @@ public class ParserTest {
 
     @Test public void largeRnum() throws Exception {
         Graph g = Parser.parse("C%99CCCC%99");
-        assertThat(g.order(), is(6));
-        assertThat(g.size(), is(6));
+        assertThat(g.order(), is(5));
+        assertThat(g.size(), is(5));
     }
 
     // not part of spec
