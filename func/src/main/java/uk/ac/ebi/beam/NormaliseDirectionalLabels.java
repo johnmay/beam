@@ -179,7 +179,7 @@ final class NormaliseDirectionalLabels
         }
 
         private void flip(Edge first, int u, BitSet dbAtoms) {
-            if (first != null)
+            if (first == null)
                 return;
             if (ordering[first.other(u)] < ordering[u]) {
                 if (first.bond(u) == Bond.UP)
