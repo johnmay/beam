@@ -7,7 +7,7 @@
     <description>SMILES parsing and generation library for cheminformatics</description>
     <url>http://www.github.com/johnmay/beam/</url>
     <packaging>pom</packaging>
-    <version>1.3.4</version>
+    <version>1.3.5</version>
     <modules>
         <module>core</module>
         <module>func</module>
@@ -51,11 +51,40 @@
             <name>John Mayfield (né May)</name>
             <email>https://github.com/johnmay</email>
             <url>http://www.github.com/johnmay/</url>
-            <organization>EMBL-EBI</organization>
-            <organizationUrl>http://ebi.ac.uk</organizationUrl>
+            <organization>NextMove Software</organization>
+            <organizationUrl>https://www.nextmovesoftware.com</organizationUrl>
             <timezone>GMT</timezone>
         </developer>
     </developers>
+    <dependencyManagement>
+      <dependencies>
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.13.2</version>
+        </dependency>
+        <dependency>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-core</artifactId>
+          <version>2.2</version>
+        </dependency>
+        <dependency>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-all</artifactId>
+          <version>2.2</version>
+        </dependency>
+        <dependency>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest</artifactId>
+          <version>2.2</version>
+        </dependency>
+        <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-core</artifactId>
+          <version>4.11.0</version>
+        </dependency>
+      </dependencies>
+    </dependencyManagement>
     <profiles>
         <profile>
             <id>ossrh</id>
