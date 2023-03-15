@@ -385,6 +385,10 @@ public class LocaliseTest {
         test("*1ccccc1", "*1=CC=CC=C1");
     }
 
+    @Test public void aromphos() throws Exception {
+      test("O=p1ccccc1", "O=P1=CC=CC=C1");
+    }
+
     static void test(String delocalised, String localised) throws Exception {
         Graph g = Graph.fromSmiles(delocalised);
         Graph h = Localise.localise(g);

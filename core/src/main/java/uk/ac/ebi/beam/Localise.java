@@ -159,8 +159,9 @@ final class Localise {
             for (int j = 0; j < d; ++j) {
                 Edge e = g.edgeAt(v, j);
                 if (e.bond() == Bond.DOUBLE) {
-                    if (q == 0 && (a.element() == Element.Nitrogen || (a.element() == Element.Sulfur && deg > 3))
-                            )
+                    if (q == 0 && (a.element() == Element.Nitrogen ||
+                                   a.element() == Element.Phosphorus ||
+                                  (a.element() == Element.Sulfur && deg > 3)))
                         return false;
                     return true;
                 }
