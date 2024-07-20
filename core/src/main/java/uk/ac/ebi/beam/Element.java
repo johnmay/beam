@@ -41,7 +41,7 @@ import java.util.Map;
 /**
  * Enumeration of valid OpenSMILES elements.
  *
- * <h1>Organic subsets</h1> Several of the elements belong to the organic
+ * <h2>Organic subsets</h2> Several of the elements belong to the organic
  * subset. Atoms of an organic element type can be written just as their symbol
  * (see. <a href="http://www.opensmiles.org/opensmiles.html#orgsbst">Organic
  * Subset, OpenSMILES Specification</a>).
@@ -52,7 +52,7 @@ import java.util.Map;
  * #Sulfur}</li> <li>{@link #Chlorine}</li> <li>{@link #Bromine}</li> <li>{@link
  * #Iodine}</li> </ul>
  *
- * <h1>Usage</h1>
+ * <h2>Usage</h2>
  *
  * Elements can be created by either using the value directly or by looking up
  * it's symbol. If the element may be aromatic the lower-case symbol can also be

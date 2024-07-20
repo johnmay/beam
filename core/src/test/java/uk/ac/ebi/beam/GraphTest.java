@@ -546,6 +546,22 @@ public class GraphTest {
         Assert.assertThat(g.topologyOf(3).configuration(), is(Configuration.AL2));
     }
 
+    @Test public void testDegenerateOctahedral() throws InvalidSmilesException {
+        Graph g = Graph.fromSmiles("O=[V@OH25](Cl)(Cl)(F)F");
+        System.err.println(g.configurationOf(1));
+        for (int nbor : g.neighbors(1)) {
+            System.err.println(nbor);
+        }
+    }
+
+    @Test public void testDegenerateOctahedral2() throws InvalidSmilesException {
+        Graph g = Graph.fromSmiles("O=[V@OH25]12(F)F.Cl1.Cl2");
+        System.err.println(g.configurationOf(1));
+        for (int nbor : g.neighbors(1)) {
+            System.err.println(nbor);
+        }
+    }
+
     @Test public void nofail() throws IOException {
         Graph g = Graph.fromSmiles("CCCO[P@H]1(OC[C@@H]2[C@@H](O1)[C@@]([C@@H](O2)n3cnc4c3nc(nc4OCC)N)(C)F)O CHEMBL1630021");
         assertThat(g.toSmiles(),

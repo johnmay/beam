@@ -34,7 +34,9 @@ package uk.ac.ebi.beam;
  * valid undirected and directed bond types and {@link #DOT}. Opposed to the
  * other types, {@link #DOT} indicates that two atoms are not connected. <br>
  *
- * <table summary="" style="font-family: Courier, monospace;"> <tr><th>{@link
+ * <table style="font-family: Courier, monospace;"> <caption>
+ *     Bond Types
+ * </caption><tr><th>{@link
  * Bond}</th><th>{@link #token()}</th><th>{@link #order()}</th><th>{@link
  * #inverse()}</th></tr> <tr><td>{@link #DOT}</td><td>.</td><td>0</td><td></td></tr>
  * <tr><td>{@link #IMPLICIT}</td><td></td><td>undefined (2 or
