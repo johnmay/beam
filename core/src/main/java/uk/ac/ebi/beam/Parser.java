@@ -46,26 +46,38 @@ import static java.util.Map.Entry;
  */
 final class Parser {
 
-    /** Keep track of branching. */
+    /**
+     * Keep track of branching.
+     */
     private final IntStack stack = new IntStack(10);
 
-    /** Molecule being loaded. */
+    /**
+     * Molecule being loaded.
+     */
     private final Graph g;
 
-    /** Keep track of ring information. */
+    /**
+     * Keep track of ring information.
+     */
     private RingBond[] rings = new RingBond[10];
 
-    /** Local arrangement for ring openings. */
+    /**
+     * Local arrangement for ring openings.
+     */
     private Map<Integer, LocalArrangement> arrangement
             = new HashMap<Integer, LocalArrangement>(5);
 
     private Map<Integer, Configuration> configurations
             = new HashMap<Integer, Configuration>(5);
 
-    /** Current bond. */
+    /**
+     * Current bond.
+     */
     private Bond bond = Bond.IMPLICIT;
 
-    /** Current configuration. */
+    /**
+     * Current configuration.
+     */
     private Configuration configuration = Configuration.UNKNOWN;
 
 
@@ -76,16 +88,20 @@ final class Parser {
      */
     private Set<Integer> start = new TreeSet<Integer>();
 
-    /** Number of open rings - all rings should be closed. */
+    /**
+     * Number of open rings - all rings should be closed.
+     */
     private int openRings = 0;
 
-    /** Strict parsing. */
+    /**
+     * Strict parsing.
+     */
     private final boolean strict;
 
     private BitSet checkDirectionalBonds = new BitSet();
 
     private int lastBondPos = -1;
-    private Map<Edge,Integer> bondStrPos = new HashMap<>();
+    private Map<Edge, Integer> bondStrPos = new HashMap<>();
 
     private List<String> warnings = new ArrayList<>();
 
@@ -116,7 +132,7 @@ final class Parser {
                     int nArom = 0;
                     for (Edge e : g.edges(i)) {
                         if (e.bond() == Bond.AROMATIC ||
-                                e.bond() == Bond.IMPLICIT && g.atom(e.other(i)).aromatic())
+                            e.bond() == Bond.IMPLICIT && g.atom(e.other(i)).aromatic())
                             nArom++;
                     }
                     if (nArom >= 2) {
@@ -124,13 +140,13 @@ final class Parser {
                             g.setAtom(i, AtomImpl.AromaticSubset.Any);
                         else
                             g.setAtom(i,
-                                    new AtomImpl.BracketAtom(-1,
-                                                             Element.Unknown,
-                                                             atom.label(),
-                                                             atom.hydrogens(),
-                                                             atom.charge(),
-                                                             atom.atomClass(),
-                                                             true));
+                                      new AtomImpl.BracketAtom(-1,
+                                                               Element.Unknown,
+                                                               atom.label(),
+                                                               atom.hydrogens(),
+                                                               atom.charge(),
+                                                               atom.atomClass(),
+                                                               true));
                     }
                 }
             }
@@ -190,6 +206,7 @@ final class Parser {
         // create topologies (stereo configurations)
         for (Entry<Integer, Configuration> e : configurations.entrySet()) {
             addTopology(e.getKey(),
+                        e.getValue(),
                         Topology.toExplicit(g, e.getKey(), e.getValue()));
         }
 
@@ -244,8 +261,8 @@ final class Parser {
                             offset2 = bondStrPos.get(e);
                 }
                 String errorPos = InvalidSmilesException.display(buffer,
-                                                                 offset1-buffer.length(),
-                                                                 offset2-buffer.length());
+                                                                 offset1 - buffer.length(),
+                                                                 offset2 - buffer.length());
                 if (strict)
                     throw new InvalidSmilesException("Ignored invalid Cis/Trans specification: " + errorPos);
                 else
@@ -261,8 +278,8 @@ final class Parser {
                             offset2 = bondStrPos.get(e);
                 }
                 String errorPos = InvalidSmilesException.display(buffer,
-                                                                 offset1-buffer.length(),
-                                                                 offset2-buffer.length());
+                                                                 offset1 - buffer.length(),
+                                                                 offset2 - buffer.length());
                 if (strict)
                     throw new InvalidSmilesException("Ignored invalid Cis/Trans specification: " + errorPos);
                 else
@@ -311,22 +328,25 @@ final class Parser {
         return new int[]{prevEnd1, prevEnd2};
     }
 
-    /** Access the local edges in order. */
+    /**
+     * Access the local edges in order.
+     */
     private List<Edge> getLocalEdges(int end) {
         return getEdges(arrangement.get(end), end);
     }
 
     /**
      * Complicated process to get correct Allene neighbors.
+     *
      * @param focus the focus (central cumualted atom)
      * @return the carrier list
      */
     public int[] getAlleneCarriers(int focus) {
         int[] carriers = new int[4];
-        int     i     = 0;
-        int[]   ends  = findExtendedTetrahedralEnds(focus);
-        int     beg   = ends[0];
-        int     end   = ends[1];
+        int i = 0;
+        int[] ends = findExtendedTetrahedralEnds(focus);
+        int beg = ends[0];
+        int end = ends[1];
         boolean begh = g.implHCount(beg) == 1;
         boolean endh = g.implHCount(end) == 1;
         List<Edge> begEdges = new ArrayList<>(getLocalEdges(beg));
@@ -372,52 +392,56 @@ final class Parser {
      * @param c explicit configuration of that vertex
      * @see Topology#toExplicit(Graph, int, Configuration)
      */
-    private void addTopology(int u, Configuration c) throws
-                                                     InvalidSmilesException {
-
+    private void addTopology(int u, Configuration input, Configuration c) throws
+            InvalidSmilesException {
         // stereo on ring closure - use local arrangement
         if (arrangement.containsKey(u)) {
             int[] us = arrangement.get(u).toArray();
             List<Edge> es = getLocalEdges(u);
 
-            if (c.type() == Configuration.Type.Tetrahedral)
+            if (c.type() == Configuration.Type.Tetrahedral) {
                 us = insertThImplicitRef(u, us); // XXX: temp fix
-            else if (c.type() == Configuration.Type.DoubleBond)
+            } else if (c.type() == Configuration.Type.DoubleBond) {
                 us = insertDbImplicitRef(u, us); // XXX: temp fix
-            else if (c.type() == Configuration.Type.ExtendedTetrahedral) {
+            } else if (c.type() == Configuration.Type.ExtendedTetrahedral) {
                 g.addFlags(Graph.HAS_EXT_STRO);
                 if ((us = getAlleneCarriers(u)) == null) {
-                  if (strict)
-                    throw new InvalidSmilesException("Invalid Allene stereo");
-                  else
-                    warnings.add("Ignored invalid Allene stereochemistry");
-                  return;
+                    if (strict)
+                        throw new InvalidSmilesException("Invalid Allene stereo");
+                    else
+                        warnings.add("Ignored invalid Allene stereochemistry");
+                    return;
                 }
+            } else if (input.type() == Configuration.Type.SquarePlanar) {
+                us = insertMultipleImplicitRefs(u, us, 4);
+            } else if (input.type() == Configuration.Type.TrigonalBipyramidal) {
+                us = insertMultipleImplicitRefs(u, us, 5);
+            } else if (input.type() == Configuration.Type.Octahedral) {
+                us = insertMultipleImplicitRefs(u, us, 6);
             } else if (c.type() == Configuration.Type.SquarePlanar &&
                        us.length != 4) {
-              if (strict)
-                throw new InvalidSmilesException("SquarePlanar without 4 explicit neighbours");
-              else
-                warnings.add("SquarePlanar without 4 explicit neighbours");
-              return;
+                if (strict)
+                    throw new InvalidSmilesException("SquarePlanar without 4 explicit neighbours");
+                else
+                    warnings.add("SquarePlanar without 4 explicit neighbours");
+                return;
             } else if (c.type() == Configuration.Type.TrigonalBipyramidal &&
                        us.length != 5) {
-              if (strict)
-                throw new InvalidSmilesException("SquarePlanar without 5 explicit neighbours");
-              else
-                warnings.add("SquarePlanar without 5 explicit neighbours");
-              return;
+                if (strict)
+                    throw new InvalidSmilesException("TrigonalBipyramidal without 5 explicit neighbours");
+                else
+                    warnings.add("SquarePlanar without 5 explicit neighbours");
+                return;
             } else if (c.type() == Configuration.Type.Octahedral &&
                        us.length != 6) {
-              if (strict)
-                throw new InvalidSmilesException("SquarePlanar without 6 explicit neighbours");
-              else
-                warnings.add("SquarePlanar without 6 explicit neighbours");
-              return;
+                if (strict)
+                    throw new InvalidSmilesException("Octahedral without 6 explicit neighbours");
+                else
+                    warnings.add("SquarePlanar without 6 explicit neighbours");
+                return;
             }
             g.addTopology(Topology.create(u, us, es, c));
-        }
-        else {
+        } else {
             int[] us = new int[g.degree(u)];
             List<Edge> es = g.edges(u);
             for (int i = 0; i < us.length; i++)
@@ -425,35 +449,78 @@ final class Parser {
 
             if (c.type() == Configuration.Type.Tetrahedral) {
                 us = insertThImplicitRef(u, us); // XXX: temp fix
-            }
-            else if (c.type() == Configuration.Type.DoubleBond) {
+            } else if (c.type() == Configuration.Type.DoubleBond) {
                 us = insertDbImplicitRef(u, us); // XXX: temp fix
-            }
-            else if (c.type() == Configuration.Type.ExtendedTetrahedral) {
+            } else if (c.type() == Configuration.Type.ExtendedTetrahedral) {
                 g.addFlags(Graph.HAS_EXT_STRO);
                 if ((us = getAlleneCarriers(u)) == null)
                     return;
+            } else if (input.type() == Configuration.Type.SquarePlanar) {
+                us = insertMultipleImplicitRefs(u, us, 4);
+            } else if (input.type() == Configuration.Type.TrigonalBipyramidal) {
+                us = insertMultipleImplicitRefs(u, us, 5);
+            } else if (input.type() == Configuration.Type.Octahedral) {
+                us = insertMultipleImplicitRefs(u, us, 6);
+            } else if (c.type() == Configuration.Type.SquarePlanar &&
+                       us.length != 4) {
+                if (strict)
+                    throw new InvalidSmilesException("SquarePlanar without 4 explicit neighbours");
+                else
+                    warnings.add("SquarePlanar without 4 explicit neighbours");
+                return;
+            } else if (c.type() == Configuration.Type.TrigonalBipyramidal &&
+                       us.length != 5) {
+                if (strict)
+                    throw new InvalidSmilesException("TrigonalBipyramidal without 5 explicit neighbours");
+                else
+                    warnings.add("SquarePlanar without 5 explicit neighbours");
+                return;
+            } else if (c.type() == Configuration.Type.Octahedral &&
+                       us.length != 6) {
+                if (strict)
+                    throw new InvalidSmilesException("Octahedral without 6 explicit neighbours");
+                else
+                    warnings.add("SquarePlanar without 6 explicit neighbours");
+                return;
             }
             g.addTopology(Topology.create(u, us, es, c));
         }
     }
 
-    // XXX: temporary fix for correcting configurations
     private int[] insertThImplicitRef(int u, int[] vs) throws
-                                                       InvalidSmilesException {
+            InvalidSmilesException {
         if (vs.length == 4)
             return vs;
         if (vs.length != 3)
-            throw new InvalidSmilesException("Invaid number of verticies for TH1/TH2 stereo chemistry");
+            throw new InvalidSmilesException("Invalid number of vertices for TH1/TH2 stereo chemistry");
         if (start.contains(u))
             return new int[]{u, vs[0], vs[1], vs[2]};
         else
             return new int[]{vs[0], u, vs[1], vs[2]};
     }
 
+    private int[] insertMultipleImplicitRefs(int u, int[] vs, int n) throws
+            InvalidSmilesException {
+        if (vs.length == n)
+            return vs;
+        if (vs.length <= 1)
+            throw new InvalidSmilesException("Cannot have <= 1 vertices for high-order stereo chemistry");
+        int cnt = n - vs.length;
+        int srcIdx = 0;
+        int dstIdx = 0;
+        int[] padded = new int[n];
+        if (!start.contains(u))
+            padded[dstIdx++] = vs[srcIdx++];
+        while (cnt-- > 0)
+            padded[dstIdx++] = u;
+        while (srcIdx < vs.length)
+            padded[dstIdx++] = vs[srcIdx++];
+        return padded;
+    }
+
     // XXX: temporary fix for correcting configurations
     private int[] insertDbImplicitRef(int u, int[] vs) throws
-                                                       InvalidSmilesException {
+            InvalidSmilesException {
         if (vs.length == 3)
             return vs;
         if (vs.length != 2)
@@ -484,8 +551,7 @@ final class Parser {
                 g.addEdge(e);
                 if (arrangement.containsKey(u))
                     arrangement.get(u).add(v);
-            }
-            else {
+            } else {
                 start.add(v); // start of a new run
             }
         }
@@ -507,7 +573,7 @@ final class Parser {
      * @throws InvalidSmilesException invalid grammar
      */
     private void readSmiles(final CharBuffer buffer) throws
-                                                     InvalidSmilesException {
+            InvalidSmilesException {
         // primary dispatch
         while (buffer.hasRemaining()) {
             char c = buffer.get();
@@ -733,7 +799,7 @@ final class Parser {
      *                                specification.
      */
     Atom readBracketAtom(final CharBuffer buffer) throws
-                                                  InvalidSmilesException {
+            InvalidSmilesException {
         int start = buffer.position;
 
         boolean arbitraryLabel = false;
@@ -770,8 +836,7 @@ final class Parser {
         if (!arbitraryLabel && !buffer.getIf(']')) {
             if (strict) {
                 throw InvalidSmilesException.invalidBracketAtom(buffer);
-            }
-            else {
+            } else {
                 arbitraryLabel = true;
             }
         }
@@ -852,10 +917,10 @@ final class Parser {
     private static int readCharge(int acc, final CharBuffer buffer) {
         if (buffer.getIf('+'))
             return buffer.nextIsDigit() ? acc + buffer.getNumber()
-                                        : readCharge(acc + 1, buffer);
+                    : readCharge(acc + 1, buffer);
         if (buffer.getIf('-'))
             return buffer.nextIsDigit() ? acc - buffer.getNumber()
-                                        : readCharge(acc - 1, buffer);
+                    : readCharge(acc - 1, buffer);
         return acc;
     }
 
@@ -988,7 +1053,7 @@ final class Parser {
      * Decide the bond to use for a ring bond. The bond symbol can be present on
      * either or both bonded atoms. This method takes those bonds, chooses the
      * correct one or reports an error if there is a conflict.
-     *
+     * <p>
      * Equivalent SMILES:
      * <blockquote><pre>
      *     C=1CCCCC=1
@@ -996,9 +1061,9 @@ final class Parser {
      *     C1CCCCC=1
      * </pre></blockquote>
      *
-     * @param a a bond
-     * @param b other bond
-     * @param pos the position in the string of bond a
+     * @param a      a bond
+     * @param b      other bond
+     * @param pos    the position in the string of bond a
      * @param buffer the buffer and it's current position
      * @return the bond to use for this edge
      * @throws InvalidSmilesException ring bonds did not match
@@ -1013,11 +1078,11 @@ final class Parser {
         if (strict || a.inverse() != b)
             throw new InvalidSmilesException("Ring closure bonds did not match,  '" + a + "'!='" + b + "':" +
                                              InvalidSmilesException.display(buffer,
-                                                                            pos-buffer.position,
-                                                     lastBondPos-buffer.position));
+                                                                            pos - buffer.position,
+                                                                            lastBondPos - buffer.position));
         warnings.add("Ignored invalid Cis/Trans on ring closure, should flip:" +
-                      InvalidSmilesException.display(buffer, pos-buffer.position,
-                                                     lastBondPos-buffer.position));
+                     InvalidSmilesException.display(buffer, pos - buffer.position,
+                                                    lastBondPos - buffer.position));
         return Bond.IMPLICIT;
     }
 
@@ -1035,6 +1100,7 @@ final class Parser {
 
     /**
      * Access any warning messages from parsing the SMILES.
+     *
      * @return the warnings.
      */
     public Collection<? extends String> getWarnings() {
@@ -1046,9 +1112,9 @@ final class Parser {
      * specify the bond type.
      */
     private static final class RingBond {
-        int  u;
+        int u;
         Bond bond;
-        int  pos;
+        int pos;
 
         private RingBond(int u, Bond bond, int pos) {
             this.u = u;
@@ -1070,9 +1136,11 @@ final class Parser {
     private static final class LocalArrangement {
 
         int[] vs;
-        int   n;
+        int n;
 
-        /** New local arrangement. */
+        /**
+         * New local arrangement.
+         */
         private LocalArrangement() {
             this.vs = new int[4];
         }

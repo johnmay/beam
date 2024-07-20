@@ -182,7 +182,7 @@ final class NormaliseDirectionalLabels
             if (first == null)
                 return;
             if (ordering[first.other(u)] < ordering[u]) {
-                if (first.bond(u) == Bond.UP)
+                if (first.bond(u) == Bond.UP || first.bond(u) == Bond.UP_AROMATIC)
                     invertExistingDirectionalLabels(g,
                                                     u,
                                                     new BitSet(),
@@ -198,7 +198,7 @@ final class NormaliseDirectionalLabels
                                                   u);
             }
             else {
-                if (first.bond(u) == Bond.DOWN)
+                if (first.bond(u) == Bond.DOWN || first.bond(u) == Bond.DOWN_AROMATIC)
                     invertExistingDirectionalLabels(g,
                                                     u,
                                                     new BitSet(),
@@ -220,7 +220,7 @@ final class NormaliseDirectionalLabels
             final int d = g.degree(u);
             for (int j = 0; j < d; ++j) {
                 final Edge f = g.edgeAt(u, j);
-                if (f.bond() == Bond.UP || f.bond() == Bond.DOWN) {
+                if (f.bond().directional()) {
                     if (first == null || ordering[f.other(u)] < ordering[first.other(u)])
                         first = f;
                 }

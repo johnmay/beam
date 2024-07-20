@@ -162,6 +162,8 @@ final class RemoveUpDownBonds extends AbstractFunction<Graph,Graph> {
                     break;
                 case UP:
                 case DOWN:
+                case UP_AROMATIC:
+                case DOWN_AROMATIC:
                     edges.add(f);
                     break;
             }

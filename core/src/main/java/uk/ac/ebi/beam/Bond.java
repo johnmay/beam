@@ -109,6 +109,34 @@ public enum Bond {
         @Override boolean directional() {
             return true;
         }
+    },
+    /**
+     * This is an internal quirk to allow the aromaticity of input to be preserved when
+     * we kekulize. The up/down bonds may be between aromatic atoms:
+     * {@code O=c1cccc\c1=C/C} Since the double bond is exo, the / \ must be aromatic.
+     */
+    UP_AROMATIC("/", 1) {
+        @Override public Bond inverse() {
+            return DOWN_AROMATIC;
+        }
+
+        @Override boolean directional() {
+            return true;
+        }
+    },
+    /**
+     * This is an internal quirk to allow the aromaticity of input to be preserved when
+     * we kekulize. The up/down bonds may be between aromatic atoms:
+     * {@code O=c1cccc\c1=C/C} Since the double bond is exo, the / \ must be aromatic.
+     */
+    DOWN_AROMATIC("\\", 1) {
+        @Override public Bond inverse() {
+            return UP_AROMATIC;
+        }
+
+        @Override boolean directional() {
+            return true;
+        }
     };
 
     /** The token for the bond in the SMILES grammar. */

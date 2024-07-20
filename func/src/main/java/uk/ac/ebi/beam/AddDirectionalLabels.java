@@ -246,14 +246,16 @@ final class AddDirectionalLabels
                         return Status.COMPLETED;
                     break;
                 case UP:
+                case UP_AROMATIC:
                 case DOWN:
+                case DOWN_AROMATIC:
                     if (explicit != null) {
 
                         if (acc.containsKey(explicit))
                             explicit = acc.get(explicit);
 
                         // original bonds are invalid
-                        if ((f.bond() == Bond.UP || f.bond() == Bond.DOWN) && explicit.bond(u).inverse() != f.bond(u)) {
+                        if ((f.bond().directional()) && explicit.bond(u).inverse() != f.bond(u)) {
                             return Status.INVALID;
                         }
                         

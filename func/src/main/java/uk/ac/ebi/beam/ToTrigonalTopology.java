@@ -63,8 +63,7 @@ final class ToTrigonalTopology extends AbstractFunction<Graph,Graph> {
         // change edges (only changed added to replacement)
         for (int u = 0; u < g.order(); u++) {
             for (final Edge e : g.edges(u)) {
-                if (e.other(u) > u && e.bond() == Bond.UP || e
-                        .bond() == Bond.DOWN) {
+                if (e.other(u) > u && e.bond().directional()) {
                     replacements.put(e,
                                      new Edge(u, e.other(u), Bond.IMPLICIT));
                 }
@@ -181,11 +180,11 @@ final class ToTrigonalTopology extends AbstractFunction<Graph,Graph> {
     }
 
     static boolean isUp(Bond b) {
-        return b == Bond.UP;
+        return b == Bond.UP || b == Bond.UP_AROMATIC;
     }
 
     static boolean isDown(Bond b) {
-        return b == Bond.DOWN;
+        return b == Bond.DOWN || b == Bond.DOWN_AROMATIC;
     }
 
     private List<Edge> doubleBondLabelledEdges(Graph g) {

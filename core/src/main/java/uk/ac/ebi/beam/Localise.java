@@ -95,6 +95,20 @@ final class Localise {
                 int v = e.other(u);
                 if (v < u) {
                     switch (e.bond()) {
+                        case UP:
+                        case UP_AROMATIC:
+                            if (aromatic.get(u) && aromatic.get(v))
+                                e.bond(Bond.UP_AROMATIC);
+                            else
+                                e.bond(Bond.UP);
+                            break;
+                        case DOWN:
+                        case DOWN_AROMATIC:
+                            if (aromatic.get(u) && aromatic.get(v))
+                                e.bond(Bond.DOWN_AROMATIC);
+                            else
+                                e.bond(Bond.DOWN);
+                            break;
                         case SINGLE:
                             if (aromatic.get(u) && aromatic.get(v)) {
                                 e.bond(Bond.SINGLE);
