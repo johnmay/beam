@@ -192,7 +192,7 @@ final class Localise {
             case Boron:
                 return (q == 0) && deg == 3;
             case Carbon:
-                return (q == 1 || q == -1) && deg == 3;
+                return ((q == 1 || q == -1) && deg == 3) || (q == 0 && deg == 4);
             case Silicon:
             case Germanium:
                 return q < 0;

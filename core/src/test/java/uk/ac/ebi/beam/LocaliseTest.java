@@ -360,6 +360,14 @@ public class LocaliseTest {
         test("c1cc(c([n+]c1)N)[N+](=O)[O-]",
              "C1=CC(=C([N+]=C1)N)[N+](=O)[O-]");
     }
+
+    @Test public void acyclicValence() throws Exception {
+        test("[cH3]cc", "[CH3]C=C");
+        test("[cH2+][cH2-]", "[CH2+][CH2-]");
+        test("[cH+][cH-]", "[CH+]=[CH-]");
+        test("[nH2]cc", "[NH2]C=C");
+        test("[oH]cc", "[OH]C=C");
+    }
     
     @Test public void smallRingTest_5() throws Exception {
         Graph g = Graph.fromSmiles("C1CCCC1");
