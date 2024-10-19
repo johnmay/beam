@@ -439,8 +439,22 @@ final class Generator {
                                             .toLowerCase(Locale.ENGLISH)
                                       : atom.element()
                                             .symbol());
-            if (c != Configuration.UNKNOWN)
-                sb.append(c.shorthand().symbol());
+            if (c != Configuration.UNKNOWN) {
+                switch (c.type()) {
+                    case SquarePlanar:
+                        sb.append(g.degree(idx) == 4 ? c.shorthand().symbol() : c.symbol());
+                        break;
+                    case TrigonalBipyramidal:
+                        sb.append(g.degree(idx) == 5 ? c.shorthand().symbol() : c.symbol());
+                        break;
+                    case Octahedral:
+                        sb.append(g.degree(idx) == 6 ? c.shorthand().symbol() : c.symbol());
+                        break;
+                    default:
+                        sb.append(c.shorthand().symbol());
+                        break;
+                }
+            }
             if (atom.hydrogens() > 0 && !hExpand)
                 sb.append(Element.Hydrogen.symbol());
             if (atom.hydrogens() > 1 && !hExpand)
