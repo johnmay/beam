@@ -32,8 +32,6 @@ package uk.ac.ebi.beam;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -195,11 +193,23 @@ public final class GraphBuilder {
      * Start building a tetrahedral configuration.
      *
      * @param u the central atom
-     * @return a {@link TetrahedralBuilder} to create the stereo-configuration
+     * @return a {@link AtomStereoBuilder} to create the stereo-configuration
      *         from
      */
     public TetrahedralBuilder tetrahedral(int u) {
         return new TetrahedralBuilder(this, u);
+    }
+
+    /**
+     * Start building an atom stereo configuration (tetrahedral/square planar/
+     * octahedral/trigonal bipyramidal).
+     *
+     * @param u the central atom
+     * @return a {@link AtomStereoBuilder} to create the stereo-configuration
+     *         from
+     */
+    public AtomStereoBuilder atomStereo(int u, Configuration configuration) {
+        return new AtomStereoBuilder(this, u).config(configuration);
     }
 
     /** Start building the geometric configuration of the double bond 'u' / 'v'. */
@@ -231,7 +241,7 @@ public final class GraphBuilder {
     /**
      * (internal) Add a topology to the chemical graph. The topologies should be
      * created using one of the configuration builders (e.g. {@link
-     * TetrahedralBuilder}).
+     * AtomStereoBuilder}).
      *
      * @param t the topology to add
      */
@@ -729,6 +739,119 @@ public final class GraphBuilder {
                                                       vs[0], vs[1], vs[2]
                                               },
                                               config);
+            gb.topology(u, t);
+            return gb;
+        }
+    }
+
+    /** @author John Mayfield */
+    public static final class AtomStereoBuilder {
+
+        /**
+         * Reference to the graph builder we came from - allows us to add the
+         * topology once the configuration as been built.
+         */
+        final GraphBuilder gb;
+
+        /** Central/Focus vertex. */
+        final int u;
+
+        /** The vertex we are looking from. */
+        int v;
+
+        /** The other neighbors */
+        int[] vs;
+
+        /** The configuration of the other neighbors */
+        Configuration config;
+
+        /**
+         * (internal) - constructor for starting to configure atom stereo.
+         *
+         * @param gb the graph builder (where we came from)
+         * @param u  the vertex to
+         */
+        private AtomStereoBuilder(GraphBuilder gb,
+                                  int u) {
+            this.gb = gb;
+            this.u = u;
+        }
+
+        /**
+         * Indicate from which vertex the atom stereo. is being 'looked-at'.
+         *
+         * @param v the vertex from which we are looking from.
+         * @return tetrahedral builder for further configuration
+         */
+        public AtomStereoBuilder lookingFrom(int v) {
+            this.v = v;
+            return this;
+        }
+
+        /**
+         * Indicate the other neighbors of atom stereo (excluding the vertex we
+         * are looking from). There should be exactly 3 neighbors.
+         *
+         * @param vs the neighbors
+         * @return tetrahedral builder for further configuration
+         * @throws IllegalArgumentException when there was not exactly 3
+         *                                  neighbors
+         */
+        public AtomStereoBuilder neighbors(int[] vs) {
+            this.vs = vs;
+            return this;
+        }
+
+        /**
+         * Indicate the other neighbors of atom stereo (excluding the vertex we
+         * are looking from).
+         *
+         * @param u a neighbor
+         * @param v another neighbor
+         * @param w another neighbor
+         * @return tetrahedral builder for further configuration
+         */
+        public AtomStereoBuilder neighbors(int u, int v, int w) {
+            return neighbors(new int[]{u, v, w});
+        }
+
+        /**
+         * Specify the winding of the {@link #neighbors(int, int, int)}.
+         *
+         * @param c configuration
+         * @return tetrahedral builder for further configuration
+         */
+        public AtomStereoBuilder config(Configuration c) {
+            this.config = c;
+            return this;
+        }
+
+        /**
+         * Finish configuring the atom stereo centre and add it to the graph.
+         *
+         * @return the graph-builder to add more atoms/bonds or stereo elements
+         * @throws IllegalArgumentException configuration was missing
+         */
+        public GraphBuilder build() {
+            if (config == null)
+                throw new IllegalArgumentException("no configuration defined");
+            if (vs == null)
+                throw new IllegalArgumentException("no neighbors defined");
+            Topology t = null;
+            if (config.type() == Configuration.Type.Tetrahedral) {
+                if (vs.length != 3) throw new IllegalArgumentException("incorrect neighbour count");
+                t = Topology.tetrahedral(u, new int[]{v, vs[0], vs[1], vs[2]}, config);
+            } else if (config.type() == Configuration.Type.SquarePlanar) {
+                if (vs.length != 3) throw new IllegalArgumentException("incorrect neighbour count");
+                t = Topology.squarePlanar(u, new int[]{v, vs[0], vs[1], vs[2]}, config);
+            } else if (config.type() == Configuration.Type.TrigonalBipyramidal) {
+                if (vs.length != 4) throw new IllegalArgumentException("incorrect neighbour count");
+                t = Topology.trigonalBipyramidal(u, new int[]{v, vs[0], vs[1], vs[2], vs[3]}, config);
+            } else if (config.type() == Configuration.Type.Octahedral) {
+                if (vs.length != 5) throw new IllegalArgumentException("incorrect neighbour count");
+                t = Topology.octahedral(u, new int[]{v, vs[0], vs[1], vs[2], vs[3], vs[4]}, config);
+            } else
+                throw new IllegalArgumentException("Unimplemented config type: " + config);
             gb.topology(u, t);
             return gb;
         }

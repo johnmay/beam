@@ -270,7 +270,7 @@ abstract class Topology {
         }
     }
 
-    private static Topology trigonalBipyramidal(int u, int[] vs, Configuration c) {
+    static Topology trigonalBipyramidal(int u, int[] vs, Configuration c) {
         if (Configuration.TB1.ordinal() <= c.ordinal() &&
                 Configuration.TB20.ordinal() >= c.ordinal()) {
             int order = 1 + c.ordinal() - Configuration.TB1.ordinal();
@@ -279,7 +279,7 @@ abstract class Topology {
         return null;
     }
 
-    private static Topology octahedral(int u, int[] vs, Configuration c) {
+    static Topology octahedral(int u, int[] vs, Configuration c) {
         if (Configuration.OH1.ordinal() <= c.ordinal() &&
                 Configuration.OH30.ordinal() >= c.ordinal()) {
             int order = 1 + c.ordinal() - Configuration.OH1.ordinal();
