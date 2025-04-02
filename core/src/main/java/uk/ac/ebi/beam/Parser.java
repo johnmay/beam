@@ -29,7 +29,16 @@
 
 package uk.ac.ebi.beam;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static java.util.Map.Entry;
 
@@ -65,7 +74,7 @@ final class Parser {
      * Local arrangement for ring openings.
      */
     private Map<Integer, LocalArrangement> arrangement
-            = new HashMap<Integer, LocalArrangement>(5);
+            = new HashMap<Integer, LocalArrangement>(8);
 
     private Map<Integer, Configuration> configurations
             = new HashMap<Integer, Configuration>(5);
@@ -352,16 +361,12 @@ final class Parser {
         List<Edge> begEdges = new ArrayList<>(getLocalEdges(beg));
         if (begh)
             begEdges.add(start.contains(beg) ? 0 : 1, null);
-        for (Edge bEdge : getLocalEdges(beg)) {
+        for (Edge bEdge : begEdges) {
             if (bEdge == null) {
                 carriers[i++] = beg;
                 continue;
             }
             int bnbr = bEdge.other(beg);
-            if (beg < bnbr && begh) {
-                carriers[i++] = beg;
-                begh = false;
-            }
             if (bEdge.bond() == Bond.DOUBLE) {
                 // neighbors next to end
                 List<Edge> endEdges = new ArrayList<>(getLocalEdges(end));

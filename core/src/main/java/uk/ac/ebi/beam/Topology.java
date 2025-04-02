@@ -164,20 +164,23 @@ abstract class Topology {
      * @param rank rank of vertices
      * @return sorted array (cpy of vs)
      */
-    static int[] sort(int[] vs, int[] rank) {
-        int[] ws = Arrays.copyOf(vs, vs.length);
-
+    static void sort(int[] vs, int[] rank, int beg, int end) {
         // insertion sort using rank for the ordering
-        for (int i = 0, j = i; i < vs.length - 1; j = ++i) {
-            int v = ws[i + 1];
-            while (rank[v] < rank[ws[j]]) {
-                ws[j + 1] = ws[j];
+        for (int i = beg, j = i; i < end - 1; j = ++i) {
+            int v = vs[i + 1];
+            while (rank[v] < rank[vs[j]]) {
+                vs[j + 1] = vs[j];
                 if (--j < 0)
                     break;
             }
-            ws[j + 1] = v;
+            vs[j + 1] = v;
         }
-        return ws;
+    }
+
+    static int[] sort(int[] vs, int[] rank) {
+        int[] cpy = Arrays.copyOf(vs, vs.length);
+        sort(cpy, rank, 0, vs.length);
+        return cpy;
     }
 
     /**
@@ -221,7 +224,6 @@ abstract class Topology {
                                                        + "invalid extended tetrahedral configuration");
 
         int p = configuration.shorthand() == CLOCKWISE ? 1 : -1;
-
         return new ExtendedTetrahedral(u,
                                        Arrays.copyOf(vs, vs.length),
                                        p);
@@ -529,9 +531,15 @@ abstract class Topology {
 
         /** @inheritDoc */
         @Override Topology orderBy(int[] rank) {
-            return new ExtendedTetrahedral(u,
-                                           sort(vs, rank),
-                                           p * parity4(vs, rank));
+            int[] cpy = Arrays.copyOf(vs, vs.length);
+            sort(cpy, rank, 0, 2);
+            sort(cpy, rank, 2, 4);
+            int p2 = p;
+            if (rank[vs[1]] < rank[vs[0]])
+                p2 *= -1;
+            if (rank[vs[3]] < rank[vs[2]])
+                p2 *= -1;
+            return new ExtendedTetrahedral(u, cpy, p2);
         }
 
         /** @inheritDoc */

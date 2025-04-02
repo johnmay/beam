@@ -569,5 +569,10 @@ public class GraphTest {
                    CoreMatchers.is("CCCO[PH]1(OC[C@@H]2[C@@H](O1)[C@@]([C@@H](O2)n3cnc4c3nc(nc4OCC)N)(C)F)O"));
     }
 
-
+    @Test public void alleneWindingWithRingClosures() throws IOException {
+        Assert.assertEquals("C(=[C@]=CBr)F",
+                            Graph.fromSmiles("C1=[C@]=CBr.F1").toSmiles());
+        Assert.assertEquals("FC=[C@@]=CBr",
+                            Graph.fromSmiles("F1.C1=[C@]=CBr").toSmiles());
+    }
 }
