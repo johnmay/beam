@@ -359,8 +359,10 @@ final class Parser {
         boolean begh = g.implHCount(beg) == 1;
         boolean endh = g.implHCount(end) == 1;
         List<Edge> begEdges = new ArrayList<>(getLocalEdges(beg));
-        if (begh)
+
+        if (begh || g.degree(beg) == 2)
             begEdges.add(start.contains(beg) ? 0 : 1, null);
+
         for (Edge bEdge : begEdges) {
             if (bEdge == null) {
                 carriers[i++] = beg;
@@ -370,8 +372,10 @@ final class Parser {
             if (bEdge.bond() == Bond.DOUBLE) {
                 // neighbors next to end
                 List<Edge> endEdges = new ArrayList<>(getLocalEdges(end));
-                if (endh)
+
+                if (endh || g.degree(end) == 2)
                     endEdges.add(1, null);
+
                 for (Edge eEdge : endEdges) {
                     if (eEdge == null)
                         carriers[i++] = end;
@@ -488,6 +492,7 @@ final class Parser {
                     warnings.add("SquarePlanar without 6 explicit neighbours");
                 return;
             }
+
             g.addTopology(Topology.create(u, us, es, c));
         }
     }

@@ -546,6 +546,14 @@ public class GraphTest {
         Assert.assertThat(g.topologyOf(3).configuration(), is(Configuration.AL2));
     }
 
+
+    @Test public void extendedTetrahedralNitrogen() throws InvalidSmilesException {
+        Graph g = Graph.fromSmiles("CN=[C@AL1]=NC");
+        Assert.assertThat(g.topologyOf(2).configuration(), is(Configuration.AL1));
+        g = Graph.fromSmiles("CN=[C@]=NC");
+        Assert.assertThat(g.topologyOf(2).configuration(), is(Configuration.AL1));
+    }
+
     @Test public void testDegenerateOctahedral1() throws Exception {
         assertThat(Graph.fromSmiles("N[Co@OH1]N").toSmiles(),
                    containsString("N[Co@OH1]N"));
