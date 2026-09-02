@@ -86,7 +86,7 @@ final class NormaliseDirectionalLabels
                     if (cmp != 0) return cmp;
                     int max1 = Math.max(ordering[u1], ordering[v1]);
                     int max2 = Math.max(ordering[u2], ordering[v2]);
-                    return max1 - max2;
+                    return Integer.compare(max1, max2);
                 }
             });
 
