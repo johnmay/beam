@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, European Bioinformatics Institute (EMBL-EBI)
+ * Copyright (c) 2026, John Mayfield
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,62 +26,16 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  */
-
 package uk.ac.ebi.beam;
 
-import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 /**
- * Unit tests verify correct handling of atom class in bracket atoms.
- *
- * @author John May
+ * Parsing mode, this sets how strict the SMILES parser is.
  */
-public class ParsingAtomClassTest {
-
-    @Test(expected = InvalidSmilesException.class)
-    public void invalid() throws Exception {
-        verify(":", 0);
-    }
-
-    @Test public void none() throws Exception {
-        verify("", 0);
-    }
-
-    @Test public void none2() throws Exception {
-        verify("]", 0);
-    }
-
-    @Test public void zero() throws Exception {
-        verify(":0", 0);
-    }
-
-    @Test public void one() throws Exception {
-        verify(":1", 1);
-    }
-
-    @Test public void two() throws Exception {
-        verify(":2", 2);
-    }
-
-    @Test public void fortyTwo() throws Exception {
-        verify(":42", 42);
-    }
-
-    @Test public void fivePadded() throws Exception {
-        verify(":005", 5);
-    }
-
-    @Test public void fortyTwoPadded() throws Exception {
-        verify(":042", 42);
-    }
-
-    private void verify(String str, int atomClass) throws
-                                                   InvalidSmilesException {
-        assertThat(new Parser(CharBuffer.fromString(""), Mode.Default)
-                           .readClass(CharBuffer.fromString(str)),
-                   is(atomClass));
-    }
+public enum Mode {
+    /* Fail (exception) on errors and warnings. */
+    Strict,
+    /* Fail (exception) on errors only. */
+    Default,
+    /* Treat recoverable errors as warnings. */
+    Relaxed
 }

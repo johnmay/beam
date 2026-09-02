@@ -29,6 +29,7 @@
 
 package uk.ac.ebi.beam;
 
+import javax.swing.plaf.nimbus.AbstractRegionPainter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -103,9 +104,9 @@ final class Parser {
     private int openRings = 0;
 
     /**
-     * Strict parsing.
+     * Parsing mode
      */
-    private final boolean strict;
+    private Mode mode;
 
     private BitSet checkDirectionalBonds = new BitSet();
 
@@ -120,15 +121,16 @@ final class Parser {
      * Create a new parser for the specified buffer.
      *
      * @param buffer character buffer holding a SMILES string
+     * @param mode the mode
      * @throws InvalidSmilesException thrown if the SMILES could not be parsed
      */
-    Parser(CharBuffer buffer, boolean strict) throws InvalidSmilesException {
-        this.strict = strict;
+    Parser(CharBuffer buffer, Mode mode) throws InvalidSmilesException {
+        this.mode = mode;
         g = new Graph(1 + (2 * (buffer.length() / 3)));
         readSmiles(buffer);
-        if (openRings > 0)
+        if (openRings > 0 && mode != Mode.Relaxed)
             throw new InvalidSmilesException("Unclosed ring detected, SMILES may be truncated:", buffer);
-        if (stack.size() > 1)
+        if (stack.size() > 1 && mode != Mode.Relaxed)
             throw new InvalidSmilesException("Unclosed branch detected, SMILES may be truncated:", buffer);
         start.add(0); // always include first vertex as start
         if (g.getFlags(Graph.HAS_STRO) != 0) {
@@ -169,7 +171,7 @@ final class Parser {
      * @throws InvalidSmilesException thrown if the SMILES could not be parsed
      */
     Parser(String str) throws InvalidSmilesException {
-        this(CharBuffer.fromString(str), false);
+        this(CharBuffer.fromString(str), Mode.Default);
     }
 
     /**
@@ -181,7 +183,7 @@ final class Parser {
      * @throws InvalidSmilesException
      */
     static Graph strict(String str) throws InvalidSmilesException {
-        return new Parser(CharBuffer.fromString(str), true).molecule();
+        return new Parser(CharBuffer.fromString(str), Mode.Strict).molecule();
     }
 
     /**
@@ -194,8 +196,8 @@ final class Parser {
      * @return a graph created with the loose parser
      * @throws InvalidSmilesException
      */
-    static Graph losse(String str) throws InvalidSmilesException {
-        return new Parser(CharBuffer.fromString(str), false).molecule();
+    static Graph relaxed(String str) throws InvalidSmilesException {
+        return new Parser(CharBuffer.fromString(str), Mode.Relaxed).molecule();
     }
 
     /**
@@ -272,7 +274,7 @@ final class Parser {
                 String errorPos = InvalidSmilesException.display(buffer,
                                                                  offset1 - buffer.length(),
                                                                  offset2 - buffer.length());
-                if (strict)
+                if (mode == Mode.Strict)
                     throw new InvalidSmilesException("Ignored invalid Cis/Trans specification: " + errorPos);
                 else
                     warnings.add("Ignored invalid Cis/Trans specification: " + errorPos);
@@ -289,7 +291,7 @@ final class Parser {
                 String errorPos = InvalidSmilesException.display(buffer,
                                                                  offset1 - buffer.length(),
                                                                  offset2 - buffer.length());
-                if (strict)
+                if (mode == Mode.Strict)
                     throw new InvalidSmilesException("Ignored invalid Cis/Trans specification: " + errorPos);
                 else
                     warnings.add("Ignored invalid Cis/Trans specification: " + errorPos);
@@ -391,6 +393,36 @@ final class Parser {
         return carriers;
     }
 
+
+    private void warning(String mesg) throws InvalidSmilesException {
+        if (mode == Mode.Strict)
+            throw new InvalidSmilesException(mesg);
+        else
+            warnings.add(mesg);
+    }
+
+    private void warning(String mesg, CharBuffer input) throws InvalidSmilesException {
+        if (mode == Mode.Strict)
+            throw new InvalidSmilesException(mesg, input);
+        else
+            warnings.add(mesg);
+    }
+
+    private void error(String mesg) throws InvalidSmilesException {
+        if (mode != Mode.Relaxed)
+            throw new InvalidSmilesException(mesg);
+        else
+            warnings.add(mesg);
+    }
+
+    private void error(String mesg, CharBuffer input) throws InvalidSmilesException {
+        if (mode != Mode.Relaxed)
+            throw new InvalidSmilesException(mesg, input, input.position());
+        else
+            warnings.add(mesg);
+    }
+
+
     /**
      * Add a topology for vertex 'u' with configuration 'c'. If the atom 'u' was
      * involved in a ring closure the local arrangement is used instead of the
@@ -415,10 +447,7 @@ final class Parser {
             } else if (c.type() == Configuration.Type.ExtendedTetrahedral) {
                 g.addFlags(Graph.HAS_EXT_STRO);
                 if ((us = getAlleneCarriers(u)) == null) {
-                    if (strict)
-                        throw new InvalidSmilesException("Invalid Allene stereo");
-                    else
-                        warnings.add("Ignored invalid Allene stereochemistry");
+                    warning("Invalid Allene stereo");
                     return;
                 }
             } else if (input.type() == Configuration.Type.SquarePlanar) {
@@ -429,24 +458,15 @@ final class Parser {
                 us = insertMultipleImplicitRefs(u, us, 6);
             } else if (c.type() == Configuration.Type.SquarePlanar &&
                        us.length != 4) {
-                if (strict)
-                    throw new InvalidSmilesException("SquarePlanar without 4 explicit neighbours");
-                else
-                    warnings.add("SquarePlanar without 4 explicit neighbours");
+                warning("SquarePlanar without 4 explicit neighbours");
                 return;
             } else if (c.type() == Configuration.Type.TrigonalBipyramidal &&
                        us.length != 5) {
-                if (strict)
-                    throw new InvalidSmilesException("TrigonalBipyramidal without 5 explicit neighbours");
-                else
-                    warnings.add("SquarePlanar without 5 explicit neighbours");
+                warning("TrigonalBipyramidal without 5 explicit neighbours");
                 return;
             } else if (c.type() == Configuration.Type.Octahedral &&
                        us.length != 6) {
-                if (strict)
-                    throw new InvalidSmilesException("Octahedral without 6 explicit neighbours");
-                else
-                    warnings.add("SquarePlanar without 6 explicit neighbours");
+                warning("Octahedral without 6 explicit neighbours");
                 return;
             }
             g.addTopology(Topology.create(u, us, es, c));
@@ -472,24 +492,15 @@ final class Parser {
                 us = insertMultipleImplicitRefs(u, us, 6);
             } else if (c.type() == Configuration.Type.SquarePlanar &&
                        us.length != 4) {
-                if (strict)
-                    throw new InvalidSmilesException("SquarePlanar without 4 explicit neighbours");
-                else
-                    warnings.add("SquarePlanar without 4 explicit neighbours");
+                warning("SquarePlanar without 4 explicit neighbours");
                 return;
             } else if (c.type() == Configuration.Type.TrigonalBipyramidal &&
                        us.length != 5) {
-                if (strict)
-                    throw new InvalidSmilesException("TrigonalBipyramidal without 5 explicit neighbours");
-                else
-                    warnings.add("SquarePlanar without 5 explicit neighbours");
+                warning("TrigonalBipyramidal without 5 explicit neighbours");
                 return;
             } else if (c.type() == Configuration.Type.Octahedral &&
                        us.length != 6) {
-                if (strict)
-                    throw new InvalidSmilesException("Octahedral without 6 explicit neighbours");
-                else
-                    warnings.add("SquarePlanar without 6 explicit neighbours");
+                warning("Octahedral without 6 explicit neighbours");
                 return;
             }
 
@@ -497,8 +508,7 @@ final class Parser {
         }
     }
 
-    private int[] insertThImplicitRef(int u, int[] vs) throws
-            InvalidSmilesException {
+    private int[] insertThImplicitRef(int u, int[] vs) throws InvalidSmilesException {
         if (vs.length == 4)
             return vs;
         if (vs.length != 3)
@@ -534,7 +544,7 @@ final class Parser {
         if (vs.length == 3)
             return vs;
         if (vs.length != 2)
-            throw new InvalidSmilesException("Invaid number of verticies for DB1/DB2 stereo chemistry");
+            throw new InvalidSmilesException("Invalid number of vertices for DB1/DB2 stereo chemistry");
         if (start.contains(u))
             return new int[]{u, vs[0], vs[1]};
         else
@@ -656,21 +666,15 @@ final class Parser {
                 // says it's possible. The D and T here are automatic converted
                 // to [2H] and [3H].
                 case 'H':
-                    if (strict)
-                        throw new InvalidSmilesException("hydrogens should be specified in square brackets - '[H]'",
-                                                         buffer);
+                    warning("hydrogens should be specified in square brackets - '[H]'", buffer);
                     addAtom(AtomImpl.EXPLICIT_HYDROGEN, buffer);
                     break;
                 case 'D':
-                    if (strict)
-                        throw new InvalidSmilesException("deuterium should be specified as a hydrogen isotope - '[2H]'",
-                                                         buffer);
+                    warning("deuterium should be specified as a hydrogen isotope - '[2H]'", buffer);
                     addAtom(AtomImpl.DEUTERIUM, buffer);
                     break;
                 case 'T':
-                    if (strict)
-                        throw new InvalidSmilesException("tritium should be specified as a hydrogen isotope - '[3H]'",
-                                                         buffer);
+                    warning("tritium should be specified as a hydrogen isotope - '[3H]'", buffer);
                     addAtom(AtomImpl.TRITIUM, buffer);
                     break;
 
@@ -694,78 +698,83 @@ final class Parser {
                     break;
                 case '%':
                     int num = buffer.getNumber(2);
-                    if (num < 0)
-                        throw new InvalidSmilesException("a number (<digit>+) must follow '%':", buffer);
-                    if (strict && num < 10)
-                        throw new InvalidSmilesException("two digits must follow '%'", buffer);
+                    if (num < 0) {
+                        error("a number (<digit>+) must follow '%':", buffer);
+                        continue;
+                    }
+                    if (num < 10) {
+                        warning("two digits must follow '%'", buffer);
+                    }
                     ring(num, buffer);
                     lastBondPos = buffer.position();
                     break;
 
                 // bond/dot
                 case '-':
-                    if (bond != Bond.IMPLICIT)
-                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);
+                    if (bond != Bond.IMPLICIT || stack.empty())
+                        error("Invalid bond:", buffer);
                     bond = Bond.SINGLE;
                     lastBondPos = buffer.position();
                     break;
                 case '=':
-                    if (bond != Bond.IMPLICIT)
-                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);
+                    if (bond != Bond.IMPLICIT || stack.empty())
+                        error("Invalid bond:", buffer);
                     bond = Bond.DOUBLE;
                     lastBondPos = buffer.position();
                     break;
                 case '#':
-                    if (bond != Bond.IMPLICIT)
-                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);
+                    if (bond != Bond.IMPLICIT || stack.empty())
+                        error("Invalid bond:", buffer);
                     bond = Bond.TRIPLE;
                     lastBondPos = buffer.position();
                     break;
                 case '$':
-                    if (bond != Bond.IMPLICIT)
-                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);
+                    if (bond != Bond.IMPLICIT || stack.empty())
+                        error("Invalid bond:", buffer);
                     bond = Bond.QUADRUPLE;
                     lastBondPos = buffer.position();
                     break;
                 case ':':
-                    if (bond != Bond.IMPLICIT)
-                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);
+                    if (bond != Bond.IMPLICIT || stack.empty())
+                        error("Invalid bond:", buffer);
                     g.addFlags(Graph.HAS_AROM);
                     bond = Bond.AROMATIC;
                     lastBondPos = buffer.position();
                     break;
                 case '/':
-                    if (bond != Bond.IMPLICIT)
-                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);
+                    if (bond != Bond.IMPLICIT || stack.empty())
+                        error("Invalid bond:", buffer);
                     bond = Bond.UP;
                     lastBondPos = buffer.position();
                     g.addFlags(Graph.HAS_BND_STRO);
                     break;
                 case '\\':
                     // we allow C\\C=C/C since it could be an escaping error
-                    if (bond != Bond.IMPLICIT && bond != Bond.DOWN)
-                        throw new InvalidSmilesException("Multiple bonds specified:", buffer);
+                    if (bond != Bond.IMPLICIT && bond != Bond.DOWN || stack.empty())
+                        error("Invalid bond:", buffer);
                     bond = Bond.DOWN;
                     lastBondPos = buffer.position();
                     g.addFlags(Graph.HAS_BND_STRO);
                     break;
                 case '.':
                     if (bond != Bond.IMPLICIT)
-                        throw new InvalidSmilesException("Bond specified before disconnection:", buffer);
+                        error("Invalid disconnection:", buffer);
                     bond = Bond.DOT;
                     break;
 
                 // branching
                 case '(':
-                    if (stack.empty())
-                        throw new InvalidSmilesException("Cannot open branch at this position, SMILES may be truncated:",
-                                                         buffer);
+                    if (stack.empty()) {
+                        error("Cannot open branch at this position, SMILES may be truncated:", buffer);
+                        continue;
+                    }
                     stack.push(stack.peek());
                     break;
                 case ')':
-                    if (stack.size() < 2)
-                        throw new InvalidSmilesException("Closing of an unopened branch, SMILES may be truncated:",
-                                                         buffer);
+                    if (stack.size() < 2) {
+                        error("Closing of an unopened branch, SMILES may be truncated:", buffer);
+                        continue;
+                    }
                     stack.pop();
                     break;
 
@@ -787,6 +796,11 @@ final class Parser {
                 case '\r':
                     return;
 
+                case ']':
+                case '@':
+                case '+':
+                    error("unexpected character:", buffer);
+                    continue;
                 default:
                     throw new InvalidSmilesException("unexpected character:", buffer);
             }
@@ -814,8 +828,10 @@ final class Parser {
 
         boolean arbitraryLabel = false;
 
-        if (!buffer.hasRemaining())
-            throw new InvalidSmilesException("Unclosed bracket atom, SMILES may be truncated", buffer);
+        if (!buffer.hasRemaining()) {
+            error("Unclosed bracket atom, SMILES may be truncated", buffer);
+            return AtomImpl.AliphaticSubset.Any;
+        }
 
         final int isotope = buffer.getNumber();
         final boolean aromatic = buffer.next() >= 'a' && buffer.next() <= 'z';
@@ -823,15 +839,15 @@ final class Parser {
         if (element == Element.Unknown)
             hasAstrix = true;
 
-        if (strict && element == null)
-            throw new InvalidSmilesException("unrecognised element symbol, SMILES may be truncated: ", buffer);
+        if (mode == Mode.Strict && element == null)
+            warning("unrecognised element symbol, SMILES may be truncated: ", buffer);
 
         if (element != null && aromatic)
             g.addFlags(Graph.HAS_AROM);
 
         // element isn't aromatic as per the OpenSMILES specification
-        if (strict && aromatic && !element.aromatic(Element.AromaticSpecification.OpenSmiles))
-            throw new InvalidSmilesException("abnormal aromatic element", buffer);
+        if (mode == Mode.Strict && aromatic && !element.aromatic(Element.AromaticSpecification.OpenSmiles))
+            warning("abnormal aromatic element", buffer);
 
         if (element == null) {
             arbitraryLabel = true;
@@ -844,10 +860,12 @@ final class Parser {
         int atomClass = readClass(buffer);
 
         if (!arbitraryLabel && !buffer.getIf(']')) {
-            if (strict) {
+            if (mode == Mode.Strict) {
                 throw InvalidSmilesException.invalidBracketAtom(buffer);
-            } else {
+            } else if (buffer.hasRemaining()) {
                 arbitraryLabel = true;
+            } else {
+                error("Unclosed bracket atom!");
             }
         }
 
@@ -866,9 +884,7 @@ final class Parser {
                 end++;
             }
             if (depth != 0)
-                throw new InvalidSmilesException("unparsable label in bracket atom",
-                                                 buffer,
-                                                 buffer.position - 1);
+                error("Unclosed bracket atom", buffer);
             String label = buffer.substr(start, end);
             hasAstrix = true;
             return new AtomImpl.BracketAtom(label);
@@ -945,11 +961,11 @@ final class Parser {
      * @see <a href="http://www.opensmiles.org/opensmiles.html#atomclass">Atom
      * Class - OpenSMILES Specification</a>
      */
-    static int readClass(CharBuffer buffer) throws InvalidSmilesException {
+    int readClass(CharBuffer buffer) throws InvalidSmilesException {
         if (buffer.getIf(':')) {
             if (buffer.nextIsDigit())
                 return buffer.getNumber();
-            throw new InvalidSmilesException("invalid atom class, <digit>+ must follow ':'", buffer);
+            error("invalid atom class, <digit>+ must follow ':'", buffer);
         }
         return 0;
     }
@@ -961,14 +977,14 @@ final class Parser {
      * @throws InvalidSmilesException bond types did not match on ring closure
      */
     private void ring(int rnum, CharBuffer buffer) throws InvalidSmilesException {
-        if (bond == Bond.DOT)
-            throw new InvalidSmilesException("a ring bond can not be a 'dot':",
-                                             buffer,
-                                             buffer.position());
-        if (stack.empty())
-            throw new InvalidSmilesException("No previous atom for ring open!",
-                                             buffer,
-                                             buffer.position());
+        if (bond == Bond.DOT) {
+            error("a ring bond can not be a 'dot':", buffer);
+            return;
+        }
+        if (stack.empty()) {
+            error("No previous atom for ring open!", buffer);
+            return;
+        }
 
         if (rings.length <= rnum || rings[rnum] == null)
             openRing(rnum, buffer);
@@ -1035,9 +1051,11 @@ final class Parser {
             throw new InvalidSmilesException("Endpoints of ringbond are the same - loops are not allowed",
                                              buffer);
 
-        if (g.adjacent(u, v))
-            throw new InvalidSmilesException("Endpoints of ringbond are already connected - multi-edges are not allowed",
-                                             buffer);
+        if (g.adjacent(u, v)) {
+            error("Endpoints of ringbond are already connected - multi-edges are not allowed",
+                  buffer);
+            return;
+        }
 
         bond = decideBond(rbond.bond, bond.inverse(), rbond.pos, buffer);
 
@@ -1085,11 +1103,13 @@ final class Parser {
             return b;
         else if (b == Bond.IMPLICIT)
             return a;
-        if (strict || a.inverse() != b)
-            throw new InvalidSmilesException("Ring closure bonds did not match,  '" + a + "'!='" + b + "':" +
-                                             InvalidSmilesException.display(buffer,
-                                                                            pos - buffer.position,
-                                                                            lastBondPos - buffer.position));
+        if (mode == Mode.Strict || a.inverse() != b) {
+            error("Ring closure bonds did not match,  '" + a + "'!='" + b + "':" +
+                  InvalidSmilesException.display(buffer,
+                                                 pos - buffer.position,
+                                                 lastBondPos - buffer.position));
+            return b; // arbitrary closure takes priority
+        }
         warnings.add("Ignored invalid Cis/Trans on ring closure, should flip:" +
                      InvalidSmilesException.display(buffer, pos - buffer.position,
                                                     lastBondPos - buffer.position));

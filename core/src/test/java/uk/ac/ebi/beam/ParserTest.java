@@ -108,7 +108,7 @@ public class ParserTest {
     }
 
     @Test public void hydrogen() throws IOException {
-        Graph g = Parser.losse("HH");
+        Graph g = Parser.parse("HH");
         assertThat(g.order(), is(2));
         assertThat(g.toSmiles(), is("[H][H]"));
     }
@@ -119,7 +119,7 @@ public class ParserTest {
     }
 
     @Test public void deuterium() throws IOException {
-        Graph g = Parser.losse("DD");
+        Graph g = Parser.parse("DD");
         assertThat(g.order(), is(2));
         assertThat(g.toSmiles(), is("[2H][2H]"));
     }
@@ -130,7 +130,7 @@ public class ParserTest {
     }
 
     @Test public void tritium() throws IOException {
-        Graph g = Parser.losse("TT");
+        Graph g = Parser.parse("TT");
         assertThat(g.order(), is(2));
         assertThat(g.toSmiles(), is("[3H][3H]"));
     }
@@ -148,7 +148,7 @@ public class ParserTest {
     }
 
     @Test public void tellurium() throws IOException {
-        Graph g = Parser.losse("[te]");
+        Graph g = Parser.relaxed("[te]");
         assertTrue(g.atom(0).aromatic());
         assertThat(g.atom(0).element(), is(Element.Tellurium));
     }

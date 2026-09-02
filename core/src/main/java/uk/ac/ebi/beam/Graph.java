@@ -428,7 +428,7 @@ public final class Graph {
                                                InvalidSmilesException {
         if (smi == null)
             throw new NullPointerException("no SMILES provided");
-        Parser parser = new Parser(CharBuffer.fromString(smi), false);
+        Parser parser = new Parser(CharBuffer.fromString(smi), Mode.Default);
         for (String warn : parser.getWarnings()) {
             for (String line : warn.split("\n"))
               System.err.println("SMILES Warning: " + line);
@@ -436,10 +436,10 @@ public final class Graph {
         return parser.molecule();
     }
 
-    public static Graph parse(String smi, boolean strict, Set<String> warnings) throws InvalidSmilesException {
+    public static Graph parse(String smi, Mode mode, Set<String> warnings) throws InvalidSmilesException {
         if (smi == null)
             throw new NullPointerException("no SMILES provided");
-        Parser parser = new Parser(CharBuffer.fromString(smi), strict);
+        Parser parser = new Parser(CharBuffer.fromString(smi), mode);
         warnings.addAll(parser.getWarnings());
         return parser.molecule();
     }
