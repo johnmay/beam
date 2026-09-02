@@ -113,7 +113,8 @@ public final class Graph {
         this.degrees    = new int[order];
         this.edges      = new Edge[order][];
         this.topologies = Arrays.copyOf(org.topologies, org.topologies.length);
-        
+        this.title      = org.title;
+
         for (int u = 0; u < order; u++) {
             final int deg = org.degrees[u];
             this.edges[u] = new Edge[deg];
